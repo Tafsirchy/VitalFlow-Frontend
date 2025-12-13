@@ -1,9 +1,14 @@
 import React from 'react';
+import Banner from '../../Components/HomePageComponent/Banner';
+import Feature from '../../Components/HomePageComponent/Feature';
+import ContactForm from '../../Components/HomePageComponent/ContactForm';
 
 const Home = () => {
     return (
         <div>
-            Home
+            <Banner></Banner>
+            <Feature></Feature>
+            <ContactForm></ContactForm>
         </div>
     );
 };

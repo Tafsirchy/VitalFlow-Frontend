@@ -1,2 +1,55 @@
 @import "tailwindcss";
 @plugin "daisyui";
+
+@import "tailwindcss";
+@plugin "daisyui";
+
+/* ================================
+   VitalFlow Global Color Theme
+   ================================ */
+:root {
+  /* 🔴 Primary (Blood Red) */
+  --primary-red: #C62828;
+  --primary-red-hover: #B71C1C;
+  --primary-red-light: #FFEBEE;
+
+  /* 🔵 Secondary (Trust Blue) */
+  --secondary-blue: #0D47A1;
+  --secondary-blue-hover: #08306B;
+  --secondary-blue-light: #E3F2FD;
+
+  /* 🟢 Success / Life Green */
+  --success-green: #2E7D32;
+  --success-green-light: #E8F5E9;
+
+  /* ⚪ Backgrounds */
+  --background-main: #FAFAFA;
+  --background-card: #FFFFFF;
+
+  /* ✍️ Text */
+  --text-primary: #212121;
+  --text-secondary: #616161;
+  --text-muted: #9E9E9E;
+  --text-on-dark: #FFFFFF;
+
+  /* 🧱 Borders */
+  --border-light: #E0E0E0;
+}
+
+/* ================================
+   Dark Mode
+   ================================ */
+[data-theme="dark"] {
+  --background-main: #121212;
+  --background-card: #1E1E1E;
+
+  --text-primary: #FFFFFF;
+  --text-secondary: #BDBDBD;
+  --text-muted: #9E9E9E;
+
+  --primary-red: #EF5350;
+  --secondary-blue: #90CAF9;
+  --success-green: #66BB6A;
+
+  --border-light: #333333;
+}
