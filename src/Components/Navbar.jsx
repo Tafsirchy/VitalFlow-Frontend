@@ -113,7 +113,7 @@ const Navbar = () => {
                 className="menu dropdown-content mt-3 w-40 rounded-box bg-white shadow text-[#043915]"
               >
                 <li>
-                  <Link to="/dashboard/main">Dashboard</Link>
+                  <Link to="/dashboard">Dashboard</Link>
                 </li>
                 <li>
                   <button

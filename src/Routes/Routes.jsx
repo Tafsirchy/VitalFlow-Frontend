@@ -5,6 +5,7 @@ import Login from "../Pages/Login";
 import Register from "../Pages/Register";
 import DashboardLayout from "../DashboardLayout/DashboardLayout";
 import MainDashboard from "../Pages/Dashboard/MainDashboard/MainDashboard";
+import AddRequest from "../Pages/Dashboard/AddRequest/AddRequest";
 
 const router = createBrowserRouter([
   {
@@ -26,17 +27,17 @@ const router = createBrowserRouter([
     ],
   },
   {
-    path: "/dashboard",
+    path: "dashboard",
     element: <DashboardLayout></DashboardLayout>,
     children: [
       {
-        path: "main",
+        path: "/dashboard",
         element: <MainDashboard></MainDashboard>
       },
-      // {
-      //   path: "add-products",
-      //   element: <AddProduct></AddProduct>,
-      // },
+      {
+        path: "add-request",
+        element: <AddRequest></AddRequest>
+      },
       // {
       //   path: "manage-products",
       //   element: <ManageProduct></ManageProduct>,

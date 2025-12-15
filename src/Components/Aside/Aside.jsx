@@ -22,9 +22,9 @@ const Aside = ({ onLogout }) => {
       <nav className="flex-1 px-4 py-4 space-y-1">
         <NavItem to="/dashboard" icon={<LayoutDashboard />} label="Dashboard" />
         <NavItem
-          to="/dashboard/add-products"
+          to="/dashboard/add-request"
           icon={<Package />}
-          label="Add Products"
+          label="Add Request"
         />
         <NavItem
           to="/dashboard/manage-products"
