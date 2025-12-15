@@ -1,19 +1,34 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { AuthContext } from "../Provider/AuthProvider";
 import { toast } from "react-toastify";
 import Loading from "../Components/Loading";
-import register from "../assets/register.jpg"
+import register from "../assets/register.jpg";
 import { Eye, EyeOff } from "lucide-react";
 import axios from "axios";
 
 const Register = () => {
-  const { createUser, updateUser } =
-    useContext(AuthContext);
+  const { createUser, updateUser } = useContext(AuthContext);
 
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [upazilas, setUpazilas] = useState([]);
+  const [districts, setDistricts] = useState([]);
+  const [district, setDistrict] = useState("");
+  const [upazila, setUpazila] = useState("");
+
+  useEffect(() => {
+    axios.get("/upazilas.json").then((res) => {
+      setUpazilas(res.data.upazilas);
+    });
+
+    axios.get("/districts.json").then((res) => {
+      setDistricts(res.data.districts);
+    });
+  }, []);
+
+  // console.log(upazilah, districts);
 
   const navigate = useNavigate();
 
@@ -25,8 +40,7 @@ const Register = () => {
     const email = form.email.value;
     const password = form.password.value;
     const file = photo.files[0];
-    const role = form.role.value;
-    console.log(role);
+    const blood = form.blood.value;
 
     const uppercase = /[A-Z]/;
     const lowercase = /[a-z]/;
@@ -63,9 +77,11 @@ const Register = () => {
       email,
       password,
       mainPhotoUrl,
-      role,
+      blood,
+      district,
+      upazila
     };
-
+    
     if (res.data.success == true) {
       createUser(email, password)
         .then((result) => {
@@ -85,6 +101,7 @@ const Register = () => {
             .catch((err) => {
               console.log(err);
             });
+          // toast.success("Sign Up Successful");
           toast.success("Sign Up Successful");
           navigate("/");
         })
@@ -102,7 +119,6 @@ const Register = () => {
     // return;
   };
 
-  
   {
     loading && (
       <div className="min-h-screen flex justify-center items-center">
@@ -182,10 +198,62 @@ const Register = () => {
               />
             </div>
 
-            <select name="role" defaultValue="Choose Role" className="select">
-              <option disabled={true}>Choose Role</option>
-              <option value="volunteer">Volunteer</option>
-              <option value="donor">Donor</option>
+            <label
+              // for="bloodGroup"
+              class="block mb-2 text-sm font-medium text-gray-600"
+            >
+              Blood Group
+            </label>
+            <select name="blood" required className="select w-full">
+              <option value="" disabled selected>
+                Select your blood group
+              </option>
+              <option value="A+">A+</option>
+              <option value="A-">A-</option>
+              <option value="B+">B+</option>
+              <option value="B-">B-</option>
+              <option value="AB+">AB+</option>
+              <option value="AB-">AB-</option>
+              <option value="O+">O+</option>
+              <option value="O-">O-</option>
+            </select>
+
+            <label
+              // for="bloodGroup"
+              class="block mb-2 text-sm font-medium text-gray-600"
+            >
+              District
+            </label>
+            <select
+              value={district}
+              onChange={(e) => setDistrict(e.target.value)}
+              className="select w-full"
+            >
+              <option disabled selected value="">
+                Select Your District
+              </option>
+              {districts.map((d) => (
+                <option value={d?.name}>{d?.name}</option>
+              ))}
+            </select>
+
+            <label
+              // for="bloodGroup"
+              class="block mb-2 text-sm font-medium text-gray-600"
+            >
+              Upazila
+            </label>
+            <select
+              value={upazila}
+              onChange={(e) => setUpazila(e.target.value)}
+              className="select w-full"
+            >
+              <option disabled selected value="">
+                Select Your Upazila
+              </option>
+              {upazilas.map((u) => (
+                <option value={u?.name}>{u?.name}</option>
+              ))}
             </select>
 
             <div className="relative">
@@ -218,8 +286,6 @@ const Register = () => {
             >
               {loading ? renderLoadingSpinner : "Sign Up"}
             </button>
-
-          
 
             <div className="text-center mt-6">
               <p className="text-gray-600 text-sm">
