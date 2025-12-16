@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../../Provider/AuthProvider";
 import axios from "axios";
-import useAxios from "../../../Hooks/useAxios";
 import {
   Droplet,
   Users,
@@ -15,6 +14,7 @@ import {
   HeartPulse,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import useAxiosSecure from "../../../Hooks/useAxiosSecure";
 
 const AddRequest = () => {
   const { user } = useContext(AuthContext);
@@ -24,14 +24,24 @@ const AddRequest = () => {
   const [upazila, setUpazila] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const axiosInstance = useAxios();
+  const axiosSecure = useAxiosSecure()
 
   useEffect(() => {
-    axios.get("/upazilas.json").then((res) => setUpazilas(res.data.upazilas));
-    axios
-      .get("/districts.json")
-      .then((res) => setDistricts(res.data.districts));
+    axios.get("/upazilas.json").then((res) => {
+      const sortedUpazilas = [...res.data.upazilas].sort((a, b) =>
+        a.name.localeCompare(b.name, "en", { sensitivity: "base" })
+      );
+      setUpazilas(sortedUpazilas);
+    });
+
+    axios.get("/districts.json").then((res) => {
+      const sortedDistricts = [...res.data.districts].sort((a, b) =>
+        a.name.localeCompare(b.name, "en", { sensitivity: "base" })
+      );
+      setDistricts(sortedDistricts);
+    });
   }, []);
+
 
   const handleRequest = (e) => {
     e.preventDefault();
@@ -65,7 +75,7 @@ const AddRequest = () => {
       donation_status: "pending",
     };
 
-    axiosInstance
+    axiosSecure
       .post("/requests", reqFormData)
       .then((res) => {
         setIsSubmitting(false);
@@ -151,7 +161,7 @@ const AddRequest = () => {
       {/* Form Card */}
       <motion.div variants={itemVariants}>
         <div className="card bg-base-100 shadow-2xl border border-gray-100">
-          <div className="card-body p-6 lg:p-10">
+          <form onSubmit={handleRequest} className="card-body p-6 lg:p-10">
             <div className="space-y-8">
               {/* Requester Info Section */}
               <motion.div
@@ -286,7 +296,7 @@ const AddRequest = () => {
                         name="district"
                         value={district}
                         onChange={(e) => setDistrict(e.target.value)}
-                        className="select select-bordered select-success w-full bg-white/70 backdrop-blur-sm"
+                        className="select select-bordered select-success w-full bg-white/90 backdrop-blur-sm"
                         required
                       >
                         <option value="">Select District</option>
@@ -307,7 +317,7 @@ const AddRequest = () => {
                         name="upazila"
                         value={upazila}
                         onChange={(e) => setUpazila(e.target.value)}
-                        className="select select-bordered select-success w-full bg-white/70 backdrop-blur-sm"
+                        className="select select-bordered select-success w-full bg-white/90 backdrop-blur-sm"
                         required
                       >
                         <option value="">Select Upazila</option>
@@ -433,7 +443,7 @@ const AddRequest = () => {
                 </motion.button>
               </motion.div>
             </div>
-          </div>
+          </form>
         </div>
       </motion.div>
 

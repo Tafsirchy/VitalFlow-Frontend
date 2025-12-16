@@ -429,30 +429,6 @@ const ContactUs = () => {
               </motion.div>
             </div>
 
-            {/* Response Stats */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-white rounded-xl p-4 shadow-lg text-center border border-[#E0E0E0]">
-                <div className="text-3xl font-bold text-[#C62828]">2min</div>
-                <div className="text-xs text-[#616161] mt-1">Response</div>
-              </div>
-              <div className="bg-white rounded-xl p-4 shadow-lg text-center border border-[#E0E0E0]">
-                <div className="text-3xl font-bold text-[#2E7D32]">98%</div>
-                <div className="text-xs text-[#616161] mt-1">Satisfaction</div>
-              </div>
-            </div>
-
-            {/* Trust Badge */}
-            {/* <div className="bg-gradient-to-br from-[#FFEBEE] to-white rounded-xl p-5 border-2 border-[#C62828]/20 text-center">
-              <div className="w-12 h-12 bg-[#C62828] rounded-full flex items-center justify-center mx-auto mb-3">
-                <HeartHandshake className="text-white" size={22} />
-              </div>
-              <h4 className="font-bold text-[#212121] text-sm mb-1">
-                15,000+ Donors Trust Us
-              </h4>
-              <p className="text-xs text-[#616161]">
-                Join our lifesaving community
-              </p>
-            </div> */}
 
             {/* Impact Statistics */}
             <div className="bg-white rounded-2xl p-5 shadow-xl border border-[#E0E0E0]">
@@ -485,6 +461,20 @@ const ContactUs = () => {
                 ))}
               </div>
             </div>
+            
+
+            {/* Trust Badge */}
+            {/* <div className="bg-gradient-to-br from-[#FFEBEE] to-white rounded-xl p-5 border-2 border-[#C62828]/20 text-center">
+              <div className="w-12 h-12 bg-[#C62828] rounded-full flex items-center justify-center mx-auto mb-3">
+                <HeartHandshake className="text-white" size={22} />
+              </div>
+              <h4 className="font-bold text-[#212121] text-sm mb-1">
+                15,000+ Donors Trust Us
+              </h4>
+              <p className="text-xs text-[#616161]">
+                Join our lifesaving community
+              </p>
+            </div> */}
           </motion.div>
         </div>
       </div>
