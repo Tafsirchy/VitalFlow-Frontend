@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 
 const Banner = () => {
   return (
-    <div>
+    <div className="">
       <div className="relative overflow-hidden bg-gradient-to-br from-[#FFEBEE] via-white to-[#E3F2FD] min-h-[600px] flex items-center">
         {/* Animated Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
@@ -63,7 +63,7 @@ const Banner = () => {
         </div>
 
         {/* Main Content */}
-        <div className="container mx-auto px-6 lg:px-12 relative z-10">
+        <div className="w-11/12 mx-auto px-2 relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left Content */}
             <motion.div
