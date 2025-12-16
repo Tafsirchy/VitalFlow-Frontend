@@ -29,6 +29,23 @@ const AllUsers = () => {
     }
   };
 
+  const handleRoleChange = async (email, role) => {
+    try {
+      const res = await axiosSecure.patch("/update/donor/role", {
+        email,
+        role,
+      });
+
+      if (res.data.modifiedCount > 0) {
+        setUsers((prev) =>
+          prev.map((u) => (u.email === email ? { ...u, role } : u))
+        );
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
 
   return (
     <div>
