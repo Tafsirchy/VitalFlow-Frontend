@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Link, NavLink } from "react-router";
+import { Link, NavLink, useNavigate } from "react-router";
 import {
   LayoutDashboard,
   Users,
@@ -17,10 +17,27 @@ import { AuthContext } from "../../Provider/AuthProvider";
 import { motion, AnimatePresence } from "framer-motion";
 import logo from "../../assets/image.png";
 
-const Aside = ({ onLogout }) => {
-  const { user } = useContext(AuthContext);
+/* =========================
+   Reusable NavItem Component
+========================= */
+
+/* =========================
+   Main Aside Component
+========================= */
+const Aside = () => {
+  const { role, user, logOut } = useContext(AuthContext);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogOut = () => {
+    logOut()
+      .then(() => {
+        toast.success("Logout Successfully");
+        navigate("/");
+      })
+      .catch((error) => console.error(error));
+  };
 
   useEffect(() => {
     const handleResize = () => {
@@ -34,39 +51,6 @@ const Aside = ({ onLogout }) => {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-
-  const navItems = [
-    {
-      to: "/dashboard",
-      icon: LayoutDashboard,
-      label: "Dashboard",
-      color: "from-purple-500 to-pink-500",
-    },
-    {
-      to: "/dashboard/add-request",
-      icon: Plus,
-      label: "Add Request",
-      color: "from-red-500 to-orange-500",
-    },
-    {
-      to: "/dashboard/manage-products",
-      icon: Package,
-      label: "Manage Products",
-      color: "from-blue-500 to-cyan-500",
-    },
-    {
-      to: "/admin/users",
-      icon: Users,
-      label: "Users",
-      color: "from-green-500 to-emerald-500",
-    },
-    {
-      to: "/dashboard/settings",
-      icon: Settings,
-      label: "Settings",
-      color: "from-indigo-500 to-purple-500",
-    },
-  ];
 
   return (
     <>
@@ -179,80 +163,31 @@ const Aside = ({ onLogout }) => {
 
         {/* Navigation */}
         <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto scrollbar-thin scrollbar-thumb-red-300 scrollbar-track-transparent">
-          {navItems.map((item, index) => {
-            const Icon = item.icon;
-            return (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                onClick={() => isMobile && setIsSidebarOpen(false)}
-                className={({ isActive }) => "block"}
-              >
-                {({ isActive }) => (
-                  <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    whileHover={{ scale: 1.03, x: 5 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="relative"
-                  >
-                    <div
-                      className={`
-                        flex items-center gap-3 px-4 py-3.5 rounded-2xl
-                        transition-all duration-300 relative overflow-hidden
-                        ${
-                          isActive
-                            ? "bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg shadow-red-500/30"
-                            : "text-gray-700 hover:bg-white/60 backdrop-blur-sm"
-                        }
-                      `}
-                    >
-                      {isActive && (
-                        <motion.div
-                          className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent"
-                          animate={{
-                            x: ["-100%", "100%"],
-                          }}
-                          transition={{
-                            duration: 1.5,
-                            repeat: Infinity,
-                            ease: "linear",
-                          }}
-                        />
-                      )}
+          <NavItem
+            to="/dashboard"
+            icon={LayoutDashboard}
+            label="Dashboard"
+            isMobile={isMobile}
+            closeSidebar={setIsSidebarOpen}
+          />
 
-                      <div
-                        className={`relative z-10 ${
-                          isActive ? "animate-pulse" : ""
-                        }`}
-                      >
-                        <Icon size={20} />
-                      </div>
-                      <span className="font-semibold relative z-10">
-                        {item.label}
-                      </span>
-
-                      {isActive && (
-                        <motion.div
-                          className="ml-auto"
-                          initial={{ scale: 0, rotate: -180 }}
-                          animate={{ scale: 1, rotate: 0 }}
-                          transition={{
-                            type: "spring",
-                            stiffness: 200,
-                            damping: 15,
-                          }}
-                        >
-                          <Sparkles size={16} />
-                        </motion.div>
-                      )}
-                    </div>
-                  </motion.div>
-                )}
-              </NavLink>
-            );
-          })}
+          {role == "Donor" ? (
+            <NavItem
+              to="/dashboard/add-request"
+              icon={Plus}
+              label="Add Request"
+              isMobile={isMobile}
+              closeSidebar={setIsSidebarOpen}
+            />
+          ) : (
+            <NavItem
+              to="/dashboard/all-users"
+              icon={Users}
+              label="All Users"
+              isMobile={isMobile}
+              closeSidebar={setIsSidebarOpen}
+            />
+          )}
         </nav>
 
         {/* User Info & Footer */}
@@ -303,7 +238,7 @@ const Aside = ({ onLogout }) => {
 
           {/* Logout Button */}
           <motion.button
-            onClick={onLogout}
+            onClick={handleLogOut}
             className="btn btn-outline btn-error w-full gap-2 hover:btn-error group"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
@@ -318,3 +253,61 @@ const Aside = ({ onLogout }) => {
 };
 
 export default Aside;
+
+const NavItem = ({ to, icon: Icon, label, isMobile, closeSidebar }) => (
+  <NavLink
+    to={to}
+    onClick={() => isMobile && closeSidebar(false)}
+    className="block"
+  >
+    {({ isActive }) => (
+      <motion.div
+        whileHover={{ scale: 1.03, x: 5 }}
+        whileTap={{ scale: 0.98 }}
+        className={`
+          flex items-center gap-3 px-4 py-3.5 rounded-2xl
+          transition-all duration-300 relative overflow-hidden
+          ${
+            isActive
+              ? "bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg shadow-red-500/30"
+              : "text-gray-700 hover:bg-white/60 backdrop-blur-sm"
+          }
+        `}
+      >
+        {isActive && (
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent"
+            animate={{
+              x: ["-100%", "100%"],
+            }}
+            transition={{
+              duration: 1.5,
+              repeat: Infinity,
+              ease: "linear",
+            }}
+          />
+        )}
+
+        <div className={`relative z-10 ${isActive ? "animate-pulse" : ""}`}>
+          <Icon size={20} />
+        </div>
+        <span className="font-semibold relative z-10">{label}</span>
+
+        {isActive && (
+          <motion.div
+            className="ml-auto"
+            initial={{ scale: 0, rotate: -180 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{
+              type: "spring",
+              stiffness: 200,
+              damping: 15,
+            }}
+          >
+            <Sparkles size={16} />
+          </motion.div>
+        )}
+      </motion.div>
+    )}
+  </NavLink>
+);

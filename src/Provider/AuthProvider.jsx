@@ -21,6 +21,8 @@ const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [role, setRole] = useState("");
+  const [roleLoading, setRoleLoading] = useState(true);
+  const [userStatus, setUserStatus] = useState("");
 
   const updateUser = (updateData) =>
     updateProfile(auth.currentUser, updateData);
@@ -44,11 +46,30 @@ const AuthProvider = ({ children }) => {
 
   // get user role
   useEffect(() => {
-    if (!user) return;
-    axios.get(`http://localhost:5000/donor/role/${user?.email}`).then((res) => {
-      setRole(res.data.role);
-    });
+    if (!user) {
+      setRole("");
+      setUserStatus("");
+      setRoleLoading(false);
+      return;
+    }
+
+    setRoleLoading(true);
+
+    axios
+      .get(`http://localhost:5000/donor/role/${user.email}`)
+      .then((res) => {
+        setRole(res.data.role);
+        setUserStatus(res.data.status);
+      })
+      .catch(() => {
+        setRole("");
+        setUserStatus("");
+      })
+      .finally(() => {
+        setRoleLoading(false);
+      });
   }, [user]);
+
 
   console.log(role);
 
@@ -63,6 +84,8 @@ const AuthProvider = ({ children }) => {
     setLoading,
     updateUser,
     role,
+    roleLoading,
+    userStatus,
   };
 
   return (
