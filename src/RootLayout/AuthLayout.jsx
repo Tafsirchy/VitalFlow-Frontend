@@ -5,7 +5,7 @@ import Footer from "../Components/Footer";
 import Loading from "../Components/Loading";
 
 const AuthLayout = () => {
-  navigation = useNavigation();
+  const navigation = useNavigation();
   const isLoading = navigation.state === "loading";
   return (
     <div>
