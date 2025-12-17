@@ -16,9 +16,9 @@ const AccessDenied = () => {
      y: Math.random() * 100,
      size: Math.random() * 4 + 2,
      duration: Math.random() * 3 + 2,
-   }));
-   setParticles(newParticles);
-
+    }));
+    setParticles(newParticles);
+    
    // Random glitch effect every 3 seconds
    const glitchInterval = setInterval(() => {
      setGlitchActive(true);

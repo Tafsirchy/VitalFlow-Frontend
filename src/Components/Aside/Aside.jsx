@@ -16,6 +16,7 @@ import {
 import { AuthContext } from "../../Provider/AuthProvider";
 import { motion, AnimatePresence } from "framer-motion";
 import logo from "../../assets/image.png";
+import { toast } from "react-toastify";
 
 /* =========================
    Reusable NavItem Component
@@ -171,15 +172,27 @@ const Aside = () => {
             closeSidebar={setIsSidebarOpen}
           />
 
-          {role == "Donor" ? (
-            <NavItem
-              to="/dashboard/add-request"
-              icon={Plus}
-              label="Add Request"
-              isMobile={isMobile}
-              closeSidebar={setIsSidebarOpen}
-            />
-          ) : (
+          {role === "Donor" && (
+            <>
+              <NavItem
+                to="/dashboard/add-request"
+                icon={Plus}
+                label="Add Request"
+                isMobile={isMobile}
+                closeSidebar={setIsSidebarOpen}
+              />
+
+              <NavItem
+                to="/dashboard/my-request"
+                icon={Package} // or Droplet
+                label="My Requests"
+                isMobile={isMobile}
+                closeSidebar={setIsSidebarOpen}
+              />
+            </>
+          )}
+
+          {role !== "Donor" && (
             <NavItem
               to="/dashboard/all-users"
               icon={Users}
