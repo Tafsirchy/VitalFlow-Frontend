@@ -114,9 +114,8 @@ const MyRequest = () => {
     setActiveDropdown(null);
   };
 
-  const handleView = (id) => {
-    navigate(`/dashboard/view-request/${id}`);
-    setActiveDropdown(null);
+  const handleViewDetails = (id) => {
+    navigate(`/donation-details/${id}`);
   };
 
   const getStatusColor = (status) => {
@@ -393,7 +392,9 @@ const MyRequest = () => {
 
                                   {/* View button - Always visible */}
                                   <button
-                                    onClick={() => handleView(request._id)}
+                                    onClick={() =>
+                                      handleViewDetails(request._id)
+                                    }
                                     className="w-full px-4 py-2 text-left hover:bg-blue-50 transition-colors flex items-center gap-2 text-blue-700 font-medium"
                                   >
                                     <Eye size={16} />

@@ -25,12 +25,12 @@ const Register = () => {
 
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [upazilas, setUpazilas] = useState([]);
-  const [districts, setDistricts] = useState([]);
-  const [district, setDistrict] = useState("");
-  const [upazila, setUpazila] = useState("");
   const [fileName, setFileName] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [upazila, setUpazila] = useState("");
+  const [upazilas, setUpazilas] = useState([]);
+  const [district, setDistrict] = useState("");
+  const [districts, setDistricts] = useState([]);
 
   useEffect(() => {
     axios.get("/upazilas.json").then((res) => {

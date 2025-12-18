@@ -14,6 +14,7 @@ import SearchPage from "../Pages/SearchPage/SearchPage";
 import DonationRequest from "../Pages/DonationRequest.jsx/DonationRequest";
 import Funding from "../Pages/Funding/Funding";
 import PaymentSuccess from "../Pages/PaymentSuccess/PaymentSuccess";
+import DonationDetails from "../Pages/DonationDetails/DonationDetails";
 
 const router = createBrowserRouter([
   {
@@ -66,25 +67,28 @@ const router = createBrowserRouter([
   },
   {
     path: "/search",
-    element: <SearchPage></SearchPage>
+    element: <SearchPage></SearchPage>,
   },
   {
     path: "/donation-requests",
-    element: <DonationRequest></DonationRequest>
+    element: <DonationRequest></DonationRequest>,
   },
   {
     path: "/funding",
-    element: <Funding></Funding>
+    element: <Funding></Funding>,
   },
   {
     path: "/payment-success",
-    element: <PaymentSuccess></PaymentSuccess>
-  }
+    element: <PaymentSuccess></PaymentSuccess>,
+  },
   {
     path: "/payment-cancelled",
-    element: <PaymentSuccess></PaymentSuccess>
-  }
-  
+    element: <PaymentSuccess></PaymentSuccess>,
+  },
+  {
+    path: "donation-details/:id",
+    element: <DonationDetails></DonationDetails>
+  },
 ]);
 
 export default router;

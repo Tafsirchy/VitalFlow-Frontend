@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { motion } from "framer-motion";
 import { CheckCircle, ArrowLeft, Download, Home } from "lucide-react";
-import { useNavigate } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
+import useAxios from "../../hooks/useAxios";
 
 const PaymentSuccess = ({
   title = "Payment Successful",
@@ -11,6 +12,17 @@ const PaymentSuccess = ({
   showInvoice = true,
 }) => {
   const navigate = useNavigate();
+ const [searchParams, setSearchParams] = useSearchParams();
+ const sessionId = searchParams.get("session_id");
+
+ const axiosInstance = useAxios();
+
+ useEffect(() => {
+     axiosInstance.post(`/success-payment?session_id=${sessionId}`)
+     .then((res) => {
+       console.log(res.data);
+     })
+ },[axiosInstance, sessionId])
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-emerald-100 px-4">

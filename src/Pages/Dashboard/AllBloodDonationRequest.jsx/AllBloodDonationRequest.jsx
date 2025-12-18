@@ -156,7 +156,7 @@ const AllBloodDonationRequest = () => {
       toast.error("Only admins can view details");
       return;
     }
-    navigate(`/dashboard/view-request/${id}`);
+    navigate(`/donation-details/${id}`);
     setActiveDropdown(null);
   };
 
@@ -233,7 +233,7 @@ const AllBloodDonationRequest = () => {
                 <select
                   value={filterStatus}
                   onChange={(e) => handleFilterChange(e.target.value)}
-                  className="select select-bordered select-sm bg-white border-gray-300"
+                  className="w-full select select-bordered select-sm bg-white border-gray-300"
                 >
                   <option value="all">All Status</option>
                   <option value="pending">Pending</option>
