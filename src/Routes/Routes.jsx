@@ -10,6 +10,10 @@ import AllUsers from "../Pages/Dashboard/AllUsers.jsx/AllUsers";
 import PrivateRoute from "../Provider/PrivateRoute";
 import MyRequest from "../Pages/Dashboard/MyRequest/MyRequest";
 import AllBloodDonationRequest from "../Pages/Dashboard/AllBloodDonationRequest.jsx/AllBloodDonationRequest";
+import SearchPage from "../Pages/SearchPage/SearchPage";
+import DonationRequest from "../Pages/DonationRequest.jsx/DonationRequest";
+import Funding from "../Pages/Funding/Funding";
+import PaymentSuccess from "../Pages/PaymentSuccess/PaymentSuccess";
 
 const router = createBrowserRouter([
   {
@@ -56,10 +60,31 @@ const router = createBrowserRouter([
       },
       {
         path: "all-blood-donation-request",
-        element: <AllBloodDonationRequest></AllBloodDonationRequest>
+        element: <AllBloodDonationRequest></AllBloodDonationRequest>,
       },
     ],
   },
+  {
+    path: "/search",
+    element: <SearchPage></SearchPage>
+  },
+  {
+    path: "/donation-requests",
+    element: <DonationRequest></DonationRequest>
+  },
+  {
+    path: "/funding",
+    element: <Funding></Funding>
+  },
+  {
+    path: "/payment-success",
+    element: <PaymentSuccess></PaymentSuccess>
+  }
+  {
+    path: "/payment-cancelled",
+    element: <PaymentSuccess></PaymentSuccess>
+  }
+  
 ]);
 
 export default router;

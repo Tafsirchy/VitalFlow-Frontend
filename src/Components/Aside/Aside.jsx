@@ -128,7 +128,7 @@ const Aside = () => {
             style={{ backgroundSize: "200% 200%" }}
           />
 
-          <div className="flex items-center gap-3 relative z-10">
+          <Link to={"/"} className="flex items-center gap-3 relative z-10">
             <motion.div
               className="relative"
               whileHover={{ scale: 1.1, rotate: 360 }}
@@ -159,7 +159,7 @@ const Aside = () => {
                 Admin Panel
               </p>
             </div>
-          </div>
+          </Link>
         </div>
 
         {/* Navigation */}
@@ -192,7 +192,7 @@ const Aside = () => {
             </>
           )}
 
-          {role !== "Donor" && (
+          {role === "Admin" && (
             <NavItem
               to="/dashboard/all-users"
               icon={Users}
@@ -201,6 +201,7 @@ const Aside = () => {
               closeSidebar={setIsSidebarOpen}
             />
           )}
+
           {(role === "Admin" || role === "Volunteer") && (
             <NavItem
               to="/dashboard/all-blood-donation-request"

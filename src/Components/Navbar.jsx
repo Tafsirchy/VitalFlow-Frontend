@@ -55,7 +55,7 @@ const Navbar = () => {
           {/* -------- Logo Section -------- */}
           <Link
             to="/"
-            className="flex items-center gap-3 group pointer-events-auto"
+            className="flex items-center gap-1 group pointer-events-auto"
           >
             <motion.div
               whileHover={{ scale: 1.1 }}
@@ -89,7 +89,8 @@ const Navbar = () => {
           </Link>
 
           {/* -------- Desktop Navigation -------- */}
-          <div className="hidden lg:flex items-center gap-2">
+          {/* -------- Desktop Navigation (Centered) -------- */}
+          <div className="hidden lg:absolute left-1/2 -translate-x-1/2 lg:flex items-center gap-3">
             <NavLink to="/donation-requests" className={navLinkStyle}>
               Donation Requests
             </NavLink>

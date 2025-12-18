@@ -1,8 +1,22 @@
 import React from "react";
 import { Droplets, Search, Heart, Users, Activity } from "lucide-react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router";
 
 const Banner = () => {
+
+ const navigate = useNavigate();
+
+ const onJoinClick = () => {
+   // Navigates the user to the registration route
+   navigate("/auth/register");
+ };
+
+ const onSearchClick = () => {
+   // Navigates the user to the search route
+   navigate("/search");
+ }
+
   return (
     <div className="">
       <div className="relative overflow-hidden bg-gradient-to-br from-[#FFEBEE] via-white to-[#E3F2FD] min-h-[600px] flex items-center">
@@ -136,7 +150,7 @@ const Banner = () => {
                     boxShadow: "0 20px 40px rgba(198, 40, 40, 0.3)",
                   }}
                   whileTap={{ scale: 0.95 }}
-                //   onClick={onJoinClick}
+                  onClick={onJoinClick}
                   className="btn bg-[#C62828] hover:bg-[#B71C1C] text-white border-none px-8 py-4 text-lg rounded-full shadow-xl flex items-center gap-3 group"
                 >
                   <Droplets size={24} className="group-hover:animate-bounce" />
@@ -149,7 +163,7 @@ const Banner = () => {
                     boxShadow: "0 20px 40px rgba(13, 71, 161, 0.3)",
                   }}
                   whileTap={{ scale: 0.95 }}
-                //   onClick={onSearchClick}
+                  onClick={onSearchClick}
                   className="btn bg-[#0D47A1] hover:bg-[#08306B] text-white border-none px-8 py-4 text-lg rounded-full shadow-xl flex items-center gap-3 group"
                 >
                   <Search
