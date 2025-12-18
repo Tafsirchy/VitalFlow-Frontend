@@ -63,7 +63,8 @@ const Feature = () => {
   };
 
   return (
-    <section className="relative py-28 bg-gradient-to-b from-[#fafafa] to-[#f5f5f5] overflow-hidden">
+    
+    <div className="relative py-28 bg-gradient-to-b from-[#fafafa] to-[#f5f5f5] overflow-hidden">
       {/* floating background blobs */}
       <motion.div
         animate={{ y: [0, -40, 0] }}
@@ -220,7 +221,7 @@ const Feature = () => {
           </motion.div>
         </AnimatePresence>
       </div>
-    </section>
+    </div>
   );
 };
 

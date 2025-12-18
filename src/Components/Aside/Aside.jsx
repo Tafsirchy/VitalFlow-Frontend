@@ -183,7 +183,7 @@ const Aside = () => {
               />
 
               <NavItem
-                to="/dashboard/my-request"
+                to="/dashboard/my-requests"
                 icon={Package} // or Droplet
                 label="My Requests"
                 isMobile={isMobile}
@@ -197,6 +197,15 @@ const Aside = () => {
               to="/dashboard/all-users"
               icon={Users}
               label="All Users"
+              isMobile={isMobile}
+              closeSidebar={setIsSidebarOpen}
+            />
+          )}
+          {(role === "Admin" || role === "Volunteer") && (
+            <NavItem
+              to="/dashboard/all-blood-donation-request"
+              icon={Droplet}
+              label="All Blood Requests"
               isMobile={isMobile}
               closeSidebar={setIsSidebarOpen}
             />

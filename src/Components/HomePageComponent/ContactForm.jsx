@@ -50,7 +50,7 @@ const ContactUs = () => {
       title: "Emergency",
       value: "+880 1712-345678",
       badge: "24/7",
-      color: "from-[#C62828] to-[#B71C1C]",
+      color: "from-red-600 to-red-700",
       href: "tel:+8801712345678",
     },
     {
@@ -58,7 +58,7 @@ const ContactUs = () => {
       title: "Email",
       value: "support@vitalflow.com",
       badge: "2hr reply",
-      color: "from-[#0D47A1] to-[#08306B]",
+      color: "from-blue-600 to-blue-700",
       href: "mailto:support@vitalflow.com",
     },
     {
@@ -66,7 +66,7 @@ const ContactUs = () => {
       title: "Location",
       value: "Agrabad, CTG",
       badge: "Mon-Sat",
-      color: "from-[#2E7D32] to-[#1B5E20]",
+      color: "from-green-600 to-green-700",
       href: "#",
     },
   ];
@@ -76,77 +76,79 @@ const ContactUs = () => {
       icon: Users,
       label: "Active Donors",
       value: "15,000+",
-      color: "from-[#C62828] to-[#B71C1C]",
+      color: "from-red-600 to-red-700",
     },
     {
       icon: Activity,
       label: "Lives Saved",
       value: "3,500+",
-      color: "from-[#0D47A1] to-[#08306B]",
+      color: "from-blue-600 to-blue-700",
     },
     {
       icon: Award,
       label: "Success Rate",
       value: "98%",
-      color: "from-[#2E7D32] to-[#1B5E20]",
+      color: "from-green-600 to-green-700",
     },
     {
       icon: TrendingUp,
       label: "Cities Covered",
       value: "50+",
-      color: "from-[#D84315] to-[#BF360C]",
+      color: "from-orange-600 to-orange-700",
     },
   ];
 
   return (
-    <section className="py-16 bg-gradient-to-br from-[#FAFAFA] via-white to-[#F5F5F5] relative overflow-hidden">
-      {/* Animated Background */}
+    <section className="py-20 bg-gradient-to-br from-gray-50 via-white to-gray-100 relative overflow-hidden">
+      {/* Animated Background Elements */}
       <motion.div
-        animate={{ scale: [1, 1.2, 1], opacity: [0.05, 0.1, 0.05] }}
+        animate={{ scale: [1, 1.2, 1], opacity: [0.03, 0.06, 0.03] }}
         transition={{ duration: 8, repeat: Infinity }}
-        className="absolute -top-40 -right-40 w-80 h-80 bg-[#C62828] rounded-full blur-3xl"
+        className="absolute -top-40 -right-40 w-96 h-96 bg-red-600 rounded-full blur-3xl"
       />
       <motion.div
-        animate={{ scale: [1, 1.3, 1], opacity: [0.05, 0.08, 0.05] }}
+        animate={{ scale: [1, 1.3, 1], opacity: [0.03, 0.05, 0.03] }}
         transition={{ duration: 10, repeat: Infinity, delay: 2 }}
-        className="absolute -bottom-40 -left-40 w-80 h-80 bg-[#0D47A1] rounded-full blur-3xl"
+        className="absolute -bottom-40 -left-40 w-96 h-96 bg-blue-600 rounded-full blur-3xl"
       />
 
-      <div className="container mx-auto px-6 lg:px-12 relative z-10 max-w-7xl">
-        {/* Header */}
+      <div className="container mx-auto relative z-10 w-11/12 max-w-7xl">
+        {/* Header Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-12"
+          className="text-center mb-16"
         >
           <motion.div
             initial={{ scale: 0 }}
             whileInView={{ scale: 1 }}
-            transition={{ type: "spring" }}
-            className="inline-flex items-center gap-2 bg-[#FFEBEE] px-4 py-2 rounded-full mb-4"
+            transition={{ type: "spring", stiffness: 200 }}
+            className="inline-flex items-center gap-2 bg-red-50 px-5 py-2.5 rounded-full mb-6 border border-red-100"
           >
-            <HeartHandshake className="text-[#C62828]" size={18} />
-            <span className="font-bold text-xs text-[#C62828]">
-              WE'RE HERE TO HELP
+            <HeartHandshake className="text-red-600" size={20} />
+            <span className="font-bold text-sm text-red-600 uppercase tracking-wide">
+              We're Here to Help
             </span>
           </motion.div>
-          <h2 className="text-4xl lg:text-5xl font-bold mb-4">
-            <span className="text-[#212121]">Get in </span>
-            <span className="text-[#C62828]">Touch</span>
+          <h2 className="text-4xl lg:text-5xl font-bold mb-6">
+            <span className="text-gray-900">Get in </span>
+            <span className="bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">
+              Touch
+            </span>
           </h2>
-          <p className="text-lg text-[#616161]">
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Questions about blood donation? Need urgent assistance? We're here
-            24/7.
+            24/7 to support you.
           </p>
         </motion.div>
 
-        {/* Contact Cards */}
+        {/* Contact Method Cards */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="grid md:grid-cols-3 gap-4 mb-10"
+          className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-16"
         >
           {contactMethods.map((method, idx) => (
             <motion.a
@@ -155,30 +157,30 @@ const ContactUs = () => {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.1 }}
-              whileHover={{ y: -6, scale: 1.02 }}
-              className="relative bg-white rounded-2xl p-5 shadow-lg hover:shadow-xl transition-all border border-[#E0E0E0] group overflow-hidden"
+              whileHover={{ y: -8, scale: 1.02 }}
+              className="relative bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all border border-gray-200 group overflow-hidden"
             >
               <div
                 className={`absolute inset-0 bg-gradient-to-br ${method.color} opacity-0 group-hover:opacity-5 transition-opacity`}
               />
-              <div className="relative flex items-center gap-4">
+              <div className="relative flex items-start gap-4">
                 <motion.div
                   whileHover={{ rotate: 360 }}
                   transition={{ duration: 0.6 }}
-                  className={`w-14 h-14 bg-gradient-to-br ${method.color} rounded-xl flex items-center justify-center shadow-lg`}
+                  className={`w-16 h-16 bg-gradient-to-br ${method.color} rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0`}
                 >
-                  <method.icon className="text-white" size={24} />
+                  <method.icon className="text-white" size={28} />
                 </motion.div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-bold text-[#212121] text-sm">
+                <div className="flex-1 min-w-0 pt-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <h3 className="font-bold text-gray-900 text-base">
                       {method.title}
                     </h3>
-                    <span className="text-xs px-2 py-0.5 bg-[#FFEBEE] text-[#C62828] rounded-full font-semibold">
+                    <span className="text-xs px-2.5 py-1 bg-red-50 text-red-600 rounded-full font-semibold">
                       {method.badge}
                     </span>
                   </div>
-                  <p className="text-sm font-semibold text-[#0D47A1] truncate">
+                  <p className="text-sm font-semibold text-blue-600 break-words">
                     {method.value}
                   </p>
                 </div>
@@ -187,33 +189,35 @@ const ContactUs = () => {
           ))}
         </motion.div>
 
-        {/* Main Grid */}
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Form Section */}
+        {/* Main Content Grid */}
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Contact Form - 2 columns */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             className="lg:col-span-2"
           >
-            <div className="bg-white rounded-3xl shadow-2xl p-6 lg:p-8 border border-[#E0E0E0]">
-              <div className="text-center mb-6">
+            <div className="bg-white rounded-3xl shadow-2xl p-8 lg:p-10 border border-gray-200 h-full">
+              <div className="text-center mb-8">
                 <motion.div
                   initial={{ scale: 0 }}
                   whileInView={{ scale: 1 }}
-                  transition={{ type: "spring" }}
-                  className="inline-flex items-center gap-2 bg-gradient-to-r from-[#C62828] to-[#B71C1C] text-white px-3 py-1.5 rounded-full mb-3 shadow-lg"
+                  transition={{ type: "spring", stiffness: 200 }}
+                  className="inline-flex items-center gap-2 bg-gradient-to-r from-red-600 to-red-700 text-white px-4 py-2 rounded-full mb-4 shadow-lg"
                 >
-                  <MessageCircle size={16} className="animate-pulse" />
-                  <span className="text-xs font-bold">QUICK RESPONSE</span>
+                  <MessageCircle size={18} className="animate-pulse" />
+                  <span className="text-xs font-bold uppercase tracking-wide">
+                    Quick Response
+                  </span>
                 </motion.div>
-                <h3 className="text-3xl font-bold mb-2">
-                  <span className="text-[#212121]">Drop us a </span>
-                  <span className="bg-gradient-to-r from-[#C62828] to-[#B71C1C] bg-clip-text text-transparent">
+                <h3 className="text-3xl font-bold mb-3">
+                  <span className="text-gray-900">Drop us a </span>
+                  <span className="bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">
                     Message
                   </span>
                 </h3>
-                <p className="text-[#616161]">We'll respond within 2 hours</p>
+                <p className="text-gray-600">We'll respond within 2 hours</p>
               </div>
 
               <AnimatePresence mode="wait">
@@ -223,20 +227,20 @@ const ContactUs = () => {
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0 }}
-                    className="py-12 text-center"
+                    className="py-16 text-center"
                   >
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      transition={{ type: "spring" }}
-                      className="w-20 h-20 bg-gradient-to-br from-[#2E7D32] to-[#1B5E20] rounded-full flex items-center justify-center mx-auto mb-4 shadow-xl"
+                      transition={{ type: "spring", stiffness: 200 }}
+                      className="w-24 h-24 bg-gradient-to-br from-green-600 to-green-700 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl"
                     >
-                      <CheckCircle2 className="text-white" size={40} />
+                      <CheckCircle2 className="text-white" size={48} />
                     </motion.div>
-                    <h4 className="text-2xl font-bold text-[#212121] mb-2">
-                      Message Sent!
+                    <h4 className="text-3xl font-bold text-gray-900 mb-3">
+                      Message Sent Successfully!
                     </h4>
-                    <p className="text-[#616161]">
+                    <p className="text-gray-600 text-lg">
                       We'll respond within 2 hours.
                     </p>
                   </motion.div>
@@ -244,21 +248,21 @@ const ContactUs = () => {
                   <motion.form
                     key="form"
                     onSubmit={handleSubmit}
-                    className="space-y-4"
+                    className="space-y-5"
                   >
-                    <div className="grid md:grid-cols-2 gap-4">
+                    <div className="grid md:grid-cols-2 gap-5">
                       <div>
-                        <label className="block text-xs font-bold text-[#212121] mb-1.5">
-                          FULL NAME
+                        <label className="block text-xs font-bold text-gray-900 mb-2 uppercase tracking-wide">
+                          Full Name
                         </label>
                         <div className="relative">
                           <User
-                            className={`absolute left-3 top-1/2 -translate-y-1/2 transition-colors ${
+                            className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${
                               focusedField === "name"
-                                ? "text-[#C62828]"
-                                : "text-[#9E9E9E]"
+                                ? "text-red-600"
+                                : "text-gray-400"
                             }`}
-                            size={18}
+                            size={20}
                           />
                           <input
                             type="text"
@@ -268,23 +272,23 @@ const ContactUs = () => {
                             onFocus={() => setFocusedField("name")}
                             onBlur={() => setFocusedField(null)}
                             placeholder="John Doe"
-                            className="w-full pl-11 pr-4 py-3 bg-[#FAFAFA] border-2 border-[#E0E0E0] rounded-xl focus:bg-white focus:border-[#C62828] focus:ring-2 focus:ring-[#FFEBEE] outline-none transition-all"
+                            className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl focus:bg-white focus:border-red-600 focus:ring-4 focus:ring-red-50 outline-none transition-all text-gray-900"
                             required
                           />
                         </div>
                       </div>
                       <div>
-                        <label className="block text-xs font-bold text-[#212121] mb-1.5">
-                          PHONE
+                        <label className="block text-xs font-bold text-gray-900 mb-2 uppercase tracking-wide">
+                          Phone
                         </label>
                         <div className="relative">
                           <Phone
-                            className={`absolute left-3 top-1/2 -translate-y-1/2 transition-colors ${
+                            className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${
                               focusedField === "phone"
-                                ? "text-[#C62828]"
-                                : "text-[#9E9E9E]"
+                                ? "text-red-600"
+                                : "text-gray-400"
                             }`}
-                            size={18}
+                            size={20}
                           />
                           <input
                             type="tel"
@@ -294,7 +298,7 @@ const ContactUs = () => {
                             onFocus={() => setFocusedField("phone")}
                             onBlur={() => setFocusedField(null)}
                             placeholder="+880 1712-345678"
-                            className="w-full pl-11 pr-4 py-3 bg-[#FAFAFA] border-2 border-[#E0E0E0] rounded-xl focus:bg-white focus:border-[#C62828] focus:ring-2 focus:ring-[#FFEBEE] outline-none transition-all"
+                            className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl focus:bg-white focus:border-red-600 focus:ring-4 focus:ring-red-50 outline-none transition-all text-gray-900"
                             required
                           />
                         </div>
@@ -302,17 +306,17 @@ const ContactUs = () => {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold text-[#212121] mb-1.5">
-                        EMAIL
+                      <label className="block text-xs font-bold text-gray-900 mb-2 uppercase tracking-wide">
+                        Email
                       </label>
                       <div className="relative">
                         <AtSign
-                          className={`absolute left-3 top-1/2 -translate-y-1/2 transition-colors ${
+                          className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${
                             focusedField === "email"
-                              ? "text-[#C62828]"
-                              : "text-[#9E9E9E]"
+                              ? "text-red-600"
+                              : "text-gray-400"
                           }`}
-                          size={18}
+                          size={20}
                         />
                         <input
                           type="email"
@@ -322,21 +326,21 @@ const ContactUs = () => {
                           onFocus={() => setFocusedField("email")}
                           onBlur={() => setFocusedField(null)}
                           placeholder="john@example.com"
-                          className="w-full pl-11 pr-4 py-3 bg-[#FAFAFA] border-2 border-[#E0E0E0] rounded-xl focus:bg-white focus:border-[#C62828] focus:ring-2 focus:ring-[#FFEBEE] outline-none transition-all"
+                          className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl focus:bg-white focus:border-red-600 focus:ring-4 focus:ring-red-50 outline-none transition-all text-gray-900"
                           required
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold text-[#212121] mb-1.5">
-                        SUBJECT
+                      <label className="block text-xs font-bold text-gray-900 mb-2 uppercase tracking-wide">
+                        Subject
                       </label>
                       <select
                         name="subject"
                         value={formData.subject}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 bg-[#FAFAFA] border-2 border-[#E0E0E0] rounded-xl focus:bg-white focus:border-[#C62828] focus:ring-2 focus:ring-[#FFEBEE] outline-none transition-all cursor-pointer"
+                        className="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl focus:bg-white focus:border-red-600 focus:ring-4 focus:ring-red-50 outline-none transition-all cursor-pointer text-gray-900"
                         required
                       >
                         <option value="">Select a subject</option>
@@ -348,16 +352,16 @@ const ContactUs = () => {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold text-[#212121] mb-1.5">
-                        MESSAGE
+                      <label className="block text-xs font-bold text-gray-900 mb-2 uppercase tracking-wide">
+                        Message
                       </label>
                       <textarea
                         name="message"
                         value={formData.message}
                         onChange={handleChange}
                         placeholder="How can we help you?"
-                        rows="4"
-                        className="w-full px-4 py-3 bg-[#FAFAFA] border-2 border-[#E0E0E0] rounded-xl focus:bg-white focus:border-[#C62828] focus:ring-2 focus:ring-[#FFEBEE] outline-none transition-all resize-none"
+                        rows="5"
+                        className="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl focus:bg-white focus:border-red-600 focus:ring-4 focus:ring-red-50 outline-none transition-all resize-none text-gray-900"
                         required
                       />
                     </div>
@@ -367,10 +371,21 @@ const ContactUs = () => {
                       disabled={isSubmitting}
                       whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
                       whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
-                      className="w-full bg-gradient-to-r from-[#C62828] to-[#B71C1C] hover:from-[#B71C1C] hover:to-[#C62828] text-white font-bold py-4 rounded-xl shadow-xl disabled:opacity-50 flex items-center justify-center gap-2"
+                      className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-4 rounded-xl shadow-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 transition-all"
                     >
                       {isSubmitting ? (
-                        <span className="loading loading-spinner loading-md"></span>
+                        <>
+                          <motion.div
+                            animate={{ rotate: 360 }}
+                            transition={{
+                              duration: 1,
+                              repeat: Infinity,
+                              ease: "linear",
+                            }}
+                            className="w-5 h-5 border-3 border-white border-t-transparent rounded-full"
+                          />
+                          <span>Sending...</span>
+                        </>
                       ) : (
                         <>
                           <Send size={20} />
@@ -384,20 +399,22 @@ const ContactUs = () => {
             </div>
           </motion.div>
 
-          {/* Sidebar */}
+          {/* Sidebar - 1 column */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="space-y-4"
+            className="space-y-6"
           >
-            {/* Working Hours */}
-            <div className="bg-gradient-to-br from-[#0D47A1] to-[#08306B] rounded-2xl p-5 text-white shadow-xl">
-              <div className="flex items-center gap-2 mb-4">
-                <Clock size={22} />
-                <h3 className="text-lg font-bold">Working Hours</h3>
+            {/* Working Hours Card */}
+            <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-6 text-white shadow-xl">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+                  <Clock size={22} />
+                </div>
+                <h3 className="text-xl font-bold">Working Hours</h3>
               </div>
-              <div className="space-y-2 text-sm">
+              <div className="space-y-3 text-sm">
                 {[
                   ["Mon-Fri", "9:00 AM - 8:00 PM"],
                   ["Saturday", "10:00 AM - 6:00 PM"],
@@ -405,37 +422,36 @@ const ContactUs = () => {
                 ].map(([day, hours]) => (
                   <div
                     key={day}
-                    className="flex justify-between py-2 border-b border-white/20 last:border-0"
+                    className="flex justify-between items-center py-3 border-b border-white/20 last:border-0"
                   >
                     <span className="font-semibold">{day}</span>
-                    <span className="text-white/90">{hours}</span>
+                    <span className="text-white/90 font-medium">{hours}</span>
                   </div>
                 ))}
               </div>
               <motion.div
                 animate={{ scale: [1, 1.02, 1] }}
                 transition={{ duration: 2, repeat: Infinity }}
-                className="mt-4 bg-white/10 rounded-xl p-3 text-center backdrop-blur-sm"
+                className="mt-5 bg-white/15 rounded-xl p-4 text-center backdrop-blur-sm border border-white/20"
               >
-                <div className="flex items-center justify-center gap-1.5 mb-1">
-                  <Zap className="text-[#66BB6A]" size={16} />
-                  <span className="font-bold text-[#66BB6A] text-xs">
-                    EMERGENCY 24/7
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <Zap className="text-green-400" size={18} />
+                  <span className="font-bold text-green-400 text-sm uppercase tracking-wide">
+                    Emergency 24/7
                   </span>
                 </div>
-                <p className="text-xs text-white/80">
-                  Available for urgent requests
+                <p className="text-xs text-white/90">
+                  Available for urgent requests anytime
                 </p>
               </motion.div>
             </div>
 
-
             {/* Impact Statistics */}
-            <div className="bg-white rounded-2xl p-5 shadow-xl border border-[#E0E0E0]">
-              <h4 className="font-bold text-[#212121] mb-4 text-center">
+            <div className="bg-white rounded-2xl p-6 shadow-xl border border-gray-200">
+              <h4 className="font-bold text-gray-900 mb-5 text-center text-lg">
                 Our Impact
               </h4>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-4">
                 {achievements.map((stat, idx) => (
                   <motion.div
                     key={idx}
@@ -443,38 +459,24 @@ const ContactUs = () => {
                     whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true }}
                     transition={{ delay: idx * 0.1 }}
-                    whileHover={{ scale: 1.05 }}
-                    className="text-center p-3 bg-gradient-to-br from-[#FAFAFA] to-white rounded-xl border border-[#E0E0E0]"
+                    whileHover={{ scale: 1.05, y: -2 }}
+                    className="text-center p-4 bg-gradient-to-br from-gray-50 to-white rounded-xl border border-gray-200 shadow-sm"
                   >
                     <div
-                      className={`w-10 h-10 bg-gradient-to-br ${stat.color} rounded-lg flex items-center justify-center mx-auto mb-2`}
+                      className={`w-12 h-12 bg-gradient-to-br ${stat.color} rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg`}
                     >
-                      <stat.icon className="text-white" size={18} />
+                      <stat.icon className="text-white" size={20} />
                     </div>
-                    <div className="text-xl font-bold text-[#212121]">
+                    <div className="text-2xl font-bold text-gray-900 mb-1">
                       {stat.value}
                     </div>
-                    <div className="text-xs text-[#616161] mt-0.5">
+                    <div className="text-xs text-gray-600 font-medium">
                       {stat.label}
                     </div>
                   </motion.div>
                 ))}
               </div>
             </div>
-            
-
-            {/* Trust Badge */}
-            {/* <div className="bg-gradient-to-br from-[#FFEBEE] to-white rounded-xl p-5 border-2 border-[#C62828]/20 text-center">
-              <div className="w-12 h-12 bg-[#C62828] rounded-full flex items-center justify-center mx-auto mb-3">
-                <HeartHandshake className="text-white" size={22} />
-              </div>
-              <h4 className="font-bold text-[#212121] text-sm mb-1">
-                15,000+ Donors Trust Us
-              </h4>
-              <p className="text-xs text-[#616161]">
-                Join our lifesaving community
-              </p>
-            </div> */}
           </motion.div>
         </div>
       </div>
