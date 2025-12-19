@@ -1,3 +1,4 @@
+// src/Provider/AuthProvider.jsx
 import React, { createContext, useEffect, useState } from "react";
 import {
   createUserWithEmailAndPassword,
@@ -12,39 +13,47 @@ import {
 import app from "../firebase/firebase.config";
 import axios from "axios";
 
-export const AuthContext = createContext();
-
+export const AuthContext = createContext(null);
 const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); // Firebase auth loading
   const [role, setRole] = useState("");
-  const [roleLoading, setRoleLoading] = useState(true);
+  const [roleLoading, setRoleLoading] = useState(true); // Role & status loading
   const [userStatus, setUserStatus] = useState("");
+
+  const createUser = (email, password) => {
+    setLoading(true);
+    return createUserWithEmailAndPassword(auth, email, password);
+  };
+
+  const signIn = (email, password) => {
+    setLoading(true);
+    return signInWithEmailAndPassword(auth, email, password);
+  };
+
+  const handleGoogleSignIn = () => signInWithPopup(auth, googleProvider);
 
   const updateUser = (updateData) =>
     updateProfile(auth.currentUser, updateData);
-  const createUser = (email, password) =>
-    createUserWithEmailAndPassword(auth, email, password);
-  const signIn = (email, password) =>
-    signInWithEmailAndPassword(auth, email, password);
-  const handleGoogleSignIn = () => signInWithPopup(auth, googleProvider);
-  const logOut = () => signOut(auth);
 
-  console.log(user);
+  const logOut = () => {
+    setLoading(true);
+    return signOut(auth);
+  };
 
+  // Firebase auth state listener
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       setLoading(false);
-      console.log(currentUser);
     });
-    return unsubscribe;
+    return () => unsubscribe();
   }, []);
 
-  // get user role
+  // Fetch role & status when user changes
   useEffect(() => {
     if (!user) {
       setRole("");
@@ -54,14 +63,14 @@ const AuthProvider = ({ children }) => {
     }
 
     setRoleLoading(true);
-
     axios
       .get(`http://localhost:5000/donor/role/${user.email}`)
       .then((res) => {
-        setRole(res.data.role);
-        setUserStatus(res.data.status);
+        setRole(res.data?.role || "");
+        setUserStatus(res.data?.status || "");
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error("Failed to fetch role/status:", err);
         setRole("");
         setUserStatus("");
       })
@@ -70,22 +79,17 @@ const AuthProvider = ({ children }) => {
       });
   }, [user]);
 
-
-  console.log(role);
-
   const authData = {
     user,
-    setUser,
-    createUser,
-    signIn,
-    handleGoogleSignIn,
-    logOut,
     loading,
-    setLoading,
-    updateUser,
     role,
     roleLoading,
     userStatus,
+    createUser,
+    signIn,
+    handleGoogleSignIn,
+    updateUser,
+    logOut,
   };
 
   return (

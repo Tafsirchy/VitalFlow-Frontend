@@ -149,8 +149,8 @@ const MyRequest = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8">
-      <div className="w-11/12 max-w-7xl mx-auto">
+    <div className=" bg-gradient-to-br from-gray-50 to-gray-100 py-8">
+      <div className="">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

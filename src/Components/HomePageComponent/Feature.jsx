@@ -13,6 +13,7 @@ import {
   MessageSquare,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "react-toastify";
 
 const Feature = () => {
   const [selectedBloodType, setSelectedBloodType] = useState("all");
@@ -33,7 +34,7 @@ const Feature = () => {
       );
       setUrgentRequests(res.data);
     } catch (error) {
-      console.error("Failed to fetch urgent requests:", error);
+      toast.error("Failed to fetch urgent requests:", error);
     } finally {
       setLoading(false);
     }

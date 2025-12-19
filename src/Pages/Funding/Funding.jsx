@@ -15,6 +15,7 @@ import { AuthContext } from "../../Provider/AuthProvider";
 import Navbar from "../../Components/Navbar";
 import Footer from "../../Components/Footer";
 import useAxiosSecure from "../../Hooks/useAxiosSecure";
+import { toast } from "react-toastify";
 
 const FundingPage = () => {
   const axiosSecure = useAxiosSecure();
@@ -62,11 +63,11 @@ const FundingPage = () => {
         return;
       }
 
-      // Debug log (safe)
-      console.log("Creating payment for:", {
-        donorEmail: user.email,
-        amount,
-      });
+      // // Debug log (safe)
+      // console.log("Creating payment for:", {
+      //   donorEmail: user.email,
+      //   amount,
+      // });
 
       // 🔥 ONLY send amount & email
       const res = await axiosSecure.post("/create-payment-checkout", {
@@ -77,8 +78,8 @@ const FundingPage = () => {
       // Redirect to Stripe checkout
       window.location.href = res.data.url;
     } catch (error) {
-      console.error("Donation error:", error);
-      alert("Failed to initiate payment. Please try again.");
+      // console.error("Donation error:", error);
+      toast.error("Failed to initiate payment. Please try again.");
     }
   };
 

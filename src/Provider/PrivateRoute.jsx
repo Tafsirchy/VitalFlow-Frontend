@@ -1,31 +1,40 @@
+// src/routes/PrivateRoute.jsx
 import React, { useContext } from "react";
-import { AuthContext } from "./AuthProvider";
+import { AuthContext } from "../Provider/AuthProvider";
 import { Navigate, useLocation } from "react-router";
 import Loading from "../Components/Loading";
 import AccessDenied from "../Components/AccessDenied";
 
 const PrivateRoute = ({ children }) => {
-  const { user, loading, roleloading, userStatus } = useContext(AuthContext);
-
+  const { user, loading, roleLoading, userStatus } = useContext(AuthContext);
   const location = useLocation();
 
-  if (loading || roleloading) {
+  // Still waiting for Firebase auth OR role/status
+  if (loading || roleLoading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <Loading></Loading>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <Loading />
       </div>
     );
   }
 
-  if (!user || !userStatus == "Active") {
-    return <Navigate state={location.pathname} to="/auth/login"></Navigate>;
+  // Not logged in → go to login (preserve intended path)
+  if (!user) {
+    return <Navigate to="/auth/login" state={location.pathname} replace />;
   }
+
+  // Blocked user
   if (userStatus === "Blocked") {
-    return <AccessDenied></AccessDenied>;
+    return <AccessDenied />;
   }
-  if (user && user.email) {
-    return children;
+
+  // Inactive user (not Active)
+  if (userStatus !== "Active") {
+    return <Navigate to="/auth/login" state={location.pathname} replace />;
   }
+
+  // All good → show protected content
+  return children;
 };
 
 export default PrivateRoute;

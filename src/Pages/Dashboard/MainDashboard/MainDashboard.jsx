@@ -120,8 +120,8 @@ const MainDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8">
-      <div className="w-11/12 max-w-7xl mx-auto">
+    <div className=" bg-gradient-to-br from-gray-50 to-gray-100 py-8">
+      <div className="">
         {/* Welcome Section */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
@@ -317,7 +317,7 @@ const MainDashboard = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden mb-6"
+                className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden mb-6"
               >
                 <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
                   <div className="flex items-center justify-between">

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import { Users, DollarSign, Droplet } from "lucide-react";
 import useAxiosSecure from "../../../Hooks/useAxiosSecure";
+import { toast } from "react-toastify";
 
 // Custom Count Up Animation Hook
 const CountUp = ({ end, duration = 2 }) => {
@@ -41,7 +42,7 @@ const AdminDashboardFeature = () => {
           totalRequests: requestsRes.data.totalRequest,
         });
       } catch (error) {
-        console.error("Error fetching admin stats:", error);
+        toast.error("Error fetching admin stats:", error);
       } finally {
         setLoading(false);
       }

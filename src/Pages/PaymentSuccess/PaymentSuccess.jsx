@@ -11,18 +11,26 @@ const PaymentSuccess = ({
   transactionId,
   showInvoice = true,
 }) => {
-  const navigate = useNavigate();
- const [searchParams, setSearchParams] = useSearchParams();
+ const navigate = useNavigate();
+ const [searchParams] = useSearchParams();
  const sessionId = searchParams.get("session_id");
 
  const axiosInstance = useAxios();
 
  useEffect(() => {
-     axiosInstance.post(`/success-payment?session_id=${sessionId}`)
-     .then((res) => {
-       console.log(res.data);
+   if (!sessionId) return;
+
+   axiosInstance
+     .post(`/success-payment?session_id=${sessionId}`)
+     .then(() => {
+       // optional: navigate or show success UI
+      //  navigate("/dashboard/payment-success");
      })
- },[axiosInstance, sessionId])
+     .catch(() => {
+       // optional: handle error silently or show toast
+     });
+ }, [axiosInstance, sessionId]);
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-emerald-100 px-4">

@@ -27,32 +27,45 @@ const Login = () => {
 
   const handleLogin = (e) => {
     e.preventDefault();
-
     const form = e.target;
-    const email = form.email.value;
+    const email = form.email.value.trim();
     const password = form.password.value;
+
+    if (!email || !password) return;
 
     setError("");
     setLoading(true);
 
     signIn(email, password)
-      .then(() => {
-        toast.success("Login successfully");
+      .then((result) => {
+        toast.success("Login successful!");
+
         form.reset();
-        navigate(location.state || "/");
+
+        // Safe redirect: Firebase auth is now confirmed, user is set
+        // Use location.state if user came from a protected route
+        const redirectPath = location.state || "/";
+        navigate(redirectPath, { replace: true });
       })
       .catch((error) => {
+        let message = "Login failed. Please try again.";
+
         if (error.code === "auth/wrong-password") {
-          setError("Incorrect password. Please try again.");
+          message = "Incorrect password. Please try again.";
         } else if (error.code === "auth/user-not-found") {
-          setError("No account found with this email.");
+          message = "No account found with this email.";
         } else if (error.code === "auth/invalid-email") {
-          setError("Invalid email format.");
-        } else {
-          setError("Something went wrong. Please try again.");
+          message = "Invalid email format.";
+        } else if (error.code === "auth/too-many-requests") {
+          message = "Too many attempts. Try again later.";
         }
+
+        setError(message);
+        toast.error(message);
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   if (loading) {

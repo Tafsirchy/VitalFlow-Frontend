@@ -103,7 +103,7 @@ const Register = () => {
     if (res.data.success == true) {
       createUser(email, password)
         .then((result) => {
-          console.log(result);
+          // console.log(result);
           return updateUser({
             displayName: name,
             photoURL: mainPhotoUrl,
@@ -113,7 +113,7 @@ const Register = () => {
           axios
             .post("http://localhost:5000/donor", formData)
             .then((res) => {
-              console.log(res.data);
+              // console.log(res.data);
               setLoading(false);
             })
             .catch((err) => {
@@ -133,72 +133,6 @@ const Register = () => {
         });
     }
   };
-
-  // const handleRegister = async (e) => {
-  //   e.preventDefault();
-  //   setError("");
-  //   setLoading(true);
-
-  //   try {
-  //     const form = e.target;
-  //     const name = form.name.value;
-  //     const email = form.email.value;
-  //     const password = form.password.value;
-  //     const blood = form.blood.value;
-  //     const file = form.photo.files[0];
-
-  //     const uppercase = /[A-Z]/;
-  //     const lowercase = /[a-z]/;
-
-  //     if (password.length < 6)
-  //       throw new Error("Password must be 6 characters long");
-  //     if (!uppercase.test(password))
-  //       throw new Error("Must contain uppercase letter");
-  //     if (!lowercase.test(password))
-  //       throw new Error("Must contain lowercase letter");
-
-  //     /* ---------- Image Upload ---------- */
-  //     const imageData = new FormData();
-  //     imageData.append("image", file);
-
-  //     const imgRes = await axios.post(
-  //       `https://api.imgbb.com/1/upload?key=0e9b758a4b670cd200c15b853076e20f`,
-  //       imageData
-  //     );
-
-  //     const photoURL = imgRes.data.data.display_url;
-
-  //     /* ---------- Firebase Auth ---------- */
-  //     await createUser(email, password);
-  //     await updateUser({
-  //       displayName: name,
-  //       photoURL,
-  //     });
-
-  //     /* ---------- Save to DB ---------- */
-  //     await axios.post("http://localhost:5000/donor", {
-  //       name,
-  //       email,
-  //       blood,
-  //       district,
-  //       upazila,
-  //       mainPhotoUrl: photoURL,
-  //     });
-
-  //     toast.success("Sign Up Successful 🎉");
-  //     navigate("/");
-  //   } catch (err) {
-  //     console.error(err);
-
-  //     if (err.code === "auth/email-already-in-use") {
-  //       toast.error("Email already in use");
-  //     } else {
-  //       toast.error(err.message || "Registration failed");
-  //     }
-  //   } finally {
-  //     setLoading(false); // 🔥 ALWAYS runs
-  //   }
-  // };
 
 
   if (loading) {

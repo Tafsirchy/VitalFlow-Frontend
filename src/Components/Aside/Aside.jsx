@@ -37,7 +37,8 @@ const Aside = () => {
         toast.success("Logout Successfully");
         navigate("/");
       })
-      .catch((error) => console.error(error));
+      .catch((error) => 
+        toast.error(error));
   };
 
   useEffect(() => {

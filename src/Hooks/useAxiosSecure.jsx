@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useContext, useEffect } from "react";
 import { AuthContext } from "../Provider/AuthProvider";
+import { toast } from "react-toastify";
 
 const axiosSecure = axios.create({
   baseURL: "http://localhost:5000",
@@ -19,7 +20,7 @@ const useAxiosSecure = () => {
         return response;
       },
       (error) => {
-        console.log(error);
+        toast.log(error);
         return Promise.reject(error);
       }
     );

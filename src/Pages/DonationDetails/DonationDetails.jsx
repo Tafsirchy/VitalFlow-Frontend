@@ -54,9 +54,9 @@ const DonationDetails = () => {
    } catch (error) {
      console.error("Donation confirmation failed:", error);
 
-     toast.error(
-       error?.response?.data?.message || "Failed to confirm donation"
-     );
+    //  console.error(
+    //    error?.response?.data?.message || "Failed to confirm donation"
+    //  );
    } finally {
      setLoading(false);
    }
