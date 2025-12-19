@@ -32,8 +32,7 @@ const Navbar = () => {
         toast.success("Logout Successfully");
         navigate("/");
       })
-      .catch((error) => 
-        console.log(error));
+      .catch((error) => console.log(error));
   };
 
   const navLinkStyle = ({ isActive }) =>

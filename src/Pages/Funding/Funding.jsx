@@ -27,6 +27,8 @@ const FundingPage = () => {
   const [showDonateModal, setShowDonateModal] = useState(false);
   const [donateAmount, setDonateAmount] = useState("");
   const [selectedAmount, setSelectedAmount] = useState(null);
+  const [isDonating, setIsDonating] = useState(false);
+
 
   useEffect(() => {
     fetchFundings();
@@ -54,27 +56,29 @@ const FundingPage = () => {
       return;
     }
 
-    try {
-      // Validate amount
-      const amount = selectedAmount || donateAmount;
-      if (!amount || amount <= 0) {
-        alert("Please select or enter a valid donation amount");
-        return;
-      }
+    const amount = selectedAmount || donateAmount;
 
-    
+    if (!amount || amount <= 0) {
+      toast.error("Please select or enter a valid donation amount");
+      return;
+    }
+
+    try {
+      setIsDonating(true);
+
       const res = await axiosSecure.post("/create-payment-checkout", {
         donateAmount: amount,
         donorEmail: user.email,
       });
 
-      // Redirect to Stripe checkout
+      // Redirect to Stripe
       window.location.href = res.data.url;
     } catch (error) {
-      // console.error("Donation error:", error);
+      setIsDonating(false);
       toast.error("Failed to initiate payment. Please try again.");
     }
   };
+
 
 
   const formatDate = (date) =>
@@ -457,15 +461,35 @@ const FundingPage = () => {
                         Cancel
                       </motion.button>
                       <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
+                        whileHover={!isDonating ? { scale: 1.02 } : {}}
+                        whileTap={!isDonating ? { scale: 0.98 } : {}}
                         onClick={handleDonate}
-                        disabled={!selectedAmount && !donateAmount}
-                        className="flex-1 py-4 bg-gradient-to-r from-red-500 to-rose-500 text-white font-bold rounded-xl shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                        disabled={
+                          isDonating || (!selectedAmount && !donateAmount)
+                        }
+                        className="flex-1 py-4 bg-gradient-to-r from-red-500 to-rose-500 text-white font-bold rounded-xl shadow-lg
+             disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                       >
-                        <Heart size={20} fill="currentColor" />
-                        Donate Now
-                        <ArrowRight size={20} />
+                        {isDonating ? (
+                          <>
+                            <motion.div
+                              animate={{ rotate: 360 }}
+                              transition={{
+                                repeat: Infinity,
+                                duration: 1,
+                                ease: "linear",
+                              }}
+                              className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                            />
+                            Redirecting...
+                          </>
+                        ) : (
+                          <>
+                            <Heart size={20} fill="currentColor" />
+                            Donate Now
+                            <ArrowRight size={20} />
+                          </>
+                        )}
                       </motion.button>
                     </div>
                   </div>

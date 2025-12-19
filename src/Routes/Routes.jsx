@@ -1,4 +1,6 @@
 import { createBrowserRouter } from "react-router";
+import { lazy } from "react";
+
 import RootLayout from "../RootLayout/RootLayout";
 import Home from "../Pages/Home/Home";
 import Login from "../Pages/Login";
@@ -10,95 +12,106 @@ import AllUsers from "../Pages/Dashboard/AllUsers.jsx/AllUsers";
 import PrivateRoute from "../Provider/PrivateRoute";
 import MyRequest from "../Pages/Dashboard/MyRequest/MyRequest";
 import AllBloodDonationRequest from "../Pages/Dashboard/AllBloodDonationRequest.jsx/AllBloodDonationRequest";
-import SearchPage from "../Pages/SearchPage/SearchPage";
-import DonationRequest from "../Pages/DonationRequest.jsx/DonationRequest";
-import Funding from "../Pages/Funding/Funding";
-import PaymentSuccess from "../Pages/PaymentSuccess/PaymentSuccess";
-import DonationDetails from "../Pages/DonationDetails/DonationDetails";
 import NotFoundPage from "../Pages/NotFoundPage/NotFoundPage";
 import Profile from "../Pages/Dashboard/Profile/Profile";
+import SuspenseWrapper from "../Components/ComponentForLoader/SuspenseWrapper";
+
+// ✅ Lazy loaded public pages
+const SearchPage = lazy(() => import("../Pages/SearchPage/SearchPage"));
+const DonationRequest = lazy(() =>
+  import("../Pages/DonationRequest.jsx/DonationRequest")
+);
+const Funding = lazy(() => import("../Pages/Funding/Funding"));
+const PaymentSuccess = lazy(() =>
+  import("../Pages/PaymentSuccess/PaymentSuccess")
+);
+const DonationDetails = lazy(() =>
+  import("../Pages/DonationDetails/DonationDetails")
+);
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <RootLayout></RootLayout>,
+    element: <RootLayout />,
     children: [
-      {
-        path: "/",
-        element: <Home></Home>,
-      },
-      {
-        path: "/auth/login",
-        element: <Login></Login>,
-      },
-      {
-        path: "/auth/register",
-        element: <Register></Register>,
-      },
+      { path: "/", element: <Home /> },
+      { path: "/auth/login", element: <Login /> },
+      { path: "/auth/register", element: <Register /> },
     ],
   },
   {
     path: "dashboard",
     element: (
       <PrivateRoute>
-        <DashboardLayout></DashboardLayout>,
+        <DashboardLayout />
       </PrivateRoute>
     ),
     children: [
-      {
-        path: "/dashboard",
-        element: <MainDashboard></MainDashboard>,
-      },
-      {
-        path: "add-request",
-        element: <AddRequest></AddRequest>,
-      },
-      {
-        path: "all-users",
-        element: <AllUsers></AllUsers>,
-      },
-      {
-        path: "my-requests",
-        element: <MyRequest></MyRequest>,
-      },
+      { path: "/dashboard", element: <MainDashboard /> },
+      { path: "add-request", element: <AddRequest /> },
+      { path: "all-users", element: <AllUsers /> },
+      { path: "my-requests", element: <MyRequest /> },
       {
         path: "all-blood-donation-request",
-        element: <AllBloodDonationRequest></AllBloodDonationRequest>,
+        element: <AllBloodDonationRequest />,
       },
-      {
-        path: "profile",
-        element: <Profile></Profile>,
-      }
+      { path: "profile", element: <Profile /> },
     ],
   },
+
+  // 🌐 PUBLIC ROUTES (ALL with loader)
   {
     path: "/search",
-    element: <SearchPage></SearchPage>,
+    element: (
+      <SuspenseWrapper>
+        <SearchPage />
+      </SuspenseWrapper>
+    ),
   },
   {
     path: "/donation-requests",
-    element: <DonationRequest></DonationRequest>,
+    element: (
+      <SuspenseWrapper>
+        <DonationRequest />
+      </SuspenseWrapper>
+    ),
   },
   {
     path: "/funding",
-    element: <Funding></Funding>,
+    element: (
+      <SuspenseWrapper>
+        <Funding />
+      </SuspenseWrapper>
+    ),
   },
   {
     path: "/payment-success",
-    element: <PaymentSuccess></PaymentSuccess>,
+    element: (
+      <SuspenseWrapper>
+        <PaymentSuccess />
+      </SuspenseWrapper>
+    ),
   },
   {
     path: "/payment-cancelled",
-    element: <PaymentSuccess></PaymentSuccess>,
+    element: (
+      <SuspenseWrapper>
+        <PaymentSuccess />
+      </SuspenseWrapper>
+    ),
   },
   {
-    path: "donation-details/:id",
-    element: <DonationDetails></DonationDetails>
+    path: "/donation-details/:id",
+    element: (
+      <SuspenseWrapper>
+        <DonationDetails />
+      </SuspenseWrapper>
+    ),
   },
   {
     path: "*",
-    element: <NotFoundPage></NotFoundPage>
-  }
+    element: <NotFoundPage />,
+  },
 ]);
 
 export default router;
