@@ -16,6 +16,7 @@ import Funding from "../Pages/Funding/Funding";
 import PaymentSuccess from "../Pages/PaymentSuccess/PaymentSuccess";
 import DonationDetails from "../Pages/DonationDetails/DonationDetails";
 import NotFoundPage from "../Pages/NotFoundPage/NotFoundPage";
+import Profile from "../Pages/Dashboard/Profile/Profile";
 
 const router = createBrowserRouter([
   {
@@ -64,6 +65,10 @@ const router = createBrowserRouter([
         path: "all-blood-donation-request",
         element: <AllBloodDonationRequest></AllBloodDonationRequest>,
       },
+      {
+        path: "profile",
+        element: <Profile></Profile>,
+      }
     ],
   },
   {

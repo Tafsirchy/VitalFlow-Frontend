@@ -30,7 +30,7 @@ const Feature = () => {
     setLoading(true);
     try {
       const res = await axios.get(
-        `http://localhost:5000/urgent-requests?bloodGroup=${selectedBloodType}`
+        `https://vital-flow-backend-khaki.vercel.app/urgent-requests?bloodGroup=${selectedBloodType}`
       );
       setUrgentRequests(res.data);
     } catch (error) {

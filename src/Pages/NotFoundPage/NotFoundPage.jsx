@@ -4,12 +4,10 @@ import { Link } from "react-router";
 import { Droplet, Heart, Home, Search } from "lucide-react";
 
 const NotFoundPage = () => {
-  // Floating blood droplets in background (more particles, varied sizes)
   const droplets = [...Array(12)];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 to-blue-50 flex items-center justify-center px-4 py-5 overflow-hidden relative">
-      {/* Animated Floating Droplets Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {droplets.map((_, i) => (
           <motion.div

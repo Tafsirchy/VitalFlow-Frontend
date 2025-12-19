@@ -49,7 +49,6 @@ const FundingPage = () => {
   };
 
   const handleDonate = async () => {
-    // Redirect if not logged in
     if (!user) {
       window.location.href = "/login";
       return;
@@ -63,13 +62,7 @@ const FundingPage = () => {
         return;
       }
 
-      // // Debug log (safe)
-      // console.log("Creating payment for:", {
-      //   donorEmail: user.email,
-      //   amount,
-      // });
-
-      // 🔥 ONLY send amount & email
+    
       const res = await axiosSecure.post("/create-payment-checkout", {
         donateAmount: amount,
         donorEmail: user.email,

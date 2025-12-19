@@ -79,7 +79,6 @@ const AddRequest = () => {
       .post("/requests", reqFormData)
       .then((res) => {
         setIsSubmitting(false);
-        // Success Modal
         document.getElementById("success_modal").showModal();
         form.reset();
         setDistrict("");
@@ -119,7 +118,7 @@ const AddRequest = () => {
       className="relative"
     >
       {/* Header with Floating Animation */}
-      <motion.div variants={itemVariants} className="text-center mb-8 relative">
+      <motion.div variants={itemVariants} className="text-center p-8 relative ">
         {/* Decorative Background */}
         <div className="absolute inset-0 -z-10 overflow-hidden">
           <motion.div
@@ -160,7 +159,7 @@ const AddRequest = () => {
 
       {/* Form Card */}
       <motion.div variants={itemVariants}>
-        <div className="card bg-base-100 shadow-2xl border border-gray-100">
+        <div className="card bg-base-100 shadow-2xl border border-gray-100 mx-5 mb-5">
           <form onSubmit={handleRequest} className="card-body p-6 lg:p-10">
             <div className="space-y-8">
               {/* Requester Info Section */}

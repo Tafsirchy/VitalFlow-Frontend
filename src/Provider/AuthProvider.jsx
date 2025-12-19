@@ -1,4 +1,3 @@
-// src/Provider/AuthProvider.jsx
 import React, { createContext, useEffect, useState } from "react";
 import {
   createUserWithEmailAndPassword,
@@ -19,18 +18,18 @@ const googleProvider = new GoogleAuthProvider();
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // Firebase auth loading
+  const [loading, setLoading] = useState(true);
   const [role, setRole] = useState("");
-  const [roleLoading, setRoleLoading] = useState(true); // Role & status loading
+  const [roleLoading, setRoleLoading] = useState(true);
   const [userStatus, setUserStatus] = useState("");
 
   const createUser = (email, password) => {
-    setLoading(true);
+    // setLoading(true);
     return createUserWithEmailAndPassword(auth, email, password);
   };
 
   const signIn = (email, password) => {
-    setLoading(true);
+    // setLoading(true);
     return signInWithEmailAndPassword(auth, email, password);
   };
 
@@ -64,7 +63,9 @@ const AuthProvider = ({ children }) => {
 
     setRoleLoading(true);
     axios
-      .get(`http://localhost:5000/donor/role/${user.email}`)
+      .get(
+        `https://vital-flow-backend-khaki.vercel.app/donor/role/${user.email}`
+      )
       .then((res) => {
         setRole(res.data?.role || "");
         setUserStatus(res.data?.status || "");

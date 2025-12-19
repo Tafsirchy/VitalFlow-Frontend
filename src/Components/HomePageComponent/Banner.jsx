@@ -8,12 +8,10 @@ const Banner = () => {
  const navigate = useNavigate();
 
  const onJoinClick = () => {
-   // Navigates the user to the registration route
    navigate("/auth/register");
  };
 
  const onSearchClick = () => {
-   // Navigates the user to the search route
    navigate("/search");
  }
 

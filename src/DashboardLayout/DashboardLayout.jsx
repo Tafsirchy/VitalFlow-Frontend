@@ -48,7 +48,7 @@ const DashboardLayout = () => {
 
         {/* Content Container */}
         <motion.div
-          className="relative z-10 p-4 lg:p-8 max-w-7xl mx-auto"
+          className="relative z-10 max-w-7xl mx-auto"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}

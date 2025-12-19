@@ -173,6 +173,14 @@ const Aside = () => {
             closeSidebar={setIsSidebarOpen}
           />
 
+          <NavItem
+            to="/dashboard/profile"
+            icon={Settings}
+            label="Profile"
+            isMobile={isMobile}
+            closeSidebar={setIsSidebarOpen}
+          />
+
           {role === "Donor" && (
             <>
               <NavItem
@@ -185,7 +193,7 @@ const Aside = () => {
 
               <NavItem
                 to="/dashboard/my-requests"
-                icon={Package} // or Droplet
+                icon={Package}
                 label="My Requests"
                 isMobile={isMobile}
                 closeSidebar={setIsSidebarOpen}

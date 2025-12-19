@@ -4,7 +4,6 @@ import { Users, DollarSign, Droplet } from "lucide-react";
 import useAxiosSecure from "../../../Hooks/useAxiosSecure";
 import { toast } from "react-toastify";
 
-// Custom Count Up Animation Hook
 const CountUp = ({ end, duration = 2 }) => {
   const count = useMotionValue(0);
   const rounded = useTransform(count, Math.round);
@@ -79,12 +78,10 @@ const AdminDashboardFeature = () => {
     },
   ];
 
-  // Floating particles background
   const particles = [...Array(10)];
 
   return (
     <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-gray-50 via-white to-blue-50/30 p-8">
-      {/* Animated Floating Particles */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {particles.map((_, i) => (
           <motion.div

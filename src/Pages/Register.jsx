@@ -111,7 +111,7 @@ const Register = () => {
         })
         .then(() => {
           axios
-            .post("http://localhost:5000/donor", formData)
+            .post("https://vital-flow-backend-khaki.vercel.app/donor", formData)
             .then((res) => {
               // console.log(res.data);
               setLoading(false);
@@ -133,7 +133,6 @@ const Register = () => {
         });
     }
   };
-
 
   if (loading) {
     return (

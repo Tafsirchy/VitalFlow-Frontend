@@ -133,7 +133,6 @@ const MyRequest = () => {
     }
   };
 
-  // Get page numbers to display (show max 5 pages at a time)
   const getPageNumbers = () => {
     const maxPagesToShow = 5;
     const halfRange = Math.floor(maxPagesToShow / 2);
@@ -150,7 +149,7 @@ const MyRequest = () => {
 
   return (
     <div className=" bg-gradient-to-br from-gray-50 to-gray-100 py-8">
-      <div className="">
+      <div className="p-5">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

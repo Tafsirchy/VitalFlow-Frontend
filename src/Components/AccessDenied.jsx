@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router"; // Fixed import (was "react-router")
+import { useNavigate } from "react-router"; 
 import { ShieldAlert, Lock, AlertTriangle, X, ArrowLeft } from "lucide-react";
 
 const AccessDenied = () => {
@@ -9,7 +9,6 @@ const AccessDenied = () => {
   const [particles, setParticles] = useState([]);
 
  useEffect(() => {
-   // Generate random particles
    const newParticles = Array.from({ length: 20 }, (_, i) => ({
      id: i,
      x: Math.random() * 100,
@@ -19,7 +18,6 @@ const AccessDenied = () => {
     }));
     setParticles(newParticles);
     
-   // Random glitch effect every 3 seconds
    const glitchInterval = setInterval(() => {
      setGlitchActive(true);
      setTimeout(() => setGlitchActive(false), 200);
@@ -189,7 +187,7 @@ const AccessDenied = () => {
           {/* Action button - NOW FUNCTIONAL */}
           <motion.div variants={itemVariants} className="flex justify-center">
             <motion.button
-              onClick={() => navigate(-1)} // This makes the button go back!
+              onClick={() => navigate(-1)} 
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="flex items-center justify-center gap-2 px-8 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-colors shadow-lg shadow-red-500/30 cursor-pointer"

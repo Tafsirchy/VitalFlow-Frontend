@@ -30,7 +30,7 @@ const MainDashboard = () => {
   const [myRecentRequests, setMyRecentRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeDropdown, setActiveDropdown] = useState(null);
-  const [userRole, setUserRole] = useState(null); // "Admin", "Volunteer", "Donor"
+  const [userRole, setUserRole] = useState(null);
   const [roleLoading, setRoleLoading] = useState(true);
   const axiosSecure = useAxiosSecure();
   const navigate = useNavigate();
@@ -64,7 +64,7 @@ const MainDashboard = () => {
       setUserRole(response.data?.role || "Donor");
     } catch (error) {
       console.error("Error fetching user role:", error);
-      setUserRole("Donor"); // fallback to donor
+      setUserRole("Donor");
     } finally {
       setRoleLoading(false);
     }
@@ -101,7 +101,7 @@ const MainDashboard = () => {
   };
 
   const handleView = (id) => {
-    navigate(`/dashboard/view-request/${id}`);
+    navigate(`/donation-details/${id}`);
   };
 
   const getStatusColor = (status) => {
@@ -120,8 +120,8 @@ const MainDashboard = () => {
   };
 
   return (
-    <div className=" bg-gradient-to-br from-gray-50 to-gray-100 py-8">
-      <div className="">
+    <div className=" bg-gradient-to-br from-gray-50 to-gray-100 py-5">
+      <div className="py-8 px-5">
         {/* Welcome Section */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}

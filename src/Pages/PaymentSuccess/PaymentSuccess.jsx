@@ -22,12 +22,11 @@ const PaymentSuccess = ({
 
    axiosInstance
      .post(`/success-payment?session_id=${sessionId}`)
-     .then(() => {
-       // optional: navigate or show success UI
-      //  navigate("/dashboard/payment-success");
+     .then((res) => {
+      //  console.log(res.data);
      })
-     .catch(() => {
-       // optional: handle error silently or show toast
+     .catch((err) => {
+      console.log(err);
      });
  }, [axiosInstance, sessionId]);
 

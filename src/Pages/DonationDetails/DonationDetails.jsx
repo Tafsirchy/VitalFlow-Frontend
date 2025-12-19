@@ -19,7 +19,6 @@ import { AuthContext } from "../../Provider/AuthProvider";
 import useAxiosSecure from "../../Hooks/useAxiosSecure";
 import { toast } from "react-toastify";
 
-// Try multiple toast import methods
 
 const DonationDetails = () => {
   const { id } = useParams();
@@ -54,9 +53,7 @@ const DonationDetails = () => {
    } catch (error) {
      console.error("Donation confirmation failed:", error);
 
-    //  console.error(
-    //    error?.response?.data?.message || "Failed to confirm donation"
-    //  );
+   
    } finally {
      setLoading(false);
    }
@@ -468,7 +465,6 @@ const DonationDetails = () => {
   );
 };
 
-// Reusable Info Item Component
 const InfoItem = ({ icon, label, value }) => (
   <motion.div whileHover={{ x: 4 }} className="flex items-start gap-3 group">
     <div className="p-2 bg-red-50 rounded-lg text-red-500 group-hover:bg-red-100 transition-colors">
