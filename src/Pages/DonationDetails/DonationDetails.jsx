@@ -19,7 +19,6 @@ import { AuthContext } from "../../Provider/AuthProvider";
 import useAxiosSecure from "../../Hooks/useAxiosSecure";
 import { toast } from "react-toastify";
 
-
 const DonationDetails = () => {
   const { id } = useParams();
   const { user } = useContext(AuthContext);
@@ -35,30 +34,27 @@ const DonationDetails = () => {
     });
   }, [id, axiosSecure]);
 
- const handleConfirmDonation = async () => {
-   try {
-     setLoading(true);
+  const handleConfirmDonation = async () => {
+    try {
+      setLoading(true);
 
-     await axiosSecure.patch(`/update-donation-status/${id}`, {
-       status: "inprogress",
-     });
+      await axiosSecure.patch(`/update-donation-status/${id}`, {
+        status: "inprogress",
+      });
 
-     setRequest((prev) => ({
-       ...prev,
-       donation_status: "inprogress",
-     }));
+      setRequest((prev) => ({
+        ...prev,
+        donation_status: "inprogress",
+      }));
 
-     toast.success("Donation confirmed successfully ❤️");
-     setOpen(false);
-   } catch (error) {
-     console.error("Donation confirmation failed:", error);
-
-   
-   } finally {
-     setLoading(false);
-   }
- };
-
+      toast.success("Donation confirmed successfully ❤️");
+      setOpen(false);
+    } catch (error) {
+      console.error("Donation confirmation failed:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (!request) {
     return (

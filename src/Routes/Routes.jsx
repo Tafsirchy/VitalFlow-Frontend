@@ -16,7 +16,6 @@ import NotFoundPage from "../Pages/NotFoundPage/NotFoundPage";
 import Profile from "../Pages/Dashboard/Profile/Profile";
 import SuspenseWrapper from "../Components/ComponentForLoader/SuspenseWrapper";
 
-// ✅ Lazy loaded public pages
 const SearchPage = lazy(() => import("../Pages/SearchPage/SearchPage"));
 const DonationRequest = lazy(() =>
   import("../Pages/DonationRequest.jsx/DonationRequest")
@@ -59,7 +58,6 @@ const router = createBrowserRouter([
     ],
   },
 
-  // 🌐 PUBLIC ROUTES (ALL with loader)
   {
     path: "/search",
     element: (

@@ -40,7 +40,6 @@ const Profile = () => {
 
   const bloodGroups = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
-  /* ---------------- Fetch districts & upazilas ---------------- */
   useEffect(() => {
     axios.get("/districts.json").then((res) => {
       setDistricts(
@@ -58,7 +57,6 @@ const Profile = () => {
     });
   }, []);
 
-  /* ---------------- Fetch profile ---------------- */
   useEffect(() => {
     if (!user?.email) return;
     const fetchProfile = async () => {
@@ -76,7 +74,6 @@ const Profile = () => {
     fetchProfile();
   }, [user, axiosSecure]);
 
-  /* ---------------- Handlers ---------------- */
   const handleEdit = () => {
     setIsEditing(true);
     setFormData(profileData);
@@ -122,7 +119,6 @@ const Profile = () => {
     }
   };
 
-  /* ---------------- UI Config ---------------- */
   const roleGradient = {
     Admin: "from-purple-500 to-indigo-600",
     Volunteer: "from-orange-500 to-red-500",

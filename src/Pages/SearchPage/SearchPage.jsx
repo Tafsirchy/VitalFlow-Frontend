@@ -99,7 +99,6 @@ const SearchPage = () => {
       <main>
         <div className="min-h-screen bg-gradient-to-br from-red-50 via-pink-50 to-rose-50 py-12">
           <div className="w-11/12 max-w-7xl mx-auto">
-            {/* Hero Section */}
             <motion.div
               initial={{ opacity: 0, y: -30 }}
               animate={{ opacity: 1, y: 0 }}
@@ -127,7 +126,6 @@ const SearchPage = () => {
               </p>
             </motion.div>
 
-            {/* Search Form */}
             <motion.form
               onSubmit={handleSearch}
               initial={{ opacity: 0, y: 20 }}
@@ -139,7 +137,6 @@ const SearchPage = () => {
               <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 via-pink-500/5 to-rose-500/5 rounded-3xl blur-xl"></div>
 
               <div className="relative flex flex-col gap-4 md:flex-row md:items-end md:gap-4">
-                {/* Blood Group */}
                 <motion.div
                   whileHover={{ scale: 1.02 }}
                   className="flex flex-col w-full md:w-1/4"
@@ -188,7 +185,6 @@ const SearchPage = () => {
                   </select>
                 </motion.div>
 
-                {/* Upazila */}
                 <motion.div
                   whileHover={{ scale: 1.02 }}
                   className="flex flex-col w-full md:w-1/4"
@@ -211,7 +207,6 @@ const SearchPage = () => {
                   </select>
                 </motion.div>
 
-                {/* Search Button */}
                 <motion.div
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -237,7 +232,6 @@ const SearchPage = () => {
               </div>
             </motion.form>
 
-            {/* Default Animated Message */}
             <AnimatePresence mode="wait">
               {!hasSearched && (
                 <motion.div
@@ -263,7 +257,6 @@ const SearchPage = () => {
                     />
 
                     <div className="text-center space-y-8 py-16">
-                      {/* Animated Hearts */}
                       <div className="flex justify-center gap-8">
                         {[0, 1, 2].map((i) => (
                           <motion.div
@@ -303,7 +296,6 @@ const SearchPage = () => {
                         </p>
                       </motion.div>
 
-                      {/* Animated Stats */}
                       <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -351,7 +343,6 @@ const SearchPage = () => {
                         ))}
                       </motion.div>
 
-                      {/* Call to Action */}
                       <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
@@ -372,7 +363,6 @@ const SearchPage = () => {
                 </motion.div>
               )}
 
-              {/* Search Results */}
               {hasSearched && (
                 <motion.div
                   initial={{ opacity: 0 }}
@@ -439,7 +429,6 @@ const SearchPage = () => {
                             }}
                             className="group relative bg-white/80 backdrop-blur-lg rounded-2xl shadow-lg hover:shadow-2xl transition-all p-6 border border-white/40 overflow-hidden"
                           >
-                            {/* Animated gradient background on hover */}
                             <motion.div
                               className="absolute inset-0 bg-gradient-to-br from-red-500/10 via-pink-500/10 to-rose-500/10 opacity-0 group-hover:opacity-100 transition-opacity"
                               animate={{
@@ -479,7 +468,6 @@ const SearchPage = () => {
                                 {getStatusBadge(request.donation_status)}
                               </div>
 
-                              {/* Recipient Info */}
                               <div className="space-y-3 mb-4">
                                 <motion.div
                                   whileHover={{ x: 5 }}
@@ -566,7 +554,6 @@ const SearchPage = () => {
                                 </div>
                               </div>
 
-                              {/* Requester Info */}
                               <motion.div
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}

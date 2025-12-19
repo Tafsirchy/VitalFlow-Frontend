@@ -43,7 +43,6 @@ const AuthProvider = ({ children }) => {
     return signOut(auth);
   };
 
-  // Firebase auth state listener
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);

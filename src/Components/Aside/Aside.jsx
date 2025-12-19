@@ -18,13 +18,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import logo from "../../assets/image.png";
 import { toast } from "react-toastify";
 
-/* =========================
-   Reusable NavItem Component
-========================= */
-
-/* =========================
-   Main Aside Component
-========================= */
 const Aside = () => {
   const { role, user, logOut } = useContext(AuthContext);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
