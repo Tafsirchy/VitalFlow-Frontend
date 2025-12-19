@@ -15,6 +15,7 @@ import DonationRequest from "../Pages/DonationRequest.jsx/DonationRequest";
 import Funding from "../Pages/Funding/Funding";
 import PaymentSuccess from "../Pages/PaymentSuccess/PaymentSuccess";
 import DonationDetails from "../Pages/DonationDetails/DonationDetails";
+import NotFoundPage from "../Pages/NotFoundPage/NotFoundPage";
 
 const router = createBrowserRouter([
   {
@@ -89,6 +90,10 @@ const router = createBrowserRouter([
     path: "donation-details/:id",
     element: <DonationDetails></DonationDetails>
   },
+  {
+    path: "*",
+    element: <NotFoundPage></NotFoundPage>
+  }
 ]);
 
 export default router;

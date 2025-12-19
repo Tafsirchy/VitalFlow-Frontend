@@ -48,41 +48,40 @@ const FundingPage = () => {
   };
 
   const handleDonate = async () => {
-    if (!user) return (window.location.href = "/login");
-
-    // Debug: Check what we're sending
-    console.log("Full user object:", user);
-    console.log("User data:", {
-      email: user.email,
-      displayName: user.displayName,
-      name: user.name,
-      photoURL: user.photoURL,
-    });
-
-    // Try to get name from user object or fetch from database
-    let donorName = user.displayName || user.name || "Anonymous";
-
-    // If still no name, try to fetch from database
-    if (donorName === "Anonymous") {
-      try {
-        const { data } = await axiosSecure.get(`/donor/role/${user.email}`);
-        donorName = data?.name || "Anonymous";
-        console.log("Name from database:", donorName);
-      } catch (error) {
-        console.log("Could not fetch name from database:", error);
-      }
+    // Redirect if not logged in
+    if (!user) {
+      window.location.href = "/login";
+      return;
     }
 
-    console.log("Final donor name being sent:", donorName);
+    try {
+      // Validate amount
+      const amount = selectedAmount || donateAmount;
+      if (!amount || amount <= 0) {
+        alert("Please select or enter a valid donation amount");
+        return;
+      }
 
-    const res = await axiosSecure.post("/create-payment-checkout", {
-      donateAmount: selectedAmount || donateAmount,
-      donorEmail: user.email,
-      donorName: donorName,
-    });
+      // Debug log (safe)
+      console.log("Creating payment for:", {
+        donorEmail: user.email,
+        amount,
+      });
 
-    window.location.href = res.data.url;
+      // 🔥 ONLY send amount & email
+      const res = await axiosSecure.post("/create-payment-checkout", {
+        donateAmount: amount,
+        donorEmail: user.email,
+      });
+
+      // Redirect to Stripe checkout
+      window.location.href = res.data.url;
+    } catch (error) {
+      console.error("Donation error:", error);
+      alert("Failed to initiate payment. Please try again.");
+    }
   };
+
 
   const formatDate = (date) =>
     new Date(date).toLocaleDateString("en-US", {
@@ -400,7 +399,7 @@ const FundingPage = () => {
                   </div>
 
                   {/* Modal Content */}
-                  <div className="p-8 space-y-6">
+                  <div className="p-6 space-y-4">
                     {/* Quick Amount Selection */}
                     <div>
                       <label className="block text-sm font-bold text-gray-700 mb-3">
@@ -416,7 +415,7 @@ const FundingPage = () => {
                               setSelectedAmount(amount);
                               setDonateAmount("");
                             }}
-                            className={`py-3 rounded-xl font-bold transition-all ${
+                            className={`py-2 rounded-xl font-bold transition-all ${
                               selectedAmount === amount
                                 ? "bg-gradient-to-r from-red-500 to-rose-500 text-white shadow-lg"
                                 : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -430,7 +429,7 @@ const FundingPage = () => {
 
                     {/* Custom Amount */}
                     <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-3">
+                      <label className="block text-sm font-bold text-gray-700 mb-2">
                         Or Enter Custom Amount
                       </label>
                       <div className="relative">
@@ -447,14 +446,14 @@ const FundingPage = () => {
                             setDonateAmount(e.target.value);
                             setSelectedAmount(null);
                           }}
-                          className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-red-500 transition-colors text-lg font-semibold"
+                          className="w-full pl-12 pr-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-red-500 transition-colors text-lg font-semibold"
                           placeholder="Enter custom amount"
                         />
                       </div>
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex gap-3 pt-4">
+                    <div className="flex gap-3 pt-2">
                       <motion.button
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
