@@ -21,7 +21,7 @@ const PaymentSuccess = ({
     if (!sessionId) return;
 
     axiosInstance
-      .get(`/success-payment?session_id=${sessionId}`)
+      .post(`/success-payment?session_id=${sessionId}`)
 
       .then((res) => {
         //  console.log(res.data);

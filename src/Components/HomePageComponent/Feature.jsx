@@ -87,35 +87,50 @@ const Feature = () => {
     },
   };
 
+  // Generate random positions for falling blood drops
+  const drops = Array.from({ length: 12 }, (_, i) => ({
+    id: i,
+    left: `${Math.random() * 100}%`,
+    delay: Math.random() * 10,
+    duration: 15 + Math.random() * 10,
+  }));
+
   return (
-    <div className="relative min-h-screen py-12 sm:py-16 md:py-24 lg:py-28 bg-gradient-to-br from-slate-50 via-red-50/30 to-slate-100 overflow-hidden">
-      {/* Animated background elements */}
+    <div className="relative min-h-screen py-12 sm:py-16 md:py-24 lg:py-28 bg-gradient-to-br from-slate-50 via-red-50/20 to-slate-100 overflow-hidden">
+      {/* Animated Falling Blood Drops Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {drops.map((drop) => (
+          <motion.div
+            key={drop.id}
+            initial={{ y: -100, opacity: 0 }}
+            animate={{ y: "110vh", opacity: [0, 0.6, 0.4, 0] }}
+            transition={{
+              duration: drop.duration,
+              repeat: Infinity,
+              delay: drop.delay,
+              ease: "linear",
+            }}
+            className="absolute"
+            style={{ left: drop.left }}
+          >
+            <Droplets
+              size={32}
+              className="text-red-500/60 drop-shadow-lg"
+              fill="currentColor"
+            />
+          </motion.div>
+        ))}
+
+        {/* Very subtle blurred glows for depth */}
         <motion.div
-          animate={{
-            scale: [1, 1.2, 1],
-            rotate: [0, 90, 0],
-            opacity: [0.3, 0.2, 0.3],
-          }}
-          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -top-1/4 -left-1/4 w-96 h-96 bg-gradient-to-br from-red-400/40 to-pink-400/40 rounded-full blur-3xl"
+          animate={{ opacity: [0.15, 0.25, 0.15] }}
+          transition={{ duration: 18, repeat: Infinity }}
+          className="absolute top-20 left-10 w-96 h-96 bg-red-300/10 rounded-full blur-3xl"
         />
         <motion.div
-          animate={{
-            scale: [1, 1.3, 1],
-            rotate: [0, -90, 0],
-            opacity: [0.2, 0.3, 0.2],
-          }}
-          transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-1/2 -right-1/4 w-[32rem] h-[32rem] bg-gradient-to-br from-blue-400/30 to-indigo-400/30 rounded-full blur-3xl"
-        />
-        <motion.div
-          animate={{
-            y: [0, -30, 0],
-            opacity: [0.1, 0.2, 0.1],
-          }}
-          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute bottom-0 left-1/3 w-80 h-80 bg-gradient-to-br from-purple-400/20 to-pink-400/20 rounded-full blur-3xl"
+          animate={{ opacity: [0.1, 0.2, 0.1] }}
+          transition={{ duration: 22, repeat: Infinity, delay: 6 }}
+          className="absolute bottom-32 right-20 w-80 h-80 bg-rose-300/10 rounded-full blur-3xl"
         />
       </div>
 
