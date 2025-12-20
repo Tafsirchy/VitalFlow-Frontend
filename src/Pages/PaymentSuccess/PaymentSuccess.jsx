@@ -11,25 +11,25 @@ const PaymentSuccess = ({
   transactionId,
   showInvoice = true,
 }) => {
- const navigate = useNavigate();
- const [searchParams] = useSearchParams();
- const sessionId = searchParams.get("session_id");
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const sessionId = searchParams.get("session_id");
 
- const axiosInstance = useAxios();
+  const axiosInstance = useAxios();
 
- useEffect(() => {
-   if (!sessionId) return;
+  useEffect(() => {
+    if (!sessionId) return;
 
-   axiosInstance
-     .post(`/success-payment?session_id=${sessionId}`)
-     .then((res) => {
-      //  console.log(res.data);
-     })
-     .catch((err) => {
-      console.log(err);
-     });
- }, [axiosInstance, sessionId]);
+    axiosInstance
+      .get(`/success-payment?session_id=${sessionId}`)
 
+      .then((res) => {
+        //  console.log(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [axiosInstance, sessionId]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-emerald-100 px-4">

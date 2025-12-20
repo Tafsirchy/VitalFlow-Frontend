@@ -15,6 +15,7 @@ import AllBloodDonationRequest from "../Pages/Dashboard/AllBloodDonationRequest.
 import NotFoundPage from "../Pages/NotFoundPage/NotFoundPage";
 import Profile from "../Pages/Dashboard/Profile/Profile";
 import SuspenseWrapper from "../Components/ComponentForLoader/SuspenseWrapper";
+import PaymentCancelled from "../Pages/PaymentCancelled/PaymentCancelled";
 
 const SearchPage = lazy(() => import("../Pages/SearchPage/SearchPage"));
 const DonationRequest = lazy(() =>
@@ -84,19 +85,11 @@ const router = createBrowserRouter([
   },
   {
     path: "/payment-success",
-    element: (
-      <SuspenseWrapper>
-        <PaymentSuccess />
-      </SuspenseWrapper>
-    ),
+    element: <PaymentSuccess/>
   },
   {
     path: "/payment-cancelled",
-    element: (
-      <SuspenseWrapper>
-        <PaymentSuccess />
-      </SuspenseWrapper>
-    ),
+    element: <PaymentCancelled />,
   },
   {
     path: "/donation-details/:id",
