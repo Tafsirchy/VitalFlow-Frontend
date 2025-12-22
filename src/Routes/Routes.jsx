@@ -85,7 +85,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/payment-success",
-    element: <PaymentSuccess/>
+    element: <PaymentSuccess />,
   },
   {
     path: "/payment-cancelled",
@@ -94,9 +94,11 @@ const router = createBrowserRouter([
   {
     path: "/donation-details/:id",
     element: (
-      <SuspenseWrapper>
-        <DonationDetails />
-      </SuspenseWrapper>
+      <PrivateRoute>
+        <SuspenseWrapper>
+          <DonationDetails />
+        </SuspenseWrapper>
+      </PrivateRoute>
     ),
   },
   {

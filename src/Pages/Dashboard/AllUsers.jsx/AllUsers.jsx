@@ -130,17 +130,17 @@ const AllUsers = () => {
       className="p-4 md:p-6 min-h-screen"
       style={{ backgroundColor: "var(--background-main)" }}
     >
-      <div className="max-w-7xl mx-auto">
-        {/* Animated Header */}
+      <div className="max-w-7xl mx-auto pt-7">
+        {/* Animated Header - FIXED FOR MOBILE */}
         <motion.div
           initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className="mb-8 text-center relative"
+          className="mb-8 text-center relative px-5 md:px-0"
         >
-          {/* Floating sparkles animation */}
+          {/* Floating sparkles animation - CENTERED FOR MOBILE */}
           <motion.div
-            className="absolute -top-2 left-1/2 transform -translate-x-1/2"
+            className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-6 md:-translate-y-8"
             animate={{
               y: [-5, 5, -5],
               rotate: [0, 180, 360],
@@ -152,9 +152,9 @@ const AllUsers = () => {
             }}
           >
             <Sparkles
-              size={24}
+              size={20}
               style={{ color: "var(--primary-red)" }}
-              className="opacity-70"
+              className="opacity-70 md:w-6 md:h-6"
             />
           </motion.div>
 
@@ -162,8 +162,9 @@ const AllUsers = () => {
             initial={{ scale: 0.8 }}
             animate={{ scale: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
+            className="pt-2 md:pt-0"
           >
-            <div className="flex items-center justify-center gap-3 mb-3">
+            <div className="flex items-center justify-center gap-2 md:gap-3 mb-2 md:mb-3">
               <motion.div
                 animate={{
                   rotate: [0, 10, -10, 0],
@@ -175,13 +176,14 @@ const AllUsers = () => {
                 }}
               >
                 <Users
-                  size={40}
+                  size={32}
                   style={{ color: "var(--primary-red)" }}
                   strokeWidth={2.5}
+                  className="md:w-10 md:h-10"
                 />
               </motion.div>
               <h1
-                className="text-4xl md:text-5xl font-extrabold tracking-tight"
+                className="text-3xl md:text-5xl font-extrabold tracking-tight"
                 style={{ color: "var(--text-primary)" }}
               >
                 User Management
@@ -191,7 +193,7 @@ const AllUsers = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4 }}
-              className="text-base md:text-lg font-medium"
+              className="text-sm md:text-lg font-medium px-2"
               style={{ color: "var(--text-secondary)" }}
             >
               Empower your community • Manage roles • Build the future of
@@ -199,13 +201,13 @@ const AllUsers = () => {
             </motion.p>
           </motion.div>
 
-          {/* Decorative line */}
+          {/* Decorative line - RESPONSIVE WIDTH */}
           <motion.div
-            className="mt-4 h-1 mx-auto rounded-full"
+            className="mt-3 md:mt-4 h-1 mx-auto rounded-full"
             style={{
               background:
                 "linear-gradient(90deg, transparent, var(--primary-red), transparent)",
-              width: "200px",
+              width: "150px",
             }}
             initial={{ scaleX: 0 }}
             animate={{ scaleX: 1 }}
@@ -213,16 +215,16 @@ const AllUsers = () => {
           />
         </motion.div>
 
-        {/* Search and Filter Bar */}
+        {/* Search and Filter Bar - FIXED FOR MOBILE */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="mb-6 flex flex-col md:flex-row gap-4"
+          className="mb-6 flex flex-col gap-4"
         >
           {/* Search Input */}
           <motion.div
-            className="relative flex-1"
+            className="relative w-full"
             whileHover={{ scale: 1.02 }}
             transition={{ duration: 0.2 }}
           >
@@ -250,9 +252,9 @@ const AllUsers = () => {
             />
           </motion.div>
 
-          {/* Role Filter */}
+          {/* Role Filter - FULL WIDTH ON MOBILE */}
           <motion.div
-            className="relative"
+            className="relative w-full"
             whileHover={{ scale: 1.02 }}
             transition={{ duration: 0.2 }}
           >
@@ -264,7 +266,7 @@ const AllUsers = () => {
             <select
               value={filterRole}
               onChange={(e) => setFilterRole(e.target.value)}
-              className="pl-12 pr-8 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 appearance-none cursor-pointer min-w-[180px]"
+              className="w-full pl-12 pr-8 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 appearance-none cursor-pointer"
               style={{
                 backgroundColor: "var(--background-card)",
                 borderColor: "var(--border-light)",
@@ -284,7 +286,7 @@ const AllUsers = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6"
+          className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6"
         >
           {[
             {
@@ -326,7 +328,7 @@ const AllUsers = () => {
                 y: -5,
                 transition: { duration: 0.2 },
               }}
-              className="p-5 rounded-xl border-2 cursor-pointer"
+              className="p-4 md:p-5 rounded-xl border-2 cursor-pointer"
               style={{
                 backgroundColor: "var(--background-card)",
                 borderColor: "var(--border-light)",
@@ -335,13 +337,13 @@ const AllUsers = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p
-                    className="text-sm font-medium mb-1"
+                    className="text-xs md:text-sm font-medium mb-1"
                     style={{ color: "var(--text-secondary)" }}
                   >
                     {stat.label}
                   </p>
                   <motion.p
-                    className="text-3xl font-bold"
+                    className="text-2xl md:text-3xl font-bold"
                     style={{ color: stat.color }}
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
@@ -351,7 +353,7 @@ const AllUsers = () => {
                   </motion.p>
                 </div>
                 <motion.div
-                  className="w-14 h-14 rounded-full flex items-center justify-center"
+                  className="w-10 h-10 md:w-14 md:h-14 rounded-full flex items-center justify-center"
                   style={{ backgroundColor: `${stat.color}20` }}
                   animate={{
                     rotate: [0, 360],
@@ -362,7 +364,11 @@ const AllUsers = () => {
                     ease: "linear",
                   }}
                 >
-                  <stat.icon size={24} style={{ color: stat.color }} />
+                  <stat.icon
+                    size={20}
+                    style={{ color: stat.color }}
+                    className="md:w-6 md:h-6"
+                  />
                 </motion.div>
               </div>
             </motion.div>
