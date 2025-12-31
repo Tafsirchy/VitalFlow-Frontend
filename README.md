@@ -81,7 +81,6 @@ The main purpose of VitalFlow is to save lives by reducing the time required to 
 ### 1️⃣ Clone the repository
 ```bash
 git clone https://github.com/Tafsirchy/VitalFlow-Frontend.git
-
 git clone https://github.com/Tafsirchy/VitalFlow-BackendNew.git
 
 2️⃣ Install dependencies
