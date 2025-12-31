@@ -1,59 +1,123 @@
-### Project Name:
+## 📌 Project Overview
+VitalFlow provides an efficient solution for emergency blood search by allowing users to find donors based on blood group and district/Upazila. Users can request blood, receive notifications when donors are available, and track their request history. The system also includes role-based access for Admins and Volunteers to manage users, donors, requests, and funding activities.
 
-                VitalFlow
+---
 
-### Live URL:
+## 🎯 Purpose
+The main purpose of VitalFlow is to save lives by reducing the time required to find blood donors in emergency situations. By offering district-wise search, request tracking, and instant notifications, the platform ensures that users can quickly connect with suitable donors nearby.
 
-                https://vitalflow-9b72a.web.app/
+---
 
-### Project Description:
+## 🛠️ Technologies Used
 
-                VitalFlow is a web application that helps you find blood in an emergency. It provides a list of blood donors with their contact information, location, and blood type. Users can search for blood donors based on their blood type and location. The application also provides a District wise view to help users find blood donors in your nearest area. User also request for blood and get notified when a blood donor is available.
+### Frontend
+- React
+- Tailwind CSS
+- DaisyUI
+- React Router
+- Framer Motion
+- Lucide Icons
 
-### Purpose:
+### Backend
+- Node.js
+- Express.js
+- MongoDB
+- JWT Authentication
+- Firebase Authentication
 
-                The purpose of this project is to help people find blood donors in an emergency. It provides a convenient way for users to search for blood donors based on their blood type and location. The application also provides a District wise view to help users find blood donors in their nearest area. The application also provides a feature for users to request for blood and get notified when a blood donor is available.
+### Payment
+- Stripe
 
-### Key Features:
+---
 
-                1. Blood Donor List: The application provides a list of blood donors with their contact information, location, and blood type.
-                2. Search Functionality: Users can search for blood donors based on their blood type and location.
-                3. District wise View: The application provides a District wise view to help users find blood donors in their nearest area.
-                4. Request for Blood: Users can request for blood and get notified when a blood donor is available.
-                5. The application uses Firebase Authentication to authenticate users and ensure that only authorized users can access the application.
-                6. User can see their own profile and update their information.
-                7. User can see their request history and cancel their request if needed.
-                8. User can see their notification history and mark them as read.
-                9. User can see their blood donation history and update their donation information.
-                10. User can see their blood request history and update their request information.
-                11. Admin can see all the users and their information.
-                12. Admin can see all the requests and their information.
-                13 Admin can manages all the users and their information.
-                14. Admin can manage all the requests and their information.
-                15. Admin can make any donor available or unavailable.(bllock/active)
-                16. Admin can make donor ---> volunteer, volunteer ---> donor, donor ---> admin, admin  ---> donor,
-                Volunteer ---> admin, admin ---> volunteer.
-                17. Volunteer can see all the users and their information.
-                18. Volunteer only applicible for chnages status of donor.
-                19. This application also has the fundinging part.
-                20. User can see their funding history and update their funding information.
-                21. Admin can see all the funding and their information.
-                22. Admin can manage all the funding and their information.
-                23. User can fund on funding pages.
-                24. Users can see emergency requests in featured requests.
-                25. Users can see all the requests in urgent requests pages
+## ✨ Core Features
 
-### NPM Packages Used:
+### User Features
+- View blood donors with contact details, blood group, and location
+- Search donors by blood group and district/Upazila
+- Request blood and get notified when a donor is available
+- View and manage personal profile
+- Track blood request history and cancel requests
+- View donation and funding history
+- See emergency and urgent blood requests
+- Fund blood-related causes via secure payment
 
-                  1. Express
-                  2. Cors
-                  3. MongoDB
-                  4. Dotenv
-                  5. Stripe
-                  6. React Toastify
-                  7. React Router
-                  8. Lucide Icons
-                  9. DaisyUI
-                  10. TailwindCSS
-                  11. JWT
-                  12. Framer Motion
+### Admin Features
+- View and manage all users, donors, and volunteers
+- Approve, block, or activate donors
+- Change user roles (User ↔ Donor ↔ Volunteer ↔ Admin)
+- Manage all blood requests and funding records
+- Monitor platform activity and user data
+
+### Volunteer Features
+- View user and donor information
+- Update donor availability status
+
+---
+
+## 📦 Dependencies Used
+
+### Backend
+- express
+- cors
+- mongodb
+- dotenv
+- jsonwebtoken
+- stripe
+
+### Frontend
+- react
+- react-router
+- react-toastify
+- tailwindcss
+- daisyui
+- lucide-react
+- framer-motion
+
+---
+
+## ▶️ Run the Project Locally
+
+### 1️⃣ Clone the repository
+```bash
+git clone https://github.com/Tafsirchy/VitalFlow-Frontend.git
+
+git clone https://github.com/Tafsirchy/VitalFlow-BackendNew.git
+
+2️⃣ Install dependencies
+Backend
+cd server
+npm install
+
+Frontend
+cd client
+npm install
+
+3️⃣ Environment Variables
+
+Create a .env file inside the server folder:
+
+PORT=5000
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
+STRIPE_SECRET_KEY=your_stripe_secret_key
+
+4️⃣ Start the application
+Backend
+Nodemon Index.js
+
+Frontend
+npm run dev
+
+
+The application will run at:
+👉 http://localhost:5000
+
+🌐 Live Project & Resources
+
+🔗 Live Website:=
+https://vitalflow-9b72a.web.app/
+
+💻 GitHub Repository:
+https://github.com/Tafsirchy/VitalFlow-Frontend.git
+https://github.com/Tafsirchy/VitalFlow-BackendNew.git
