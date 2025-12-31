@@ -108,7 +108,6 @@ Nodemon Index.js
 Frontend
 npm run dev
 
----
 
 The application will run at:
 👉 http://localhost:5000
