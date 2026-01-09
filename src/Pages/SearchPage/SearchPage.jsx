@@ -13,7 +13,7 @@ import {
   Activity,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion as Motion, AnimatePresence } from "framer-motion";
 import useAxios from "../../hooks/useAxios";
 import Navbar from "../../Components/Navbar";
 import Footer from "../../Components/Footer";
@@ -76,7 +76,7 @@ const SearchPage = () => {
     };
 
     return (
-      <motion.span
+      <Motion.span
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ type: "spring", stiffness: 500, damping: 30 }}
@@ -87,7 +87,7 @@ const SearchPage = () => {
         {status === "inprogress"
           ? "In Progress"
           : status.charAt(0).toUpperCase() + status.slice(1)}
-      </motion.span>
+      </Motion.span>
     );
   };
 
@@ -99,13 +99,13 @@ const SearchPage = () => {
       <main>
         <div className="min-h-screen bg-gradient-to-br from-red-50 via-pink-50 to-rose-50 py-12">
           <div className="w-11/12 max-w-7xl mx-auto">
-            <motion.div
+            <Motion.div
               initial={{ opacity: 0, y: -30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
               className="text-center mb-12"
             >
-              <motion.div
+              <Motion.div
                 animate={{
                   scale: [1, 1.05, 1],
                 }}
@@ -117,16 +117,16 @@ const SearchPage = () => {
                 className="inline-block mb-4"
               >
                 <Droplet className="text-red-600 mx-auto" size={64} />
-              </motion.div>
+              </Motion.div>
               <h1 className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-rose-600 to-pink-600 mb-4">
                 Find Blood Donors
               </h1>
               <p className="text-gray-600 text-lg">
                 Search for blood donation requests and save lives today
               </p>
-            </motion.div>
+            </Motion.div>
 
-            <motion.form
+            <Motion.form
               onSubmit={handleSearch}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -137,7 +137,7 @@ const SearchPage = () => {
               <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 via-pink-500/5 to-rose-500/5 rounded-3xl blur-xl"></div>
 
               <div className="relative flex flex-col gap-4 md:flex-row md:items-end md:gap-4">
-                <motion.div
+                <Motion.div
                   whileHover={{ scale: 1.02 }}
                   className="flex flex-col w-full md:w-1/4"
                 >
@@ -160,10 +160,10 @@ const SearchPage = () => {
                     <option>O+</option>
                     <option>O-</option>
                   </select>
-                </motion.div>
+                </Motion.div>
 
                 {/* District */}
-                <motion.div
+                <Motion.div
                   whileHover={{ scale: 1.02 }}
                   className="flex flex-col w-full md:w-1/4"
                 >
@@ -183,9 +183,9 @@ const SearchPage = () => {
                       </option>
                     ))}
                   </select>
-                </motion.div>
+                </Motion.div>
 
-                <motion.div
+                <Motion.div
                   whileHover={{ scale: 1.02 }}
                   className="flex flex-col w-full md:w-1/4"
                 >
@@ -205,9 +205,9 @@ const SearchPage = () => {
                       </option>
                     ))}
                   </select>
-                </motion.div>
+                </Motion.div>
 
-                <motion.div
+                <Motion.div
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   className="w-full md:w-1/4"
@@ -221,20 +221,20 @@ const SearchPage = () => {
                       <Search size={20} />
                       {isLoading ? "Searching..." : "Search"}
                     </span>
-                    <motion.div
+                    <Motion.div
                       className="absolute inset-0 bg-white/20"
                       initial={{ x: "-100%" }}
                       whileHover={{ x: "100%" }}
                       transition={{ duration: 0.5 }}
                     />
                   </button>
-                </motion.div>
+                </Motion.div>
               </div>
-            </motion.form>
+            </Motion.form>
 
             <AnimatePresence mode="wait">
               {!hasSearched && (
-                <motion.div
+                <Motion.div
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.9, y: -20 }}
@@ -243,7 +243,7 @@ const SearchPage = () => {
                 >
                   <div className="relative">
                     {/* Animated Background Circles */}
-                    <motion.div
+                    <Motion.div
                       animate={{
                         scale: [1, 1.2, 1],
                         opacity: [0.3, 0.5, 0.3],
@@ -259,7 +259,7 @@ const SearchPage = () => {
                     <div className="text-center space-y-8 py-16">
                       <div className="flex justify-center gap-8">
                         {[0, 1, 2].map((i) => (
-                          <motion.div
+                          <Motion.div
                             key={i}
                             animate={{
                               y: [0, -20, 0],
@@ -276,11 +276,11 @@ const SearchPage = () => {
                               size={48}
                               fill="currentColor"
                             />
-                          </motion.div>
+                          </Motion.div>
                         ))}
                       </div>
 
-                      <motion.div
+                      <Motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.6 }}
@@ -294,9 +294,9 @@ const SearchPage = () => {
                           requests in your area. Every search brings you one
                           step closer to helping someone in need.
                         </p>
-                      </motion.div>
+                      </Motion.div>
 
-                      <motion.div
+                      <Motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.8 }}
@@ -315,12 +315,12 @@ const SearchPage = () => {
                             value: "500+",
                           },
                         ].map((stat, i) => (
-                          <motion.div
+                          <Motion.div
                             key={i}
                             whileHover={{ scale: 1.1, y: -5 }}
                             className="bg-white/60 backdrop-blur-md rounded-2xl p-6 shadow-xl border border-white/40 min-w-[150px]"
                           >
-                            <motion.div
+                            <Motion.div
                               animate={{ rotate: [0, 360] }}
                               transition={{
                                 duration: 3,
@@ -332,51 +332,51 @@ const SearchPage = () => {
                                 className="text-red-600 mx-auto mb-2"
                                 size={32}
                               />
-                            </motion.div>
+                            </Motion.div>
                             <div className="text-3xl font-bold text-gray-800">
                               {stat.value}
                             </div>
                             <div className="text-sm text-gray-600">
                               {stat.label}
                             </div>
-                          </motion.div>
+                          </Motion.div>
                         ))}
-                      </motion.div>
+                      </Motion.div>
 
-                      <motion.div
+                      <Motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 1 }}
                         className="pt-8"
                       >
-                        <motion.div
+                        <Motion.div
                           animate={{ scale: [1, 1.05, 1] }}
                           transition={{ duration: 2, repeat: Infinity }}
                           className="inline-flex items-center gap-2 text-red-600 font-semibold text-lg"
                         >
                           <Search className="animate-bounce" size={24} />
                           Start your search now
-                        </motion.div>
-                      </motion.div>
+                        </Motion.div>
+                      </Motion.div>
                     </div>
                   </div>
-                </motion.div>
+                </Motion.div>
               )}
 
               {hasSearched && (
-                <motion.div
+                <Motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   className="mt-12"
                 >
                   {isLoading ? (
-                    <motion.div
+                    <Motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       className="text-center py-20"
                     >
-                      <motion.div
+                      <Motion.div
                         animate={{ rotate: 360 }}
                         transition={{
                           duration: 1,
@@ -386,34 +386,34 @@ const SearchPage = () => {
                         className="inline-block"
                       >
                         <Droplet className="text-red-600" size={64} />
-                      </motion.div>
-                      <motion.p
+                      </Motion.div>
+                      <Motion.p
                         animate={{ opacity: [0.5, 1, 0.5] }}
                         transition={{ duration: 1.5, repeat: Infinity }}
                         className="mt-6 text-xl text-gray-600 font-semibold"
                       >
                         Searching for blood donors...
-                      </motion.p>
-                    </motion.div>
+                      </Motion.p>
+                    </Motion.div>
                   ) : searchResults.length > 0 ? (
                     <>
-                      <motion.h2
+                      <Motion.h2
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         className="text-3xl font-bold text-gray-800 mb-8 flex items-center gap-3"
                       >
-                        <motion.div
+                        <Motion.div
                           animate={{ scale: [1, 1.2, 1] }}
                           transition={{ duration: 1, repeat: Infinity }}
                         >
                           🎯
-                        </motion.div>
+                        </Motion.div>
                         Found {searchResults.length} Request
                         {searchResults.length !== 1 ? "s" : ""}
-                      </motion.h2>
+                      </Motion.h2>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {searchResults.map((request, index) => (
-                          <motion.div
+                          <Motion.div
                             key={request._id}
                             initial={{ opacity: 0, y: 50, scale: 0.9 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -429,7 +429,7 @@ const SearchPage = () => {
                             }}
                             className="group relative bg-white/80 backdrop-blur-lg rounded-2xl shadow-lg hover:shadow-2xl transition-all p-6 border border-white/40 overflow-hidden"
                           >
-                            <motion.div
+                            <Motion.div
                               className="absolute inset-0 bg-gradient-to-br from-red-500/10 via-pink-500/10 to-rose-500/10 opacity-0 group-hover:opacity-100 transition-opacity"
                               animate={{
                                 backgroundPosition: ["0% 0%", "100% 100%"],
@@ -444,11 +444,11 @@ const SearchPage = () => {
                             <div className="relative z-10">
                               {/* Blood Group Badge */}
                               <div className="flex items-center justify-between mb-4">
-                                <motion.div
+                                <Motion.div
                                   className="flex items-center gap-2"
                                   whileHover={{ scale: 1.1 }}
                                 >
-                                  <motion.div
+                                  <Motion.div
                                     animate={{ rotate: [0, 10, -10, 0] }}
                                     transition={{
                                       duration: 2,
@@ -460,16 +460,16 @@ const SearchPage = () => {
                                       size={28}
                                       fill="currentColor"
                                     />
-                                  </motion.div>
+                                  </Motion.div>
                                   <span className="text-3xl font-extrabold bg-gradient-to-r from-red-600 to-rose-600 bg-clip-text text-transparent">
                                     {request.bloodGroup}
                                   </span>
-                                </motion.div>
+                                </Motion.div>
                                 {getStatusBadge(request.donation_status)}
                               </div>
 
                               <div className="space-y-3 mb-4">
-                                <motion.div
+                                <Motion.div
                                   whileHover={{ x: 5 }}
                                   className="flex items-start gap-2"
                                 >
@@ -485,9 +485,9 @@ const SearchPage = () => {
                                       {request.recipient_name}
                                     </p>
                                   </div>
-                                </motion.div>
+                                </Motion.div>
 
-                                <motion.div
+                                <Motion.div
                                   whileHover={{ x: 5 }}
                                   className="flex items-start gap-2"
                                 >
@@ -509,9 +509,9 @@ const SearchPage = () => {
                                       </p>
                                     )}
                                   </div>
-                                </motion.div>
+                                </Motion.div>
 
-                                <motion.div
+                                <Motion.div
                                   whileHover={{ x: 5 }}
                                   className="flex items-start gap-2"
                                 >
@@ -527,10 +527,10 @@ const SearchPage = () => {
                                       {request.hospital}
                                     </p>
                                   </div>
-                                </motion.div>
+                                </Motion.div>
 
                                 <div className="flex items-center gap-4">
-                                  <motion.div
+                                  <Motion.div
                                     whileHover={{ scale: 1.05 }}
                                     className="flex items-center gap-2"
                                   >
@@ -541,8 +541,8 @@ const SearchPage = () => {
                                     <span className="text-sm text-gray-700 font-medium">
                                       {request.date}
                                     </span>
-                                  </motion.div>
-                                  <motion.div
+                                  </Motion.div>
+                                  <Motion.div
                                     whileHover={{ scale: 1.05 }}
                                     className="flex items-center gap-2"
                                   >
@@ -550,11 +550,11 @@ const SearchPage = () => {
                                     <span className="text-sm text-gray-700 font-medium">
                                       {request.time}
                                     </span>
-                                  </motion.div>
+                                  </Motion.div>
                                 </div>
                               </div>
 
-                              <motion.div
+                              <Motion.div
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 transition={{ delay: 0.3 }}
@@ -569,7 +569,7 @@ const SearchPage = () => {
                                     </span>
                                   </p>
                                 </div>
-                                <motion.div
+                                <Motion.div
                                   whileHover={{ scale: 1.02 }}
                                   className="flex items-center gap-2"
                                 >
@@ -580,7 +580,7 @@ const SearchPage = () => {
                                   >
                                     {request.requester_email}
                                   </a>
-                                </motion.div>
+                                </Motion.div>
                                 {request.message && (
                                   <div className="flex items-start gap-2">
                                     <MessageSquare
@@ -592,19 +592,19 @@ const SearchPage = () => {
                                     </p>
                                   </div>
                                 )}
-                              </motion.div>
+                              </Motion.div>
                             </div>
-                          </motion.div>
+                          </Motion.div>
                         ))}
                       </div>
                     </>
                   ) : (
-                    <motion.div
+                    <Motion.div
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
                       className="text-center py-20 bg-white/60 backdrop-blur-lg rounded-3xl shadow-xl"
                     >
-                      <motion.div
+                      <Motion.div
                         animate={{
                           y: [0, -10, 0],
                           rotate: [0, 5, -5, 0],
@@ -612,7 +612,7 @@ const SearchPage = () => {
                         transition={{ duration: 2, repeat: Infinity }}
                       >
                         <Droplet className="mx-auto text-gray-300" size={80} />
-                      </motion.div>
+                      </Motion.div>
                       <h3 className="text-2xl font-bold text-gray-700 mb-3 mt-6">
                         No Results Found
                       </h3>
@@ -620,9 +620,9 @@ const SearchPage = () => {
                         Try adjusting your search filters to find blood donation
                         requests.
                       </p>
-                    </motion.div>
+                    </Motion.div>
                   )}
-                </motion.div>
+                </Motion.div>
               )}
             </AnimatePresence>
           </div>

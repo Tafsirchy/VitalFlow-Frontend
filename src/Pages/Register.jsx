@@ -21,7 +21,10 @@ import { motion } from "framer-motion";
 import axios from "axios";
 
 const Register = () => {
-  const { createUser, updateUser } = useContext(AuthContext);
+  const { createUser, updateUser, handleGoogleSignIn } = useContext(AuthContext);
+
+  // Default avatar URL for users without profile photo
+  const DEFAULT_AVATAR = "https://ui-avatars.com/api/?name=User&size=200&background=C62828&color=fff";
 
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -49,6 +52,27 @@ const Register = () => {
   }, []);
 
   const navigate = useNavigate();
+
+  // Google Sign Up handler
+  const handleGoogleSignUp = async () => {
+    setLoading(true);
+    try {
+      await handleGoogleSignIn();
+      toast.success("Google sign-up successful!");
+      navigate("/");
+    } catch (error) {
+      let message = "Google sign-up failed.";
+      if (error.code === "auth/popup-closed-by-user") {
+        message = "Sign-up cancelled.";
+      } else if (error.code === "auth/account-exists-with-different-credential") {
+        message = "Account exists. Try signing in instead.";
+      }
+      setError(message);
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -88,7 +112,7 @@ const Register = () => {
       }
     );
 
-    const mainPhotoUrl = res.data.data.display_url;
+    const mainPhotoUrl = res.data.data.display_url || DEFAULT_AVATAR;
 
     const formData = {
       name,
@@ -102,7 +126,7 @@ const Register = () => {
 
     if (res.data.success == true) {
       createUser(email, password)
-        .then((result) => {
+        .then(() => {
           // console.log(result);
           return updateUser({
             displayName: name,
@@ -112,7 +136,7 @@ const Register = () => {
         .then(() => {
           axios
             .post("https://vital-flow-backend-khaki.vercel.app/donor", formData)
-            .then((res) => {
+            .then(() => {
               // console.log(res.data);
               setLoading(false);
             })
@@ -158,7 +182,7 @@ const Register = () => {
             className="w-full h-full object-cover"
             alt="Blood Donation"
           />
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-900/90 via-blue-800/85 to-red-900/90"></div>
+          <div className="absolute inset-0 bg-premium-gradient opacity-90"></div>
         </div>
 
         {/* Animated Droplets Background */}
@@ -218,12 +242,12 @@ const Register = () => {
                 />
               </motion.div>
             </div>
-            <h1 className="text-6xl font-black mb-4 bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
+            <h1 className="text-6xl font-black mb-4 text-white">
               Join VitalFlow
             </h1>
             <div className="flex items-center justify-center gap-2 mb-6">
               <div className="h-1 w-16 bg-gradient-to-r from-transparent to-white rounded-full"></div>
-              <HeartPulse size={24} className="animate-pulse" />
+              <HeartPulse size={24} className="animate-pulse text-white" />
               <div className="h-1 w-16 bg-gradient-to-l from-transparent to-white rounded-full"></div>
             </div>
             <p className="text-xl opacity-90">
@@ -262,24 +286,23 @@ const Register = () => {
         initial={{ x: 100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 0.6 }}
-        className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gradient-to-br from-gray-50 to-blue-50/20 overflow-y-auto"
+        className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-[var(--background-main)] overflow-y-auto"
       >
         <div className="w-full max-w-md py-8">
           {/* Mobile Logo */}
           <div className="lg:hidden text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 mb-4">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-premium-gradient mb-4">
               <img
                 src={logo}
                 alt="VitalFlow Logo"
                 className="w-10 h-10 object-contain"
               />
             </div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">
+            <h1 className="text-3xl font-bold text-gradient-crimson">
               VitalFlow
             </h1>
           </div>
 
-          {/* Header */}
           <div className="mb-8">
             <motion.div
               initial={{ scale: 0 }}
@@ -289,14 +312,31 @@ const Register = () => {
             >
               <Droplet
                 size={32}
-                className="text-blue-600"
+                className="text-[var(--primary-red)]"
                 fill="currentColor"
               />
-              <div className="h-1 w-16 bg-gradient-to-r from-blue-600 to-red-600 rounded-full"></div>
+              <div className="h-1 w-16 bg-premium-gradient rounded-full"></div>
             </motion.div>
-            <h2 className="text-5xl font-black text-gray-900 mb-2">Sign Up</h2>
-            <p className="text-gray-600">Create your donor account</p>
+            <h2 className="text-5xl font-black text-[var(--text-primary)] mb-2">Sign Up</h2>
+            <p className="text-[var(--text-secondary)]">Create your donor account and start saving lives</p>
           </div>
+
+          {/* Login Banner */}
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-[var(--primary-red)]/5 border-2 border-[var(--primary-red)]/20 rounded-xl p-4 mb-6 glass-morphism !bg-transparent"
+          >
+            <div className="flex items-start gap-3">
+              <Droplet className="w-5 h-5 text-[var(--primary-red)] flex-shrink-0 mt-0.5" fill="currentColor" />
+              <div>
+                <h4 className="text-sm font-bold text-[var(--text-primary)] mb-1">Demo Account Available</h4>
+                <p className="text-xs text-[var(--text-secondary)]">
+                  Want to try the platform? Use <span className="font-mono bg-[var(--primary-red)]/10 px-1 rounded">demo@vitalflow.com</span> on the login page
+                </p>
+              </div>
+            </div>
+          </motion.div>
 
           {/* Form */}
           <motion.form
@@ -308,17 +348,17 @@ const Register = () => {
           >
             {/* Name */}
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
+              <label className="block text-sm font-bold text-[var(--text-primary)] mb-2">
                 Full Name
               </label>
               <div className="relative">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-500">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--primary-red)]">
                   <User className="w-5 h-5" />
                 </div>
                 <input
                   name="name"
                   type="text"
-                  className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition-all bg-white"
+                  className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-[var(--border-light)] focus:border-[var(--primary-red)] focus:ring-4 focus:ring-[var(--primary-red)]/10 outline-none transition-all bg-[var(--background-card)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)]"
                   placeholder="Enter your full name"
                   required
                 />
@@ -327,17 +367,17 @@ const Register = () => {
 
             {/* Email */}
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
+              <label className="block text-sm font-bold text-[var(--text-primary)] mb-2">
                 Email Address
               </label>
               <div className="relative">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-500">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--primary-red)]">
                   <Mail className="w-5 h-5" />
                 </div>
                 <input
                   name="email"
                   type="email"
-                  className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition-all bg-white"
+                  className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-[var(--border-light)] focus:border-[var(--primary-red)] focus:ring-4 focus:ring-[var(--primary-red)]/10 outline-none transition-all bg-[var(--background-card)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)]"
                   placeholder="your.email@example.com"
                   required
                 />
@@ -346,7 +386,7 @@ const Register = () => {
 
             {/* Photo Upload */}
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
+              <label className="block text-sm font-bold text-[var(--text-primary)] mb-2">
                 Profile Photo
               </label>
               <div className="relative">
@@ -360,10 +400,10 @@ const Register = () => {
                 />
                 <label
                   htmlFor="photo-upload"
-                  className="flex items-center gap-3 w-full px-4 py-3 rounded-xl border-2 border-dashed border-gray-300 hover:border-blue-500 transition-all cursor-pointer bg-white group"
+                  className="flex items-center gap-3 w-full px-4 py-3 rounded-xl border-2 border-dashed border-[var(--border-light)] hover:border-[var(--primary-red)] transition-all cursor-pointer bg-[var(--background-card)] group"
                 >
-                  <Upload className="w-5 h-5 text-blue-500" />
-                  <span className="text-gray-600 group-hover:text-blue-600 transition-colors">
+                  <Upload className="w-5 h-5 text-[var(--primary-red)]" />
+                  <span className="text-[var(--text-muted)] group-hover:text-[var(--primary-red)] transition-colors">
                     {fileName || "Choose a file..."}
                   </span>
                 </label>
@@ -372,17 +412,17 @@ const Register = () => {
 
             {/* Blood Group */}
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
+              <label className="block text-sm font-bold text-[var(--text-primary)] mb-2">
                 Blood Group
               </label>
               <div className="relative">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-red-500 z-10">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--primary-red)] z-10">
                   <Droplet className="w-5 h-5" fill="currentColor" />
                 </div>
                 <select
                   name="blood"
                   required
-                  className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-gray-200 focus:border-red-500 focus:ring-4 focus:ring-red-100 outline-none transition-all bg-white appearance-none cursor-pointer"
+                  className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-[var(--border-light)] focus:border-[var(--primary-red)] focus:ring-4 focus:ring-[var(--primary-red)]/10 outline-none transition-all bg-[var(--background-card)] text-[var(--text-primary)] appearance-none cursor-pointer"
                 >
                   <option value="" disabled selected>
                     Select your blood group
@@ -402,17 +442,17 @@ const Register = () => {
             {/* District & Upazila */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
+                <label className="block text-sm font-bold text-[var(--text-primary)] mb-2">
                   District
                 </label>
                 <div className="relative">
-                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-green-500 z-10">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--primary-red)] z-10">
                     <MapPin className="w-4 h-4" />
                   </div>
                   <select
                     value={district}
                     onChange={(e) => setDistrict(e.target.value)}
-                    className="w-full pl-10 pr-3 py-3 rounded-xl border-2 border-gray-200 focus:border-green-500 focus:ring-4 focus:ring-green-100 outline-none transition-all bg-white appearance-none cursor-pointer text-sm"
+                    className="w-full pl-10 pr-3 py-3 rounded-xl border-2 border-[var(--border-light)] focus:border-[var(--primary-red)] focus:ring-4 focus:ring-[var(--primary-red)]/10 outline-none transition-all bg-[var(--background-card)] text-[var(--text-primary)] appearance-none cursor-pointer text-sm"
                     required
                   >
                     <option disabled selected value="">
@@ -428,17 +468,17 @@ const Register = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
+                <label className="block text-sm font-bold text-[var(--text-primary)] mb-2">
                   Upazila
                 </label>
                 <div className="relative">
-                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-green-500 z-10">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--primary-red)] z-10">
                     <MapPin className="w-4 h-4" />
                   </div>
                   <select
                     value={upazila}
                     onChange={(e) => setUpazila(e.target.value)}
-                    className="w-full pl-10 pr-3 py-3 rounded-xl border-2 border-gray-200 focus:border-green-500 focus:ring-4 focus:ring-green-100 outline-none transition-all bg-white appearance-none cursor-pointer text-sm"
+                    className="w-full pl-10 pr-3 py-3 rounded-xl border-2 border-[var(--border-light)] focus:border-[var(--primary-red)] focus:ring-4 focus:ring-[var(--primary-red)]/10 outline-none transition-all bg-[var(--background-card)] text-[var(--text-primary)] appearance-none cursor-pointer text-sm"
                     required
                   >
                     <option disabled selected value="">
@@ -456,17 +496,17 @@ const Register = () => {
 
             {/* Password */}
             <div className="relative">
-              <label className="block text-sm font-bold text-gray-700 mb-2">
+              <label className="block text-sm font-bold text-[var(--text-primary)] mb-2">
                 Password
               </label>
               <div className="relative">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-500">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--primary-red)]">
                   <Lock className="w-5 h-5" />
                 </div>
                 <input
                   name="password"
                   type={showPassword ? "text" : "password"}
-                  className="w-full pl-12 pr-12 py-3 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition-all bg-white"
+                  className="w-full pl-12 pr-12 py-3 rounded-xl border-2 border-[var(--border-light)] focus:border-[var(--primary-red)] focus:ring-4 focus:ring-[var(--primary-red)]/10 outline-none transition-all bg-[var(--background-card)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)]"
                   placeholder="••••••••••••"
                   onChange={() => setError("")}
                   required
@@ -474,7 +514,7 @@ const Register = () => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600 transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--primary-red)] transition-colors"
                 >
                   {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
                 </button>
@@ -486,18 +526,18 @@ const Register = () => {
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-red-50 border-2 border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm font-medium"
+                className="bg-[var(--primary-red)]/5 border-2 border-[var(--primary-red)]/20 text-[var(--primary-red)] px-4 py-3 rounded-xl text-sm font-medium"
               >
                 {error}
               </motion.div>
             )}
 
             {/* Submit Button */}
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+            <button
               type="submit"
-              className="w-full py-4 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold transition-all shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 mt-6 flex items-center justify-center gap-2"
+              className={`btn-premium w-full !py-4 shadow-[var(--primary-red)]/20 mt-6 ${
+                loading ? "opacity-70 cursor-not-allowed" : ""
+              }`}
               disabled={loading}
             >
               {loading ? (
@@ -508,15 +548,44 @@ const Register = () => {
                   <ArrowRight size={20} />
                 </>
               )}
+            </button>
+
+            {/* Divider */}
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
+              </div>
+            <div className="relative flex justify-center text-sm">
+                <span className="px-4 bg-[var(--background-main)] text-[var(--text-muted)] font-medium">
+                  Or sign up with
+                </span>
+              </div>
+            </div>
+
+            <motion.button
+              whileHover={{ scale: 1.02, backgroundColor: "rgba(var(--primary-red-rgb), 0.05)" }}
+              whileTap={{ scale: 0.98 }}
+              type="button"
+              onClick={handleGoogleSignUp}
+              disabled={loading}
+              className="w-full py-4 rounded-xl border-2 border-[var(--border-light)] bg-transparent transition-all flex items-center justify-center gap-3 font-semibold text-[var(--text-primary)] shadow-sm"
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+              </svg>
+              Sign up with Google
             </motion.button>
 
             {/* Login Link */}
             <div className="text-center mt-6">
-              <p className="text-gray-700">
+              <p className="text-gray-700 dark:text-gray-300">
                 Already have an account?{" "}
                 <Link
                   to="/auth/login"
-                  className="text-blue-600 hover:text-blue-700 font-bold hover:underline inline-flex items-center gap-1"
+                  className="text-[var(--primary-red)] font-bold hover:underline inline-flex items-center gap-1"
                 >
                   Sign in
                   <ArrowRight size={16} />

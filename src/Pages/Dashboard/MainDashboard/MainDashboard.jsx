@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useCallback } from "react";
 import { Link, useNavigate } from "react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -21,9 +21,12 @@ import {
   UserCheck,
 } from "lucide-react";
 import { toast } from "react-toastify";
+import gsap from "gsap";
 import { AuthContext } from "../../../Provider/AuthProvider";
 import useAxiosSecure from "../../../Hooks/useAxiosSecure";
 import AdminDashboardFeature from "../AdminDashboardFeature/AdminDashboardFeature";
+import CreativeDashboardStats from "../../../Components/Dashboard/CreativeDashboardStats";
+import DataAnalysis from "../../../Components/Dashboard/DataAnalysis";
 
 const MainDashboard = () => {
   const { user } = useContext(AuthContext);
@@ -32,15 +35,18 @@ const MainDashboard = () => {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [userRole, setUserRole] = useState(null);
   const [roleLoading, setRoleLoading] = useState(true);
+  const [dashboardStats, setDashboardStats] = useState({
+    allRequests: [],
+    allDonors: [],
+    totalUsers: 0,
+    totalFunding: 0,
+    bloodTypeDistribution: {},
+    requestsByStatus: {},
+  });
   const axiosSecure = useAxiosSecure();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchRecentRequests();
-    fetchUserRole();
-  }, []);
-
-  const fetchRecentRequests = async () => {
+  const fetchRecentRequests = useCallback(async () => {
     try {
       setLoading(true);
       const response = await axiosSecure.get("/my-recent-requests");
@@ -51,9 +57,9 @@ const MainDashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [axiosSecure]);
 
-  const fetchUserRole = async () => {
+  const fetchUserRole = useCallback(async () => {
     if (!user?.email) {
       setRoleLoading(false);
       return;
@@ -68,7 +74,74 @@ const MainDashboard = () => {
     } finally {
       setRoleLoading(false);
     }
-  };
+  }, [user?.email, axiosSecure]);
+
+  const fetchDashboardStats = useCallback(async () => {
+    try {
+      // Parallel API calls for better performance
+      const [allRequestsRes, allDonorsRes, totalFundingRes] = await Promise.all([
+        axiosSecure.get("/all-requests?size=1000&page=0"),
+        axiosSecure.get("/donor"),
+        axiosSecure.get("/total-funding"),
+      ]);
+
+      const allRequests = allRequestsRes.data.request || [];
+      const allDonors = allDonorsRes.data || [];
+      const funding = totalFundingRes.data || {};
+
+      // Calculate blood type distribution from donors
+      const bloodTypes = {};
+      allDonors.forEach((donor) => {
+        const bloodType = donor.blood || donor.bloodGroup;
+        if (bloodType) {
+          bloodTypes[bloodType] = (bloodTypes[bloodType] || 0) + 1;
+        }
+      });
+
+      // Calculate request status breakdown  
+      const statusCount = {
+        pending: allRequests.filter(r => r.donation_status === "pending").length,
+        inprogress: allRequests.filter(r => r.donation_status === "inprogress").length,
+        done: allRequests.filter(r => r.donation_status === "done").length,
+        canceled: allRequests.filter(r => r.donation_status === "canceled").length,
+      };
+
+      setDashboardStats({
+        allRequests,
+        allDonors,
+        totalUsers: allDonors.length,
+        totalFunding: funding.totalAmount || 0,
+        bloodTypeDistribution: bloodTypes,
+        requestsByStatus: statusCount,
+      });
+    } catch (error) {
+      console.error("Error fetching dashboard stats:", error);
+      toast.error("Failed to load dashboard statistics");
+    }
+  }, [axiosSecure]);
+
+  useEffect(() => {
+    fetchRecentRequests();
+    fetchUserRole();
+  }, [fetchRecentRequests, fetchUserRole]);
+
+  useEffect(() => {
+    if (userRole === "Admin" || userRole === "Volunteer") {
+      fetchDashboardStats();
+    }
+  }, [userRole, fetchDashboardStats]);
+
+  useEffect(() => {
+    if (!loading && !roleLoading) {
+      gsap.from(".dashboard-card", {
+        y: 40,
+        opacity: 0,
+        duration: 0.8,
+        stagger: 0.1,
+        ease: "power3.out",
+      });
+    }
+  }, [loading, roleLoading]);
 
   const handleStatusUpdate = async (id, status) => {
     try {
@@ -120,14 +193,14 @@ const MainDashboard = () => {
   };
 
   return (
-    <div className=" bg-gradient-to-br from-gray-50 to-gray-100 py-5">
-      <div className="py-8 px-5">
+    <div className="bg-background-main min-h-screen py-5 transition-smooth">
+      <div className="py-8 px-5 max-w-7xl mx-auto">
         {/* Welcome Section */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="relative bg-gradient-to-br from-red-600 via-red-500 to-blue-600 rounded-3xl p-8 mb-8 text-white overflow-hidden shadow-2xl"
+          className="relative bg-premium-gradient rounded-[2rem] p-8 mb-8 text-white overflow-hidden shadow-premium"
         >
           {/* Animated Background Particles (Floating Blood Drops) */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -227,28 +300,25 @@ const MainDashboard = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mt-8">
               {/* Total Requests Card */}
               <motion.div
-                whileHover={{ scale: 1.05, y: -5 }}
-                className="bg-white/15 backdrop-blur-md rounded-2xl p-6 border border-white/30 shadow-xl"
-                initial={{ x: -30, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: 0.9 }}
+                whileHover={{ scale: 1.02, y: -2 }}
+                className="glass-morphism dashboard-card rounded-2xl p-6 border border-white/20"
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-white/80 text-sm font-medium">
+                    <p className="text-white/70 text-sm font-medium uppercase tracking-wider">
                       Your Requests
                     </p>
-                    <p className="text-4xl font-black mt-2">
+                    <p className="text-4xl font-black mt-2 text-white">
                       {myRecentRequests.length}
                     </p>
                   </div>
                   <motion.div
-                    animate={{ rotate: [0, 10, -10, 0] }}
+                    animate={{ scale: [1, 1.1, 1] }}
                     transition={{ duration: 4, repeat: Infinity }}
                   >
                     <Droplet
-                      size={50}
-                      className="text-white/70"
+                      size={44}
+                      className="text-white/60"
                       fill="currentColor"
                     />
                   </motion.div>
@@ -257,25 +327,25 @@ const MainDashboard = () => {
 
               {/* Online Status Card */}
               <motion.div
-                whileHover={{ scale: 1.05, y: -5 }}
-                className="bg-white/15 backdrop-blur-md rounded-2xl p-6 border border-white/30 shadow-xl"
-                initial={{ x: 30, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: 1.0 }}
+                whileHover={{ scale: 1.02, y: -2 }}
+                className="glass-morphism dashboard-card rounded-2xl p-6 border border-white/20"
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-white/80 text-sm font-medium">Status</p>
+                    <p className="text-white/70 text-sm font-medium uppercase tracking-wider">Status</p>
                     <div className="flex items-center gap-3 mt-3">
-                      <motion.div
-                        animate={{ scale: [1, 1.3, 1] }}
-                        transition={{ duration: 1.5, repeat: Infinity }}
-                        className="w-4 h-4 bg-green-400 rounded-full"
-                      />
-                      <p className="text-2xl font-bold">Active & Ready</p>
+                      <div className="relative w-4 h-4">
+                        <motion.div
+                          animate={{ scale: [1, 1.8, 1], opacity: [1, 0, 1] }}
+                          transition={{ duration: 2, repeat: Infinity }}
+                          className="absolute inset-0 bg-green-400 rounded-full"
+                        />
+                        <div className="absolute inset-0.5 bg-green-500 rounded-full border border-white/40" />
+                      </div>
+                      <p className="text-2xl font-bold text-white">Active & Ready</p>
                     </div>
                   </div>
-                  <Activity size={50} className="text-green-300" />
+                  <Activity size={44} className="text-green-400/80" />
                 </div>
               </motion.div>
             </div>
@@ -298,14 +368,42 @@ const MainDashboard = () => {
 
         {/* Admin / Volunteer Dashboard Feature */}
         {!roleLoading && (userRole === "Admin" || userRole === "Volunteer") && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="mb-8"
-          >
-            <AdminDashboardFeature />
-          </motion.div>
+          <>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="mb-8"
+            >
+              <AdminDashboardFeature />
+            </motion.div>
+
+            {/* Creative Analytics Section for Admin/Volunteer */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="mb-8"
+            >
+              <CreativeDashboardStats 
+                requests={dashboardStats.allRequests} 
+                bloodStats={dashboardStats.bloodTypeDistribution}
+              />
+            </motion.div>
+
+            {/* Data Analysis Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+              className="mb-8"
+            >
+              <DataAnalysis 
+                requests={dashboardStats.allRequests} 
+                totalUsers={dashboardStats.totalUsers}
+              />
+            </motion.div>
+          </>
         )}
 
         {/* Regular Donor Dashboard - Recent Requests */}

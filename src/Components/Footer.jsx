@@ -9,7 +9,7 @@ import {
   Linkedin,
   Youtube,
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion as Motion } from "framer-motion";
 
 const Footer = () => {
   const footerLinks = {
@@ -20,36 +20,39 @@ const Footer = () => {
       { name: "About Us", path: "/about" },
     ],
     resources: [
-      { name: "Blood Donation Guide", path: "/guide" },
-      { name: "FAQs", path: "/faqs" },
+      { name: "Help & Support", path: "/help" },
       { name: "Blog", path: "/blog" },
-      { name: "Contact Support", path: "/support" },
+      { name: "Contact Us", path: "/contact" },
+      { name: "Search Donors", path: "/search" },
     ],
     legal: [
       { name: "Privacy Policy", path: "/privacy" },
       { name: "Terms of Service", path: "/terms" },
       { name: "Cookie Policy", path: "/cookies" },
-      { name: "Disclaimer", path: "/disclaimer" },
+      { name: "About VitalFlow", path: "/about" },
     ],
   };
 
   const socialLinks = [
-    { icon: Facebook, href: "#", label: "Facebook" },
-    { icon: Twitter, href: "#", label: "Twitter" },
-    { icon: Instagram, href: "#", label: "Instagram" },
-    { icon: Linkedin, href: "#", label: "LinkedIn" },
-    { icon: Youtube, href: "#", label: "YouTube" },
+    { icon: Facebook, href: "#", label: "Facebook", color: "hover:text-[var(--primary-red)] hover:border-[var(--primary-red)] hover:bg-[var(--primary-red-light)]/10" },
+    { icon: Twitter, href: "#", label: "Twitter", color: "hover:text-[var(--primary-red)] hover:border-[var(--primary-red)] hover:bg-[var(--primary-red-light)]/10" },
+    { icon: Instagram, href: "#", label: "Instagram", color: "hover:text-[var(--primary-red)] hover:border-[var(--primary-red)] hover:bg-[var(--primary-red-light)]/10" },
+    { icon: Linkedin, href: "#", label: "LinkedIn", color: "hover:text-[var(--primary-red)] hover:border-[var(--primary-red)] hover:bg-[var(--primary-red-light)]/10" },
+    { icon: Youtube, href: "#", label: "YouTube", color: "hover:text-[var(--primary-red)] hover:border-[var(--primary-red)] hover:bg-[var(--primary-red-light)]/10" },
   ];
 
   return (
-    <footer className="bg-gradient-to-br from-gray-50 to-gray-100 border-t border-gray-200">
+    <footer className="relative bg-[var(--background-main)] border-t border-[var(--border-light)] overflow-hidden">
+      {/* Decorative Gradient Blob */}
+      <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-[var(--primary-red)]/5 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute -top-24 -right-24 w-96 h-96 bg-[var(--primary-red)]/5 rounded-full blur-3xl pointer-events-none"></div>
       {/* Main Footer Content */}
       <div className="w-11/12 mx-auto py-12 lg:py-16">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12">
           {/* Brand Section - Takes 2 columns on large screens */}
           <div className="sm:col-span-2 lg:col-span-2 space-y-4">
             <Link to="/" className="inline-flex items-center gap-3 group">
-              <motion.div
+              <Motion.div
                 whileHover={{ scale: 1.1, rotate: 360 }}
                 transition={{ type: "spring", stiffness: 260, damping: 20 }}
                 className="w-12 h-12 flex items-center justify-center p-1"
@@ -57,11 +60,11 @@ const Footer = () => {
                 <img
                   src={logo}
                   alt="VitalFlow Logo"
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(100,13,20,0.3)]"
                 />
-              </motion.div>
+              </Motion.div>
               <div>
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">
+                <h2 className="text-2xl font-bold text-gradient-crimson">
                   VitalFlow
                 </h2>
                 <p className="text-xs text-gray-500 flex items-center gap-1">
@@ -87,9 +90,9 @@ const Footer = () => {
                 <li key={link.name}>
                   <Link
                     to={link.path}
-                    className="text-gray-600 hover:text-red-600 transition-colors text-sm inline-flex items-center gap-2 group"
+                    className="text-[var(--text-secondary)] hover:text-[var(--primary-red)] transition-colors text-sm inline-flex items-center gap-2 group"
                   >
-                    <span className="w-0 h-0.5 bg-red-600 group-hover:w-3 transition-all duration-300"></span>
+                    <span className="w-0 h-0.5 bg-[var(--primary-red)] group-hover:w-3 transition-all duration-300"></span>
                     {link.name}
                   </Link>
                 </li>
@@ -140,22 +143,22 @@ const Footer = () => {
       </div>
 
       {/* Bottom Bar - Centered Copyright and Social Icons */}
-      <div className="border-t border-gray-300">
+      <div className="border-t border-[var(--border-light)]">
         <div className="w-11/12 mx-auto py-6">
           <div className="flex flex-col items-center gap-4">
             {/* Social Media Icons */}
             <div className="flex items-center gap-4">
               {socialLinks.map((social) => (
-                <motion.a
+                <Motion.a
                   key={social.label}
                   whileHover={{ scale: 1.15, y: -2 }}
                   whileTap={{ scale: 0.95 }}
                   href={social.href}
-                  className="w-9 h-9 rounded-full border-2 border-gray-400 flex items-center justify-center text-gray-600 hover:border-red-600 hover:text-red-600 hover:bg-red-50 transition-all duration-300"
+                  className={`w-10 h-10 rounded-xl border border-[var(--border-light)] flex items-center justify-center text-[var(--text-secondary)] transition-all duration-300 glass-morphism ${social.color}`}
                   aria-label={social.label}
                 >
                   <social.icon size={18} strokeWidth={2} />
-                </motion.a>
+                </Motion.a>
               ))}
             </div>
 

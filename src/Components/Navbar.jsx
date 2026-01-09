@@ -15,15 +15,21 @@ import {
   DollarSign,
   User,
   Grid3x3,
+  Info,
+  Mail,
+  BookOpen,
+  HelpCircle,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion as Motion, AnimatePresence } from "framer-motion";
 import logo from "../assets/image.png";
+import ThemeToggle from "./ThemeToggle";
 
 const Navbar = () => {
   const { user, logOut } = useContext(AuthContext);
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isAboutDropdownOpen, setIsAboutDropdownOpen] = useState(false);
 
   const handleLogOut = () => {
     setIsDropdownOpen(false);
@@ -38,51 +44,57 @@ const Navbar = () => {
   const navLinkStyle = ({ isActive }) =>
     `px-4 py-2 rounded-xl font-semibold transition-all duration-300 ${
       isActive
-        ? "bg-red-600 text-white shadow-lg shadow-red-500/50"
-        : "text-gray-700 hover:bg-red-50 hover:text-red-600"
+        ? "bg-[var(--primary-red)] text-white shadow-lg shadow-[var(--primary-red)]/50"
+        : "text-gray-700 dark:text-gray-200 hover:bg-[var(--primary-red-light)]/10 hover:text-[var(--primary-red)]"
     }`;
 
   const navigationItems = [
-    { path: "/", label: "Home", icon: Home, color: "from-red-500 to-pink-500" },
+    { path: "/", label: "Home", icon: Home, color: "from-[var(--primary-red-dark)] to-[var(--primary-red)]" },
     {
       path: "/donation-requests",
       label: "Donations",
       icon: Heart,
-      color: "from-blue-500 to-cyan-500",
+      color: "from-[var(--primary-red)] to-[var(--primary-red-light)]",
     },
     {
       path: "/funding",
       label: "Funding",
       icon: DollarSign,
-      color: "from-green-500 to-emerald-500",
+      color: "from-[var(--secondary-slate-dark)] to-[var(--secondary-slate)]",
       requireAuth: true,
     },
     {
       path: "/dashboard",
       label: "Dashboard",
       icon: LayoutDashboard,
-      color: "from-purple-500 to-indigo-500",
+      color: "from-[var(--primary-red-deepest)] to-[var(--primary-red-dark)]",
       requireAuth: true,
     },
   ];
 
   return (
     <>
-      <motion.nav
+      <Motion.nav
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ type: "spring", stiffness: 100, damping: 20 }}
-        className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-200/50 shadow-lg"
+        className="sticky top-0 z-50 glass-morphism !border-b-0"
       >
         <div className="w-11/12 mx-auto px-0">
           <div className="flex items-center justify-between py-1">
             {/* -------- Logo Section -------- */}
             <div className="flex items-center gap-1">
-              <Link
-                to="/"
-                className="flex items-center gap-1 group pointer-events-auto"
+              <a
+                href="/"
+                onClick={(e) => {
+                  if (window.location.pathname === '/') {
+                    e.preventDefault();
+                    window.location.reload();
+                  }
+                }}
+                className="flex items-center gap-1 group pointer-events-auto cursor-pointer"
               >
-                <motion.div
+                <Motion.div
                   whileHover={{ scale: 1.1 }}
                   transition={{ type: "spring", stiffness: 260, damping: 20 }}
                   className="relative"
@@ -94,29 +106,29 @@ const Navbar = () => {
                       className="w-full h-full object-contain"
                     />
                   </div>
-                </motion.div>
+                </Motion.div>
                 <div>
-                  <h1 className="text-2xl font-bold bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">
+                  <h1 className="text-2xl font-bold text-gradient-crimson">
                     VitalFlow
                   </h1>
-                  <p className="text-xs text-gray-500 flex items-center gap-1">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
                     <Activity size={12} />
                     Blood Donation
                   </p>
                 </div>
-              </Link>
+              </a>
 
               {/* Mobile/Tablet Grid Menu Button - ONLY SHOWN WHEN USER IS LOGGED IN */}
               {user && (
                 <div className="lg:hidden relative ml-2">
-                  <motion.button
+                  <Motion.button
                     whileTap={{ scale: 0.9 }}
                     onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                     className="w-10 h-10 flex items-center justify-center rounded-xl bg-gradient-to-br from-red-50 to-blue-50 hover:from-red-100 hover:to-blue-100 transition-all"
                   >
                     <AnimatePresence mode="wait">
                       {isMobileMenuOpen ? (
-                        <motion.div
+                        <Motion.div
                           key="close"
                           initial={{ rotate: -90, opacity: 0 }}
                           animate={{ rotate: 0, opacity: 1 }}
@@ -124,9 +136,9 @@ const Navbar = () => {
                           transition={{ duration: 0.2 }}
                         >
                           <X size={20} className="text-red-600" />
-                        </motion.div>
+                        </Motion.div>
                       ) : (
-                        <motion.div
+                        <Motion.div
                           key="menu"
                           initial={{ rotate: 90, opacity: 0 }}
                           animate={{ rotate: 0, opacity: 1 }}
@@ -134,18 +146,26 @@ const Navbar = () => {
                           transition={{ duration: 0.2 }}
                         >
                           <Grid3x3 size={20} className="text-red-600" />
-                        </motion.div>
+                        </Motion.div>
                       )}
                     </AnimatePresence>
-                  </motion.button>
+                  </Motion.button>
                 </div>
               )}
             </div>
 
             {/* -------- Desktop Navigation (Centered) -------- */}
             <div className="hidden lg:absolute left-1/2 -translate-x-1/2 lg:flex items-center gap-3">
+              <NavLink to="/" className={navLinkStyle}>
+                Home
+              </NavLink>
+              
+              <NavLink to="/search" className={navLinkStyle}>
+                Search
+              </NavLink>
+              
               <NavLink to="/donation-requests" className={navLinkStyle}>
-                Donation Requests
+                Donations
               </NavLink>
 
               {user && (
@@ -153,22 +173,105 @@ const Navbar = () => {
                   Funding
                 </NavLink>
               )}
+              
+              {/* About Us Dropdown - Available for ALL users */}
+              <div className="relative">
+                <button
+                  onClick={() => setIsAboutDropdownOpen(!isAboutDropdownOpen)}
+                  onMouseEnter={() => setIsAboutDropdownOpen(true)}
+                  onMouseLeave={() => setIsAboutDropdownOpen(false)}
+                  className="flex items-center gap-1 px-4 py-2 rounded-xl text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all font-semibold"
+                >
+                  <Info size={18} />
+                  <span>About Us</span>
+                  <Motion.div
+                    animate={{ rotate: isAboutDropdownOpen ? 180 : 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <ChevronDown size={16} />
+                  </Motion.div>
+                </button>
+
+                {/* Dropdown Menu */}
+                <AnimatePresence>
+                  {isAboutDropdownOpen && (
+                    <Motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                      onMouseEnter={() => setIsAboutDropdownOpen(true)}
+                      onMouseLeave={() => setIsAboutDropdownOpen(false)}
+                      className="absolute top-full right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border-2 border-gray-200 dark:border-gray-700 overflow-hidden z-50"
+                    >
+                      <div className="p-2">
+                        <NavLink
+                          to="/about"
+                          onClick={() => setIsAboutDropdownOpen(false)}
+                          className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[var(--primary-red-light)]/10 transition-all group"
+                        >
+                          <Info className="text-[var(--primary-red)]" size={20} />
+                          <span className="font-semibold text-gray-700 dark:text-gray-200 group-hover:text-[var(--primary-red)]">
+                            About VitalFlow
+                          </span>
+                        </NavLink>
+                        
+                        <NavLink
+                          to="/contact"
+                          onClick={() => setIsAboutDropdownOpen(false)}
+                          className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-blue-50 dark:hover:bg-gray-700 transition-all group"
+                        >
+                          <Mail className="text-blue-600 dark:text-blue-400" size={20} />
+                          <span className="font-semibold text-gray-700 dark:text-gray-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                            Contact Us
+                          </span>
+                        </NavLink>
+                        
+                        <NavLink
+                          to="/blog"
+                          onClick={() => setIsAboutDropdownOpen(false)}
+                          className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-purple-50 dark:hover:bg-gray-700 transition-all group"
+                        >
+                          <BookOpen className="text-purple-600 dark:text-purple-400" size={20} />
+                          <span className="font-semibold text-gray-700 dark:text-gray-200 group-hover:text-purple-600 dark:group-hover:text-purple-400">
+                            Blog
+                          </span>
+                        </NavLink>
+                        
+                        <NavLink
+                          to="/help"
+                          onClick={() => setIsAboutDropdownOpen(false)}
+                          className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-green-50 dark:hover:bg-gray-700 transition-all group"
+                        >
+                          <HelpCircle className="text-green-600 dark:text-green-400" size={20} />
+                          <span className="font-semibold text-gray-700 dark:text-gray-200 group-hover:text-green-600 dark:group-hover:text-green-400">
+                            Help & Support
+                          </span>
+                        </NavLink>
+                      </div>
+                    </Motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
 
             {/* -------- Right Section -------- */}
             <div className="flex items-center gap-4">
+              {/* Theme Toggle */}
+              <ThemeToggle />
+              
               {!user ? (
                 <>
                   {/* Mobile/Tablet Grid Menu Button - SHOWN WHEN USER IS LOGGED OUT */}
                   <div className="lg:hidden relative">
-                    <motion.button
+                    <Motion.button
                       whileTap={{ scale: 0.9 }}
                       onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                       className="w-10 h-10 flex items-center justify-center rounded-xl bg-gradient-to-br from-red-50 to-blue-50 hover:from-red-100 hover:to-blue-100 transition-all"
                     >
                       <AnimatePresence mode="wait">
                         {isMobileMenuOpen ? (
-                          <motion.div
+                          <Motion.div
                             key="close"
                             initial={{ rotate: -90, opacity: 0 }}
                             animate={{ rotate: 0, opacity: 1 }}
@@ -176,9 +279,9 @@ const Navbar = () => {
                             transition={{ duration: 0.2 }}
                           >
                             <X size={20} className="text-red-600" />
-                          </motion.div>
+                          </Motion.div>
                         ) : (
-                          <motion.div
+                          <Motion.div
                             key="menu"
                             initial={{ rotate: 90, opacity: 0 }}
                             animate={{ rotate: 0, opacity: 1 }}
@@ -186,32 +289,28 @@ const Navbar = () => {
                             transition={{ duration: 0.2 }}
                           >
                             <Grid3x3 size={20} className="text-red-600" />
-                          </motion.div>
+                          </Motion.div>
                         )}
                       </AnimatePresence>
-                    </motion.button>
+                    </Motion.button>
                   </div>
 
                   {/* Desktop Login Button */}
                   <Link to="/auth/login" className="hidden lg:block">
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="btn bg-gradient-to-r from-red-500 to-blue-500 text-white font-semibold gap-2 shadow-lg shadow-red-500/30 px-7"
-                    >
+                    <button className="btn-premium">
                       Login
-                    </motion.button>
+                    </button>
                   </Link>
                 </>
               ) : (
                 <div className="relative">
-                  <motion.div
+                  <Motion.div
                     whileHover={{ scale: 1.05 }}
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                     className="cursor-pointer relative"
                   >
                     <div className="avatar">
-                      <div className="w-11 h-11 rounded-full ring ring-red-500 ring-offset-2 hover:ring-blue-500 transition-all duration-300">
+                      <div className="w-11 h-11 rounded-full overflow-hidden ring ring-[var(--primary-red)] ring-offset-2 hover:ring-[var(--primary-red-hover)] transition-all duration-300">
                         <img
                           src={
                             user.photoURL || "https://i.ibb.co/9ZQZQZQ/user.png"
@@ -221,14 +320,14 @@ const Navbar = () => {
                         />
                       </div>
                     </div>
-                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
-                  </motion.div>
+                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-white"></div>
+                  </Motion.div>
 
                   <AnimatePresence>
                     {isDropdownOpen && (
                       <>
                         {/* Backdrop overlay - FIXED: Changed z-index from z-10 to z-40 */}
-                        <motion.div
+                        <Motion.div
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           exit={{ opacity: 0 }}
@@ -237,17 +336,17 @@ const Navbar = () => {
                         />
 
                         {/* Dropdown menu - FIXED: Changed z-index from z-20 to z-50 */}
-                        <motion.div
+                        <Motion.div
                           initial={{ opacity: 0, y: -10 }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: -10 }}
                           transition={{ duration: 0.2 }}
-                          className="absolute right-0 mt-4 w-64 rounded-2xl bg-white shadow-2xl border border-gray-100 p-3 space-y-1 z-50"
+                          className="absolute right-0 mt-4 w-64 rounded-2xl glass-morphism !p-3 !space-y-1 z-50 border-white/20"
                         >
                           <div className="px-4 py-2">
                             <div className="flex items-center gap-2">
                               <div className="avatar">
-                                <div className="w-10 h-10 rounded-full">
+                                <div className="w-10 h-10 rounded-full overflow-hidden">
                                   <img
                                     src={
                                       user.photoURL ||
@@ -271,7 +370,7 @@ const Navbar = () => {
                           <Link
                             to="/dashboard"
                             onClick={() => setIsDropdownOpen(false)}
-                            className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all"
+                            className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[var(--primary-red)]/10 hover:text-[var(--primary-red)] transition-all"
                           >
                             <LayoutDashboard size={18} />
                             <span className="font-semibold">Dashboard</span>
@@ -283,7 +382,7 @@ const Navbar = () => {
                             <LogOut size={18} />
                             <span>Logout</span>
                           </button>
-                        </motion.div>
+                        </Motion.div>
                       </>
                     )}
                   </AnimatePresence>
@@ -292,14 +391,14 @@ const Navbar = () => {
             </div>
           </div>
         </div>
-      </motion.nav>
+      </Motion.nav>
 
       {/* -------- Mobile Menu (MOVED OUTSIDE NAVBAR) -------- */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <>
             {/* Backdrop - FIXED: Added z-40 and lg:hidden */}
-            <motion.div
+            <Motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -308,7 +407,7 @@ const Navbar = () => {
             />
 
             {/* Mobile Menu Container - FIXED: Changed from absolute to fixed, adjusted positioning */}
-            <motion.div
+            <Motion.div
               initial={{ opacity: 0, scale: 0.5, y: -20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.5, y: -20 }}
@@ -325,7 +424,7 @@ const Navbar = () => {
               <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-200 p-4 w-[280px]">
                 {/* User Card (if logged in) */}
                 {user && (
-                  <motion.div
+                  <Motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 }}
@@ -333,7 +432,7 @@ const Navbar = () => {
                   >
                     <div className="flex items-center gap-3">
                       <div className="avatar">
-                        <div className="w-12 h-12 rounded-full ring-2 ring-white ring-offset-2 ring-offset-transparent">
+                        <div className="w-12 h-12 rounded-full overflow-hidden ring-2 ring-white ring-offset-2 ring-offset-transparent">
                           <img
                             src={
                               user.photoURL ||
@@ -352,7 +451,7 @@ const Navbar = () => {
                         </p>
                       </div>
                     </div>
-                  </motion.div>
+                  </Motion.div>
                 )}
 
                 {/* Grid Navigation */}
@@ -361,7 +460,7 @@ const Navbar = () => {
                     if (item.requireAuth && !user) return null;
 
                     return (
-                      <motion.div
+                      <Motion.div
                         key={item.path}
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
@@ -404,13 +503,13 @@ const Navbar = () => {
                             </div>
                           )}
                         </NavLink>
-                      </motion.div>
+                      </Motion.div>
                     );
                   })}
                 </div>
 
                 {/* Logout/Login Button */}
-                <motion.div
+                <Motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
@@ -436,7 +535,7 @@ const Navbar = () => {
                       </button>
                     </Link>
                   )}
-                </motion.div>
+                </Motion.div>
               </div>
 
               {/* Floating Arrow Indicator - FIXED: Adjusted position based on user state */}
@@ -445,7 +544,7 @@ const Navbar = () => {
                   user ? "left-8" : "right-8"
                 } w-4 h-4 bg-white rotate-45 border-l border-t border-gray-200`}
               ></div>
-            </motion.div>
+            </Motion.div>
           </>
         )}
       </AnimatePresence>

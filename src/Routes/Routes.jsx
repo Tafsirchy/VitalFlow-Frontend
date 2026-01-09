@@ -28,6 +28,14 @@ const PaymentSuccess = lazy(() =>
 const DonationDetails = lazy(() =>
   import("../Pages/DonationDetails/DonationDetails")
 );
+const About = lazy(() => import("../Pages/About/About"));
+const Contact = lazy(() => import("../Pages/Contact/Contact"));
+const Blog = lazy(() => import("../Pages/Blog/Blog"));
+const BlogPost = lazy(() => import("../Pages/Blog/BlogPost"));
+const Help = lazy(() => import("../Pages/Help/Help"));
+const PrivacyPolicy = lazy(() => import("../Pages/Legal/PrivacyPolicy"));
+const TermsOfService = lazy(() => import("../Pages/Legal/TermsOfService"));
+const CookiePolicy = lazy(() => import("../Pages/Legal/CookiePolicy"));
 
 const router = createBrowserRouter([
   {
@@ -37,6 +45,78 @@ const router = createBrowserRouter([
       { path: "/", element: <Home /> },
       { path: "/auth/login", element: <Login /> },
       { path: "/auth/register", element: <Register /> },
+      { 
+        path: "/about", 
+        element: (
+          <SuspenseWrapper>
+            <About />
+          </SuspenseWrapper>
+        )
+      },
+      { 
+        path: "/contact", 
+        element: (
+          <SuspenseWrapper>
+            <Contact />
+          </SuspenseWrapper>
+        )
+      },
+      { 
+        path: "/blog", 
+        element: (
+          <SuspenseWrapper>
+            <Blog />
+          </SuspenseWrapper>
+        )
+      },
+      { 
+        path: "/blog/:id", 
+        element: (
+          <SuspenseWrapper>
+            <BlogPost />
+          </SuspenseWrapper>
+        )
+      },
+      { 
+        path: "/help", 
+        element: (
+          <SuspenseWrapper>
+            <Help />
+          </SuspenseWrapper>
+        )
+      },
+      { 
+        path: "/privacy", 
+        element: (
+          <SuspenseWrapper>
+            <PrivacyPolicy />
+          </SuspenseWrapper>
+        )
+      },
+      { 
+        path: "/terms", 
+        element: (
+          <SuspenseWrapper>
+            <TermsOfService />
+          </SuspenseWrapper>
+        )
+      },
+      { 
+        path: "/cookies", 
+        element: (
+          <SuspenseWrapper>
+            <CookiePolicy />
+          </SuspenseWrapper>
+        )
+      },
+      { 
+        path: "/donation-details/:id", 
+        element: (
+          <SuspenseWrapper>
+            <DonationDetails />
+          </SuspenseWrapper>
+        )
+      },
     ],
   },
   {
@@ -90,16 +170,6 @@ const router = createBrowserRouter([
   {
     path: "/payment-cancelled",
     element: <PaymentCancelled />,
-  },
-  {
-    path: "/donation-details/:id",
-    element: (
-      <PrivateRoute>
-        <SuspenseWrapper>
-          <DonationDetails />
-        </SuspenseWrapper>
-      </PrivateRoute>
-    ),
   },
   {
     path: "*",

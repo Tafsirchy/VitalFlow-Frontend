@@ -12,9 +12,10 @@ import {
   Droplet,
   Activity,
   Sparkles,
+  Home,
 } from "lucide-react";
 import { AuthContext } from "../../Provider/AuthProvider";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion as Motion, AnimatePresence } from "framer-motion";
 import logo from "../../assets/image.png";
 import { toast } from "react-toastify";
 
@@ -50,7 +51,7 @@ const Aside = () => {
   return (
     <>
       {/* Mobile Menu Button */}
-      <motion.button
+      <Motion.button
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
         className="lg:hidden fixed top-4 left-4 z-50 btn btn-circle btn-error shadow-2xl"
         whileHover={{ scale: 1.1, rotate: 180 }}
@@ -58,7 +59,7 @@ const Aside = () => {
       >
         <AnimatePresence mode="wait">
           {isSidebarOpen ? (
-            <motion.div
+            <Motion.div
               key="close"
               initial={{ rotate: -90, opacity: 0 }}
               animate={{ rotate: 0, opacity: 1 }}
@@ -66,9 +67,9 @@ const Aside = () => {
               transition={{ duration: 0.2 }}
             >
               <X size={24} />
-            </motion.div>
+            </Motion.div>
           ) : (
-            <motion.div
+            <Motion.div
               key="menu"
               initial={{ rotate: 90, opacity: 0 }}
               animate={{ rotate: 0, opacity: 1 }}
@@ -76,15 +77,15 @@ const Aside = () => {
               transition={{ duration: 0.2 }}
             >
               <Menu size={24} />
-            </motion.div>
+            </Motion.div>
           )}
         </AnimatePresence>
-      </motion.button>
+      </Motion.button>
 
       {/* Overlay for mobile */}
       <AnimatePresence>
         {isMobile && isSidebarOpen && (
-          <motion.div
+          <Motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -96,7 +97,7 @@ const Aside = () => {
       </AnimatePresence>
 
       {/* Sidebar */}
-      <motion.aside
+      <Motion.aside
         initial={isMobile ? { x: -320 } : { x: 0 }}
         animate={{
           x: isMobile ? (isSidebarOpen ? 0 : -320) : 0,
@@ -113,7 +114,7 @@ const Aside = () => {
       >
         {/* Logo Section with Animation */}
         <div className="px-6 py-6 border-b border-gray-200/50 relative overflow-hidden">
-          <motion.div
+          <Motion.div
             className="absolute inset-0 bg-gradient-to-r from-red-500/10 to-blue-500/10"
             animate={{
               backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
@@ -123,7 +124,7 @@ const Aside = () => {
           />
 
           <Link to={"/"} className="flex items-center gap-3 relative z-10">
-            <motion.div
+            <Motion.div
               className="relative"
               whileHover={{ scale: 1.1, rotate: 360 }}
               transition={{ type: "spring", stiffness: 260, damping: 20 }}
@@ -135,7 +136,7 @@ const Aside = () => {
                   className="w-full h-full object-contain"
                 />
               </div>
-              <motion.div
+              <Motion.div
                 className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white"
                 animate={{
                   scale: [1, 1.2, 1],
@@ -143,7 +144,7 @@ const Aside = () => {
                 }}
                 transition={{ duration: 2, repeat: Infinity }}
               />
-            </motion.div>
+            </Motion.div>
             <div>
               <h1 className="text-2xl font-bold bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">
                 VitalFlow
@@ -218,7 +219,7 @@ const Aside = () => {
         {/* User Info & Footer */}
         <div className="p-4 border-t border-gray-200/50 space-y-3 bg-gradient-to-t from-white/80 to-transparent backdrop-blur-sm">
           {/* User Info Card */}
-          <motion.div
+          <Motion.div
             className="card bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-xl"
             whileHover={{ scale: 1.02, y: -2 }}
             transition={{ type: "spring", stiffness: 300 }}
@@ -226,7 +227,7 @@ const Aside = () => {
             <div className="card-body p-4">
               <div className="flex items-center gap-3">
                 <div className="avatar">
-                  <div className="w-10 h-10 rounded-full ring ring-white/30 ring-offset-2 ring-offset-blue-500">
+                  <div className="w-10 h-10 rounded-full overflow-hidden ring ring-white/30 ring-offset-2 ring-offset-blue-500">
                     {user?.photoURL ? (
                       <img
                         src={user.photoURL}
@@ -259,20 +260,35 @@ const Aside = () => {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </Motion.div>
 
-          {/* Logout Button */}
-          <motion.button
-            onClick={handleLogOut}
-            className="btn btn-outline btn-error w-full gap-2 hover:btn-error group"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            <LogOut size={18} className="group-hover:animate-bounce" />
-            <span className="font-semibold">Logout</span>
-          </motion.button>
+          {/* Action Buttons */}
+          <div className="grid grid-cols-2 gap-2">
+            {/* Back to Home Button */}
+            <Link to="/">
+              <Motion.button
+                className="btn btn-outline btn-primary w-full gap-2 hover:btn-primary group"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Home size={18} className="group-hover:animate-bounce" />
+                <span className="font-semibold">Home</span>
+              </Motion.button>
+            </Link>
+
+            {/* Logout Button */}
+            <Motion.button
+              onClick={handleLogOut}
+              className="btn btn-outline btn-error w-full gap-2 hover:btn-error group"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <LogOut size={18} className="group-hover:animate-bounce" />
+              <span className="font-semibold">Logout</span>
+            </Motion.button>
+          </div>
         </div>
-      </motion.aside>
+      </Motion.aside>
     </>
   );
 };
@@ -286,7 +302,7 @@ const NavItem = ({ to, icon: Icon, label, isMobile, closeSidebar }) => (
     className="block"
   >
     {({ isActive }) => (
-      <motion.div
+      <Motion.div
         whileHover={{ scale: 1.03, x: 5 }}
         whileTap={{ scale: 0.98 }}
         className={`
@@ -300,7 +316,7 @@ const NavItem = ({ to, icon: Icon, label, isMobile, closeSidebar }) => (
         `}
       >
         {isActive && (
-          <motion.div
+          <Motion.div
             className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent"
             animate={{
               x: ["-100%", "100%"],
@@ -319,7 +335,7 @@ const NavItem = ({ to, icon: Icon, label, isMobile, closeSidebar }) => (
         <span className="font-semibold relative z-10">{label}</span>
 
         {isActive && (
-          <motion.div
+          <Motion.div
             className="ml-auto"
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
@@ -330,9 +346,9 @@ const NavItem = ({ to, icon: Icon, label, isMobile, closeSidebar }) => (
             }}
           >
             <Sparkles size={16} />
-          </motion.div>
+          </Motion.div>
         )}
-      </motion.div>
+      </Motion.div>
     )}
   </NavLink>
 );
