@@ -172,7 +172,7 @@ const Testimonials = () => {
                          <p className="text-[8px] font-black uppercase tracking-[0.3em] mb-1" style={{ color: testimonials[currentIndex].accent }}>
                             {testimonials[currentIndex].impact}
                          </p>
-                         <h4 className="text-xl font-black text-[var(--text-primary)] tracking-widest uppercase">
+                         <h4 className="text-xl font-black text-white tracking-widest uppercase">
                             {testimonials[currentIndex].name}
                          </h4>
                       </div>
