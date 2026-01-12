@@ -200,7 +200,7 @@ const FAQ = () => {
                 Accessing Neural Core
               </span>
             </Motion.div>
-            <h2 className="text-4xl md:text-6xl lg:text-7xl font-black text-[var(--text-primary)] leading-[0.9] tracking-tighter uppercase">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-[var(--text-primary)] leading-tight tracking-tighter uppercase">
               Neural <br />
               <span className="text-gradient-crimson italic">Knowledge</span>
             </h2>

@@ -109,7 +109,7 @@ const Testimonials = () => {
                     NETWORK SIGNALS
                  </span>
                </Motion.div>
-                <h2 className="text-3xl md:text-5xl font-black text-[var(--text-primary)] tracking-tighter leading-none">
+                <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-[var(--text-primary)] tracking-tighter leading-tight uppercase">
                    Voices of <br />
                    <span className="italic" style={{ color: testimonials[currentIndex].accent }}>The Vital Network</span>
                 </h2>

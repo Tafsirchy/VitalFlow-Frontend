@@ -224,7 +224,7 @@ const SuccessStories = () => {
                  </span>
               </Motion.div>
               <div className="relative">
-                 <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-[0.95] tracking-tighter uppercase">
+                 <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-white leading-tight tracking-tighter uppercase">
                     History <br />
                     <span className="text-gradient-crimson italic tracking-[-0.05em]">Archive</span>
                  </h2>

@@ -1,267 +1,335 @@
-import React from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { motion as Motion } from "framer-motion";
 import { TrendingUp, Users, MapPin, Heart, Activity, Globe, ShieldCheck, Zap } from "lucide-react";
 
+// --- Custom Hooks ---
+
+// Scramble Text Hook
+const useScrambleText = (finalValue, duration = 1500, isVisible = false) => {
+  const [displayValue, setDisplayValue] = useState("");
+  const chars = "!@#$%^&*()_+-=[]{}|;:,.<>?/0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+  useEffect(() => {
+    if (!isVisible) return;
+
+    let startTime;
+    let animationFrame;
+    const valueStr = String(finalValue);
+
+    const animate = (currentTime) => {
+      if (!startTime) startTime = currentTime;
+      const progress = Math.min((currentTime - startTime) / duration, 1);
+      
+      const scrambled = valueStr
+        .split("")
+        .map((char, i) => {
+          if (progress > (i / valueStr.length)) return char;
+          return chars[Math.floor(Math.random() * chars.length)];
+        })
+        .join("");
+
+      setDisplayValue(scrambled);
+
+      if (progress < 1) {
+        animationFrame = requestAnimationFrame(animate);
+      }
+    };
+
+    animationFrame = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animationFrame);
+  }, [finalValue, duration, isVisible]);
+
+  return displayValue;
+};
+
+// --- Sub-components ---
+
+// ECG Pulse Wave Component
+const ECGSymbol = ({ className }) => {
+  return (
+    <svg viewBox="0 0 100 40" className={className} preserveAspectRatio="none">
+      <Motion.path
+        d="M 0 20 L 30 20 L 35 15 L 40 25 L 45 5 L 50 35 L 55 20 L 60 20 L 65 15 L 70 20 L 100 20"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        initial={{ pathLength: 0, opacity: 0 }}
+        animate={{ 
+          pathLength: [0, 1, 1],
+          opacity: [0, 1, 0],
+          pathOffset: [0, 0, 1]
+        }}
+        transition={{ 
+          duration: 2, 
+          repeat: Infinity, 
+          ease: "linear",
+          times: [0, 0.5, 1]
+        }}
+      />
+      <Motion.path
+        d="M 0 20 L 30 20 L 35 15 L 40 25 L 45 5 L 50 35 L 55 20 L 60 20 L 65 15 L 70 20 L 100 20"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        opacity="0.2"
+      />
+    </svg>
+  );
+};
+
+// Vital Circular Gauge
+const VitalGauge = ({ progress, isActive, colorClass }) => {
+  return (
+    <div className="relative w-full h-full flex items-center justify-center">
+      <svg className="w-full h-full transform -rotate-90">
+        {/* Background Track */}
+        <circle
+          cx="50%"
+          cy="50%"
+          r="45%"
+          className="stroke-[var(--glass-border)]"
+          fill="none"
+          strokeWidth="4"
+        />
+        {/* Progress Arc */}
+        <Motion.circle
+          cx="50%"
+          cy="50%"
+          r="45%"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="6"
+          strokeLinecap="round"
+          className={colorClass}
+          initial={{ pathLength: 0 }}
+          animate={{ pathLength: isActive ? progress : 0 }}
+          transition={{ duration: 2, ease: "easeOut" }}
+        />
+      </svg>
+      {/* Pulse Outer Ring */}
+      <Motion.div
+        animate={{ scale: [1, 1.1, 1], opacity: [0.1, 0.3, 0.1] }}
+        transition={{ duration: 1.5, repeat: Infinity }}
+        className={`absolute inset-0 rounded-full border-2 ${colorClass}`}
+      />
+    </div>
+  );
+};
+
+const StatisticsCard = ({ stat, index, isVisible }) => {
+  const scrambledValue = useScrambleText(stat.value, 2000, isVisible);
+  const cardRef = useRef(null);
+  const [rotate, setRotate] = useState({ x: 0, y: 0 });
+
+  const handleMouseMove = (e) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = (e.clientY - rect.top - rect.height / 2) / 10;
+    const y = (e.clientX - rect.left - rect.width / 2) / -10;
+    setRotate({ x, y });
+  };
+
+  return (
+    <Motion.div
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={() => setRotate({ x: 0, y: 0 })}
+      style={{
+        perspective: 1000,
+        rotateX: rotate.x,
+        rotateY: rotate.y,
+        transition: "all 0.1s ease-out"
+      }}
+      initial={{ opacity: 0, y: 50 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay: index * 0.15 }}
+      className="relative group h-[280px]"
+    >
+      <div className="absolute inset-0 rounded-[2rem] glass-morphism overflow-hidden">
+        {/* Biometric Background Detail */}
+        <div className="absolute top-4 right-4 opacity-10">
+          <Globe size={80} className="text-[var(--text-primary)]" />
+        </div>
+
+        {/* Content Container */}
+        <div className="relative z-10 p-6 flex flex-col h-full items-center text-center">
+          {/* Gauge Icon Container */}
+          <div className="w-20 h-20 relative mb-4">
+            <VitalGauge 
+              progress={index === 0 ? 0.8 : index === 1 ? 0.6 : index === 2 ? 0.9 : 0.99} 
+              isActive={isVisible} 
+              colorClass="text-[var(--primary-red)]"
+            />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <stat.icon className="text-[var(--text-primary)]" size={24} />
+            </div>
+          </div>
+
+          {/* Scrambled Number */}
+          <h3 className="text-4xl lg:text-5xl font-black text-[var(--text-primary)] mb-1 tracking-tighter">
+            {scrambledValue}{stat.suffix}
+          </h3>
+          
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--primary-red)] mb-4 bg-[var(--primary-red)]/5 px-3 py-1 rounded-full border border-[var(--primary-red)]/10">
+            {stat.label}
+          </p>
+
+          <p className="text-xs text-[var(--text-secondary)] font-medium leading-relaxed px-4 mb-4">
+            {stat.desc}
+          </p>
+
+          {/* ECG Footer */}
+          <div className="mt-auto w-full pt-4 border-t border-[var(--glass-border)] flex flex-col items-center">
+            <ECGSymbol className="w-full h-8 text-[var(--primary-red)]" />
+            <div className="flex justify-between w-full mt-2 px-2">
+              <span className="text-[8px] text-[var(--text-muted)] font-mono">BPM: SYNCED</span>
+              <span className="text-[8px] text-green-600 font-mono font-bold animate-pulse">● LIVE_NODE</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Hover Glow */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[var(--primary-red)]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+      </div>
+    </Motion.div>
+  );
+};
+
 const Statistics = () => {
+  const [isVisible, setIsVisible] = useState(false);
+
   const stats = [
     {
       icon: Users,
-      value: "15,842",
+      value: 15842,
       label: "Active Donors",
-      protocol: "DONOR-NET-X",
-      status: "PROTOCOL LINKED",
-      color: "red-600",
-      desc: "Verified donors ready to help nationwide",
-      subIcon: Globe,
-      gradient: "from-red-500 to-rose-500",
-      bgGradient: "from-red-600/30 via-red-900/10 to-transparent"
+      desc: "Verified blood donors linked to the central cluster",
+      suffix: ""
     },
     {
       icon: Heart,
-      value: "4,290",
+      value: 4290,
       label: "Lives Saved",
-      protocol: "LIFE-SYNC-42",
-      status: "EMERGENCY",
-      color: "rose-600",
-      desc: "Successful donations completed with care",
-      subIcon: Activity,
-      gradient: "from-rose-500 to-pink-500",
-      bgGradient: "from-rose-600/30 via-rose-900/10 to-transparent"
+      desc: "Emergency procedures completed successfully",
+      suffix: ""
     },
     {
       icon: MapPin,
-      value: "64",
+      value: 64,
       label: "Districts",
-      protocol: "GRID-MAP-64",
-      status: "Q2 CLUSTER",
-      color: "blue-600",
-      desc: "Complete coverage across Bangladesh",
-      subIcon: Zap,
-      gradient: "from-blue-500 to-indigo-500",
-      bgGradient: "from-blue-600/30 via-blue-900/10 to-transparent"
+      desc: "Full geometric coverage across neural sector",
+      suffix: ""
     },
     {
       icon: TrendingUp,
-      value: "99.8%",
+      value: 99.8,
       label: "Success Rate",
-      protocol: "SIG-998-A",
-      status: "VERIFIED",
-      color: "green-600",
-      desc: "Proven track record of life-saving impact",
-      subIcon: ShieldCheck,
-      gradient: "from-green-600 to-emerald-600",
-      bgGradient: "from-green-600/30 via-green-900/10 to-transparent"
+      desc: "Biological compatibility verification precision",
+      suffix: "%"
     }
   ];
 
   return (
-    <section className="relative py-8 bg-[var(--background-main)] overflow-hidden select-none">
+    <section className="relative py-20 bg-[var(--background-main)] overflow-hidden transition-colors duration-500">
       
-      <div className="absolute inset-0 pointer-events-none">
-         <div className="absolute top-0 left-0 w-full h-full opacity-[0.015] bg-[radial-gradient(var(--primary-red)_1px,transparent_1px)] [background-size:40px_40px]" />
-         
-         <Motion.div 
-           animate={{ 
-             scale: [1, 1.2, 1],
-             opacity: [0.02, 0.05, 0.02] 
-           }}
-           transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-red-600/5 blur-[120px] rounded-full"
-         />
+      {/* Bio-Digital Background */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        {/* Morphing Liquid Blobs */}
+        <Motion.div 
+          animate={{ 
+            scale: [1, 1.2, 1],
+            x: [0, 50, 0],
+            y: [0, -50, 0],
+          }}
+          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute -top-40 -left-40 w-[600px] h-[600px] bg-[var(--primary-red)]/5 blur-[120px] rounded-full"
+        />
+        <Motion.div 
+          animate={{ 
+            scale: [1.2, 1, 1.2],
+            x: [0, -80, 0],
+            y: [0, 60, 0],
+          }}
+          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute -bottom-40 -right-40 w-[500px] h-[500px] bg-[var(--primary-red)]/10 blur-[100px] rounded-full"
+        />
+
+        {/* Neural Grid Overlay */}
+        <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]" 
+          style={{ backgroundImage: 'radial-gradient(circle, var(--primary-red) 1px, transparent 1px)', backgroundSize: '40px 40px' }} 
+        />
       </div>
 
-      <div className="container mx-auto px-6 lg:px-10 relative z-20">
+      <div className="container mx-auto px-6 relative z-10 max-w-7xl">
         
-        <div className="mb-8 space-y-6">
+        {/* Section Header */}
+        <div className="text-center mb-16 space-y-4">
           <Motion.div
-            initial={{ opacity: 0, y: -20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, scale: 0.8 }}
+            whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="inline-block"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-morphism border-2 border-red-500/30 text-[var(--primary-red)]"
           >
-            <div className="relative group">
-              <div className="relative inline-flex flex-col items-start gap-0.5 px-5 py-3 rounded-xl border border-[var(--glass-border)] glass-morphism">
-                <div className="flex items-center gap-2 mb-1">
-                  <Motion.div
-                    animate={{ opacity: [0.5, 1, 0.5] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                    className="w-1.5 h-1.5 rounded-full bg-red-600"
-                  />
-                  <span className="text-[8px] font-bold text-[var(--text-muted)] tracking-[0.25em] uppercase">
-                    Mission Archive Vol. 01 // Deep Sync
-                  </span>
-                </div>
-                
-                <div className="flex items-baseline gap-2">
-                  <h1 className="text-2xl md:text-3xl font-black text-[var(--text-primary)] uppercase tracking-tight">
-                    HISTORY
-                  </h1>
-                  <h1 className="text-2xl md:text-3xl font-black uppercase tracking-tight" style={{ 
-                    background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent'
-                  }}>
-                    ARCHIVE
-                  </h1>
-                </div>
-                
-                <Motion.div
-                  animate={{ opacity: [0.2, 0.4, 0.2] }}
-                  transition={{ duration: 3, repeat: Infinity }}
-                  className="absolute -inset-2 bg-red-600/10 blur-xl rounded-xl -z-10"
+            <Activity size={14} className="animate-pulse" />
+            <span className="text-[10px] font-black uppercase tracking-[0.3em]">Neural Impact Monitor v.02</span>
+          </Motion.div>
+
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-[var(--text-primary)] leading-tight tracking-tighter uppercase">
+            Network <span className="text-gradient-crimson italic">Bio-Metrics</span>
+          </h2>
+          
+          <p className="text-[var(--text-muted)] max-w-2xl mx-auto text-sm lg:text-base font-medium font-mono uppercase">
+            &gt; Real-time synchronization with active life-saving nodes across the biological cluster.
+          </p>
+        </div>
+
+        {/* Cards Grid */}
+        <Motion.div 
+          onViewportEnter={() => setIsVisible(true)}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+        >
+          {stats.map((stat, idx) => (
+            <StatisticsCard 
+              key={idx} 
+              stat={stat} 
+              index={idx} 
+              isVisible={isVisible} 
+            />
+          ))}
+        </Motion.div>
+
+        {/* Footer Technical Detail */}
+        <div className="mt-20 flex flex-col lg:flex-row items-center justify-between gap-8 border-t border-[var(--glass-border)] pt-10">
+          <div className="flex items-center gap-6">
+            <div className="space-y-1">
+              <div className="text-[10px] text-[var(--text-muted)] font-black uppercase tracking-widest">System Load</div>
+              <div className="h-1 w-32 bg-[var(--primary-red)]/10 rounded-full overflow-hidden">
+                <Motion.div 
+                  animate={{ width: ["10%", "85%", "40%", "95%"] }}
+                  transition={{ duration: 10, repeat: Infinity }}
+                  className="h-full bg-[var(--primary-red)]"
                 />
               </div>
             </div>
-          </Motion.div>
+            <div className="space-y-1 text-right lg:text-left">
+              <div className="text-[10px] text-[var(--text-muted)] font-black uppercase tracking-widest">Nodes Active</div>
+              <div className="text-xs text-[var(--text-primary)] font-mono font-bold">1.25k Signal Cluster</div>
+            </div>
+          </div>
 
-          <Motion.p 
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            className="text-sm text-[var(--text-secondary)] font-medium opacity-60 max-w-2xl">
-            Real-time impact dashboard tracking our life-saving network across the nation.
-          </Motion.p>
-        </div>
-
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 w-full">
-           
-           {stats.map((stat, i) => (
-             <Motion.div 
-               key={i}
-               initial={{ opacity: 0, y: 30, scale: 0.9 }}
-               whileInView={{ opacity: 1, y: 0, scale: 1 }}
-               viewport={{ once: true, margin: "-50px" }}
-               transition={{ 
-                 duration: 0.6, 
-                 delay: i * 0.12,
-                 ease: [0.22, 1, 0.36, 1]
-               }}
-               whileHover={{ 
-                 y: -12, 
-                 scale: 1.04
-               }}
-               className="relative group cursor-pointer overflow-hidden"
-             >
-                <div 
-                  className="relative h-full rounded-2xl p-6 flex flex-col border border-[var(--glass-border)]"
-                  style={{
-                    background: 'var(--background-card)',
-                    backdropFilter: 'blur(20px)',
-                    boxShadow: 'var(--shadow-premium-lg)',
-                    transformStyle: 'preserve-3d'
-                  }}
-                >
-                  <Motion.div 
-                    className="absolute inset-0 opacity-0 group-hover:opacity-100 rounded-2xl"
-                    initial={{ opacity: 0 }}
-                    whileHover={{ opacity: 1 }}
-                    transition={{ duration: 0.6 }}
-                    style={{
-                      background: `linear-gradient(135deg, ${stat.bgGradient.split(' ').map(c => c.replace('/', '/')).join(', ')})`
-                    }}
-                  />
-
-                  <div className="relative z-10 flex flex-col items-center text-center h-full">
-                    <Motion.div 
-                      whileHover={{ scale: 1.15 }}
-                      className="w-16 h-16 rounded-xl flex items-center justify-center mb-5 relative"
-                      style={{
-                        background: 'linear-gradient(135deg, rgba(100,13,20,0.25), rgba(128,14,19,0.15))',
-                        border: '1.5px solid rgba(220,38,38,0.25)',
-                        boxShadow: 'var(--shadow-premium)'
-                      }}
-                    >
-                      <Motion.div
-                        animate={{ 
-                          scale: [1, 1.08, 1]
-                        }}
-                        transition={{ 
-                          duration: 4,
-                          repeat: Infinity,
-                          delay: i * 0.3,
-                          ease: "easeInOut"
-                        }}
-                        className="relative z-10"
-                      >
-                        {React.createElement(stat.icon, { 
-                          size: 26, 
-                          className: "text-[var(--primary-red-hover)] drop-shadow-md",
-                          strokeWidth: 2.5
-                        })}
-                      </Motion.div>
-                    </Motion.div>
-
-                    <Motion.h3 
-                      className="text-4xl md:text-5xl lg:text-6xl font-black mb-2 relative"
-                      style={{
-                        background: `linear-gradient(135deg, var(--primary-red), var(--primary-red-hover))`,
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                        backgroundClip: 'text'
-                      }}
-                    >
-                      {stat.value}
-                    </Motion.h3>
-
-                    <p className="text-xs font-bold uppercase tracking-[0.15em] mb-3 text-[var(--text-muted)]">
-                       {stat.label}
-                    </p>
-
-                    {stat.desc && (
-                      <p className="text-xs font-medium leading-relaxed mb-4 text-[var(--text-secondary)] opacity-70">
-                         {stat.desc}
-                      </p>
-                    )}
-
-                    <Motion.div
-                      className="mt-auto pt-3 w-full flex items-center justify-between border-t border-[var(--glass-border)]"
-                      initial={{ opacity: 0 }}
-                      whileInView={{ opacity: 1 }}
-                      transition={{ delay: i * 0.12 + 0.5 }}
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="text-[9px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
-                          Live Data
-                        </span>
-                      </div>
-                      
-                      <div className="flex items-center gap-1">
-                        <TrendingUp size={12} className="text-green-500" strokeWidth={2.5} />
-                        <span className="text-[9px] font-black text-green-500">
-                          {i === 0 ? '+12%' : i === 1 ? '+8%' : i === 2 ? '+3' : '+0.2%'}
-                        </span>
-                      </div>
-                    </Motion.div>
-                  </div>
-
-                  <Motion.div
-                    className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"
-                    style={{
-                      background: 'linear-gradient(135deg, var(--primary-red), transparent)',
-                      padding: '2px',
-                      WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-                      WebkitMaskComposite: 'xor',
-                      maskComposite: 'exclude'
-                    }}
-                  />
-                </div>
-             </Motion.div>
-           ))}
-        </div>
-
-        <div className="mt-8 max-w-4xl mx-auto">
-          <Motion.div 
-            initial={{ scaleX: 0 }}
-            whileInView={{ scaleX: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 1, ease: "easeInOut" }}
-            className="h-px bg-gradient-to-r from-transparent via-[var(--primary-red)]/20 to-transparent origin-center"
-          />
+          <div className="flex gap-4">
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="w-8 h-8 rounded-lg border border-[var(--glass-border)] flex items-center justify-center text-[10px] text-[var(--text-muted)] font-mono">
+                0{i}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
   );
 };
+
 
 export default Statistics;

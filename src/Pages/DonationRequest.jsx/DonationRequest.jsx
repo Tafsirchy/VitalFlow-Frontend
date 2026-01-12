@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   Droplet,
   MapPin,
@@ -8,14 +8,73 @@ import {
   Zap,
   Users,
   AlertCircle,
-  ArrowRight,
+  Target,
+  Hospital,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion as Motion, AnimatePresence } from "framer-motion";
 import Navbar from "../../Components/Navbar";
 import Footer from "../../Components/Footer";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import useAxios from "../../hooks/useAxios";
+
+// --- Sub-component: Neural Background ---
+const NeuralBackground = () => {
+  const circles = useMemo(() => 
+    [...Array(20)].map(() => ({
+      cx: Math.random() * 1000,
+      cy: Math.random() * 1000,
+      r: Math.random() * 2 + 1,
+      duration: Math.random() * 3 + 2,
+      delay: Math.random() * 5
+    })), []);
+
+  const paths = useMemo(() => [
+    { d: "M0,500 Q250,200 500,500 T1000,500", duration: 5, delay: 0 },
+    { d: "M0,300 Q300,600 600,300 T1000,300", duration: 7, delay: 1 }
+  ], []);
+
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-[0.3] dark:opacity-[0.1]">
+      <svg className="w-full h-full" viewBox="0 0 1000 1000">
+        <defs>
+          <linearGradient id="neural-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="var(--primary-red)" stopOpacity="0.2" />
+            <stop offset="100%" stopColor="transparent" />
+          </linearGradient>
+        </defs>
+        {paths.map((p, i) => (
+          <Motion.path
+            key={i}
+            d={p.d}
+            fill="none"
+            stroke="url(#neural-grad)"
+            strokeWidth="1"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: 1 }}
+            transition={{ duration: p.duration, repeat: Infinity, ease: "linear", delay: p.delay }}
+          />
+        ))}
+        {circles.map((c, i) => (
+          <Motion.circle
+            key={i}
+            cx={c.cx}
+            cy={c.cy}
+            r={c.r}
+            fill="var(--primary-red)"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0, 0.5, 0] }}
+            transition={{ 
+              duration: c.duration, 
+              repeat: Infinity, 
+              delay: c.delay 
+            }}
+          />
+        ))}
+      </svg>
+    </div>
+  );
+};
 
 const PendingDonationRequests = () => {
   const [requests, setRequests] = useState([]);
@@ -24,21 +83,21 @@ const PendingDonationRequests = () => {
   const navigate = useNavigate();
   const axiosInstance = useAxios();
 
-  useEffect(() => {
-    fetchPendingRequests();
-  }, []);
-
-  const fetchPendingRequests = async () => {
+  const fetchPendingRequests = React.useCallback(async () => {
     try {
       setIsLoading(true);
       const { data } = await axiosInstance.get("/pending-donation-requests");
       setRequests(data);
-    } catch (error) {
+    } catch (err) {
       toast.error("Failed to fetch pending requests");
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [axiosInstance]);
+
+  useEffect(() => {
+    fetchPendingRequests();
+  }, [fetchPendingRequests]);
 
   const handleViewDetails = (id) => {
     navigate(`/donation-details/${id}`);
@@ -52,341 +111,233 @@ const PendingDonationRequests = () => {
       : requests.filter((r) => r.bloodGroup === filter);
 
   return (
-    <section>
+    <section className="bg-[var(--background-main)] min-h-screen">
       <navbar>
         <Navbar />
       </navbar>
-      <main>
-        <div className="relative min-h-screen bg-gradient-to-br from-red-900 via-rose-800 to-pink-900 overflow-hidden">
-          {/* Animated Background Pattern */}
-          <div className="absolute inset-0 opacity-10">
-            <motion.div
-              animate={{
-                backgroundPosition: ["0% 0%", "100% 100%"],
-              }}
-              transition={{
-                duration: 20,
-                repeat: Infinity,
-                repeatType: "reverse",
-              }}
-              className="w-full h-full"
-              style={{
-                backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`,
-                backgroundSize: "40px 40px",
-              }}
-            />
+      <main className="relative pt-20 overflow-hidden">
+        <NeuralBackground />
+        
+        <div className="container mx-auto px-6 lg:px-12 relative z-10">
+          {/* Hero Header */}
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-20">
+            <div className="space-y-6 max-w-2xl">
+              <Motion.div
+                initial={{ opacity: 0, x: -30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                className="inline-flex items-center gap-3 px-5 py-2 rounded-full ultra-glass border border-red-500/20 shadow-sm"
+              >
+                <AlertCircle size={14} className="text-red-500 animate-pulse" />
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--text-primary)]">
+                  Active Emergency Protocol
+                </span>
+              </Motion.div>
+              <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-[var(--text-primary)] leading-tight tracking-tighter uppercase">
+                Urgent <br />
+                <span className="text-gradient-crimson italic">Blood Requests</span>
+              </h1>
+              <p className="text-lg text-[var(--text-secondary)] font-medium opacity-70 leading-relaxed max-w-xl">
+                Every circuit connects a生命 (life). Every donation bridges the void. Synchronize with the network to identify critical requests in your sector.
+              </p>
+            </div>
+
+            {/* Stats Banner */}
+            <Motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              className="flex items-center gap-6 md:gap-8 bg-black/5 dark:bg-white/5 backdrop-blur-xl rounded-[2.5rem] px-10 py-6 border border-white/10 shadow-xl"
+            >
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-red-600/10 rounded-2xl">
+                  <Droplet className="text-red-600" size={28} />
+                </div>
+                <div>
+                  <p className="text-3xl font-black text-[var(--text-primary)] leading-none">{requests.length}</p>
+                  <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest mt-1">Pending</p>
+                </div>
+              </div>
+              <div className="w-px h-10 bg-white/10" />
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-red-600/10 rounded-2xl">
+                  <Users className="text-red-600" size={28} />
+                </div>
+                <div>
+                  <p className="text-3xl font-black text-[var(--text-primary)] leading-none">{new Set(requests.map((r) => r.bloodGroup)).size}</p>
+                  <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest mt-1">Sectors</p>
+                </div>
+              </div>
+            </Motion.div>
           </div>
 
-          {/* Floating Blood Drops */}
-          {[...Array(6)].map((_, i) => (
-            <motion.div
-              key={i}
-              animate={{
-                y: [0, -30, 0],
-                x: [0, Math.random() * 20 - 10, 0],
-                rotate: [0, 360],
-              }}
-              transition={{
-                duration: 5 + i,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: i * 0.5,
-              }}
-              className="absolute"
-              style={{
-                left: `${10 + i * 15}%`,
-                top: `${20 + (i % 3) * 20}%`,
-              }}
-            >
-              <Droplet
-                size={40 + i * 10}
-                className="text-white/10"
-                fill="currentColor"
-              />
-            </motion.div>
-          ))}
-
-          <div className="relative max-w-7xl mx-auto px-4 py-16">
-            {/* Hero Header */}
-            <motion.div
-              initial={{ opacity: 0, y: -50 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-center mb-16"
-            >
-              <motion.div
-                animate={{
-                  scale: [1, 1.15, 1],
-                  rotate: [0, 5, -5, 0],
-                }}
-                transition={{
-                  duration: 4,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-                className="inline-block mb-6 relative"
+          {/* Blood Group Filter */}
+          <Motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-wrap gap-4 mb-20 p-4 ultra-glass rounded-[2rem] border border-white/5"
+          >
+            {bloodGroups.map((group) => (
+              <Motion.button
+                key={group}
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setFilter(group)}
+                className={`px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
+                  filter === group
+                    ? "bg-[var(--primary-red)] text-white shadow-[0_10px_20px_rgba(100,13,20,0.3)]"
+                    : "bg-white/5 text-[var(--text-secondary)] border border-white/10 hover:bg-white/10"
+                }`}
               >
-                <Droplet
-                  size={100}
-                  className="text-white drop-shadow-2xl"
-                  fill="currentColor"
-                />
-                <motion.div
-                  animate={{
-                    scale: [1, 1.5, 1],
-                    opacity: [0.5, 0, 0.5],
-                  }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                  className="absolute inset-0 bg-white rounded-full blur-3xl"
-                />
-              </motion.div>
+                {group === "all" ? "All Sectors" : group}
+              </Motion.button>
+            ))}
+          </Motion.div>
 
-              <h1 className="text-5xl md:text-7xl font-black text-white mb-4 drop-shadow-lg">
-                Urgent Blood Requests
-              </h1>
-              <p className="text-xl md:text-2xl text-red-100 max-w-3xl mx-auto mb-8">
-                Every second counts. Your donation can save a life today.
-              </p>
-
-              {/* Stats Banner */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="inline-flex items-center gap-8 bg-white/20 backdrop-blur-xl rounded-2xl px-8 py-4 border border-white/30"
-              >
-                <div className="flex items-center gap-2">
-                  <AlertCircle className="text-yellow-300" size={24} />
-                  <div className="text-left">
-                    <p className="text-3xl font-bold text-white">
-                      {requests.length}
-                    </p>
-                    <p className="text-sm text-red-100">Pending Requests</p>
-                  </div>
-                </div>
-                <div className="w-px h-12 bg-white/30" />
-                <div className="flex items-center gap-2">
-                  <Users className="text-green-300" size={24} />
-                  <div className="text-left">
-                    <p className="text-3xl font-bold text-white">
-                      {new Set(requests.map((r) => r.bloodGroup)).size}
-                    </p>
-                    <p className="text-sm text-red-100">Blood Groups</p>
-                  </div>
-                </div>
-              </motion.div>
-            </motion.div>
-
-            {/* Blood Group Filter */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="flex flex-wrap justify-center gap-3 mb-12"
-            >
-              {bloodGroups.map((group, index) => (
-                <motion.button
-                  key={group}
-                  initial={{ opacity: 0, scale: 0 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.5 + index * 0.05 }}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setFilter(group)}
-                  className={`px-6 py-3 rounded-xl font-bold transition-all ${
-                    filter === group
-                      ? "bg-white text-red-600 shadow-2xl scale-110"
-                      : "bg-white/20 text-white backdrop-blur-sm hover:bg-white/30"
-                  }`}
-                >
-                  {group === "all" ? "All Groups" : group}
-                </motion.button>
-              ))}
-            </motion.div>
-
-            {/* Loading Skeletons */}
-            {isLoading && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Request Grid */}
+          <div className="min-h-[400px] pb-24">
+            {isLoading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {[...Array(6)].map((_, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: i * 0.1 }}
-                    className="h-96 rounded-3xl bg-white/10 backdrop-blur-md animate-pulse"
-                  />
+                  <div key={i} className="h-[420px] rounded-[2.5rem] ultra-glass animate-pulse border border-white/5" />
                 ))}
               </div>
-            )}
-
-            {/* Request Cards */}
-            {!isLoading && filteredRequests.length > 0 && (
-              <motion.div
-                initial="hidden"
-                animate="visible"
+            ) : filteredRequests.length > 0 ? (
+              <Motion.div
+                layout
                 className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
               >
-                <AnimatePresence>
+                <AnimatePresence mode='popLayout'>
                   {filteredRequests.map((request, index) => (
-                    <motion.div
+                    <Motion.div
                       key={request._id}
+                      layout
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -20 }}
-                      transition={{
-                        delay: index * 0.05,
-                        duration: 0.3,
-                      }}
-                      whileHover={{
-                        y: -8,
-                        transition: { duration: 0.2 },
-                      }}
-                      className="relative group"
+                      exit={{ opacity: 0, scale: 0.9 }}
+                      transition={{ delay: index * 0.05 }}
+                      whileHover={{ y: -8 }}
+                      className="group relative"
                     >
-                      {/* Card Glow */}
-                      <div className="absolute -inset-1 bg-gradient-to-r from-red-500 via-pink-500 to-rose-500 rounded-3xl blur-xl opacity-0 group-hover:opacity-75 transition-opacity duration-300" />
-
-                      <div className="relative bg-gradient-to-br from-white via-red-50 to-rose-50 rounded-3xl shadow-2xl overflow-hidden border-2 border-white/50">
-                        {/* Urgency Badge */}
-                        <div className="absolute top-4 right-4 z-10">
-                          <div className="flex items-center gap-1 bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold">
-                            <Zap size={14} fill="currentColor" />
-                            URGENT
+                      <div className="relative ultra-glass rounded-[2.5rem] border border-white/10 overflow-hidden hover:border-red-500/30 transition-all duration-500 shadow-2xl flex flex-col h-full">
+                        {/* Status Bar */}
+                        <div className="absolute top-6 right-6 z-10 flex gap-2">
+                          <div className="bg-[var(--primary-red)] text-white px-3 py-1 rounded-full text-[9px] font-black tracking-widest uppercase flex items-center gap-1 shadow-lg">
+                            <Zap size={10} fill="currentColor" />
+                            CRITICAL
                           </div>
                         </div>
 
-                        <div className="p-6">
-                          {/* Blood Group Display */}
-                          <div className="flex items-center justify-center mb-6">
-                            <div className="relative">
-                              <div className="absolute inset-0 bg-gradient-to-br from-red-500 to-rose-600 rounded-full blur-xl opacity-50" />
-                              <motion.div
-                                whileHover={{ scale: 1.1 }}
-                                transition={{ duration: 0.3 }}
-                                className="relative bg-gradient-to-br from-red-500 to-rose-600 text-white rounded-full w-24 h-24 flex items-center justify-center shadow-2xl"
-                              >
-                                <Droplet
-                                  size={32}
-                                  className="absolute top-2 left-2 opacity-30"
-                                  fill="currentColor"
-                                />
-                                <span className="text-4xl font-black relative z-10">
-                                  {request.bloodGroup}
-                                </span>
-                              </motion.div>
-                            </div>
-                          </div>
-
-                          {/* Recipient Info */}
-                          <div className="text-center mb-6">
-                            <p className="text-xs uppercase tracking-widest text-red-600 font-bold mb-1">
-                              Patient Name
-                            </p>
-                            <p className="text-2xl font-bold text-gray-900 mb-4">
-                              {request.recipient_name}
-                            </p>
-
-                            {/* Location */}
-                            <motion.div
-                              whileHover={{ x: 5 }}
-                              className="flex items-center justify-center gap-2 text-gray-700 bg-white/80 rounded-xl px-4 py-3 mb-4"
+                        <div className="p-8 flex-grow">
+                          {/* Header: Blood Group & Name */}
+                          <div className="flex items-center gap-5 mb-8">
+                            <Motion.div 
+                              whileHover={{ scale: 1.05 }}
+                              className="w-16 h-16 rounded-3xl bg-white dark:bg-white shadow-[0_8px_20px_rgba(0,0,0,0.15)] flex items-center justify-center border border-white/20 shrink-0"
                             >
-                              <MapPin
-                                className="text-red-500 flex-shrink-0"
-                                size={20}
-                              />
-                              <p className="text-sm font-semibold">
-                                {request.recipient_upazila},{" "}
-                                {request.recipient_district}
-                              </p>
-                            </motion.div>
-
-                            {/* Date & Time */}
-                            <div className="grid grid-cols-2 gap-3 mb-6">
-                              <div className="bg-gradient-to-br from-red-50 to-rose-50 rounded-xl p-3 border border-red-100">
-                                <Calendar
-                                  size={18}
-                                  className="text-red-500 mx-auto mb-1"
-                                />
-                                <p className="text-xs font-bold text-gray-900">
-                                  {request.date}
-                                </p>
-                              </div>
-                              <div className="bg-gradient-to-br from-red-50 to-rose-50 rounded-xl p-3 border border-red-100">
-                                <Clock
-                                  size={18}
-                                  className="text-red-500 mx-auto mb-1"
-                                />
-                                <p className="text-xs font-bold text-gray-900">
-                                  {request.time}
-                                </p>
+                              <span className="text-xl font-black text-[var(--primary-red)] tracking-tighter">
+                                {request.bloodGroup}
+                              </span>
+                            </Motion.div>
+                            <div className="min-w-0">
+                              <h3 className="text-lg font-black text-[var(--text-primary)] uppercase tracking-tight leading-none mb-2 truncate">
+                                {request.recipient_name}
+                              </h3>
+                              <div className="flex items-center gap-2 text-[var(--primary-red)] font-bold">
+                                <Hospital size={14} />
+                                <span className="text-[10px] uppercase tracking-widest truncate">
+                                  {request.hospital || "Central Medical Cluster"}
+                                </span>
                               </div>
                             </div>
                           </div>
 
-                          {/* View Details Button */}
-                          <motion.button
+                          {/* Info Matrix */}
+                          <div className="grid grid-cols-2 gap-6 mb-8">
+                            <div className="space-y-4">
+                              <div className="space-y-1">
+                                <p className="text-[9px] font-black text-[var(--text-muted)] tracking-[0.2em] uppercase">Coordinate</p>
+                                <div className="flex items-center gap-2 text-[var(--text-primary)]">
+                                  <MapPin size={14} className="text-[var(--primary-red)]" />
+                                  <span className="text-xs font-black uppercase truncate">{request.recipient_district}</span>
+                                </div>
+                              </div>
+                              <div className="space-y-1">
+                                <p className="text-[9px] font-black text-[var(--text-muted)] tracking-[0.2em] uppercase">Temporal Window</p>
+                                <div className="flex items-center gap-2 text-[var(--text-primary)]">
+                                  <Calendar size={14} className="text-[var(--primary-red)]" />
+                                  <span className="text-xs font-black uppercase">{request.date}</span>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="space-y-4">
+                              <div className="space-y-1">
+                                <p className="text-[9px] font-black text-[var(--text-muted)] tracking-[0.2em] uppercase">Sub-Sector</p>
+                                <div className="flex items-center gap-2 text-[var(--text-primary)]">
+                                  <Target size={14} className="text-[var(--primary-red)]" />
+                                  <span className="text-xs font-black uppercase truncate">{request.recipient_upazila}</span>
+                                </div>
+                              </div>
+                              <div className="space-y-1">
+                                <p className="text-[9px] font-black text-[var(--text-muted)] tracking-[0.2em] uppercase">Sync Time</p>
+                                <div className="flex items-center gap-2 text-[var(--text-primary)]">
+                                  <Clock size={14} className="text-[var(--primary-red)]" />
+                                  <span className="text-xs font-black uppercase">{request.time}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Action Button */}
+                          <Motion.button
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                             onClick={() => handleViewDetails(request._id)}
-                            className="w-full bg-gradient-to-r from-red-600 via-rose-600 to-pink-600 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-2xl transition-all flex items-center justify-center gap-2 group"
+                            className="w-full bg-[var(--primary-red)] text-white font-black py-4 rounded-2xl shadow-[0_10px_20px_rgba(100,13,20,0.2)] hover:shadow-[0_15px_30px_rgba(100,13,20,0.4)] transition-all flex items-center justify-center gap-3 group/btn relative overflow-hidden"
                           >
-                            <Eye size={20} />
-                            <span>View Full Details</span>
-                            <motion.div
-                              animate={{ x: [0, 5, 0] }}
-                              transition={{ duration: 1.5, repeat: Infinity }}
-                            >
-                              <ArrowRight size={20} />
-                            </motion.div>
-                          </motion.button>
+                            <Eye size={18} />
+                            <span className="text-xs uppercase tracking-widest">Connect</span>
+                            <div className="absolute inset-0 bg-white/20 translate-y-full group-hover/btn:translate-y-0 transition-transform" />
+                          </Motion.button>
                         </div>
 
-                        {/* Bottom Accent */}
-                        <div className="h-2 bg-gradient-to-r from-red-500 via-pink-500 to-red-500" />
+                        {/* Card Footer/Accent */}
+                        <div className="h-2 bg-gradient-to-r from-transparent via-[var(--primary-red)]/50 to-transparent opacity-30" />
                       </div>
-                    </motion.div>
+                    </Motion.div>
                   ))}
                 </AnimatePresence>
-              </motion.div>
-            )}
-
-            {/* Empty State */}
-            {!isLoading && filteredRequests.length === 0 && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
+              </Motion.div>
+            ) : (
+              /* Empty State */
+              <Motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="text-center py-24 bg-white/10 backdrop-blur-xl rounded-3xl border-2 border-white/20"
+                className="text-center py-32 ultra-glass rounded-[4rem] border border-white/10 shadow-3xl overflow-hidden relative"
               >
-                <motion.div
-                  animate={{
-                    y: [0, -20, 0],
-                    rotate: [0, 10, -10, 0],
-                  }}
-                  transition={{ duration: 3, repeat: Infinity }}
+                <div className="absolute inset-0 -z-10 bg-red-600/5 blur-[120px]" />
+                <Motion.div
+                  animate={{ y: [0, -20, 0] }}
+                  transition={{ duration: 4, repeat: Infinity }}
+                  className="mb-10 inline-block p-10 rounded-full bg-red-600/5 border border-red-500/10 shadow-inner"
                 >
-                  <Droplet size={120} className="mx-auto text-white/40 mb-6" />
-                </motion.div>
-                <h3 className="text-4xl font-bold text-white mb-4">
-                  {filter === "all"
-                    ? "No Pending Requests"
-                    : `No ${filter} Requests`}
+                  <Droplet size={80} className="text-[var(--primary-red)]/30" strokeWidth={1} />
+                </Motion.div>
+                <h3 className="text-3xl font-black text-[var(--text-primary)] uppercase tracking-tight mb-4">
+                  All Systems Clear
                 </h3>
-                <p className="text-xl text-red-100 mb-8">
+                <p className="text-lg text-[var(--text-secondary)] font-medium max-w-lg mx-auto opacity-60 leading-relaxed mb-10">
                   {filter === "all"
-                    ? "All requests have been fulfilled. Check back soon!"
-                    : "Try selecting a different blood group."}
+                    ? "Initial sweep suggests all critical requests have been synchronized. The network is stable."
+                    : `No active signals detected for the ${filter} sector. Monitoring continues...`}
                 </p>
                 {filter !== "all" && (
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                  <button
                     onClick={() => setFilter("all")}
-                    className="px-8 py-4 bg-white text-red-600 font-bold rounded-xl shadow-lg hover:shadow-2xl"
+                    className="px-10 py-4 bg-[var(--primary-red)] text-white font-black rounded-xl shadow-xl hover:scale-105 transition-transform uppercase text-xs tracking-widest"
                   >
-                    View All Requests
-                  </motion.button>
+                    Reset Grid Scan
+                  </button>
                 )}
-              </motion.div>
+              </Motion.div>
             )}
           </div>
         </div>

@@ -210,7 +210,7 @@ const ContactUs = () => {
 
         {/* Contact Methods */}
         <Motion.div
-          className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6 mb-8 lg:mb-12"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6 mb-8 lg:mb-12"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
@@ -253,14 +253,13 @@ const ContactUs = () => {
         </Motion.div>
 
         {/* Main Grid */}
-        <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
+        <div className="grid lg:grid-cols-[2fr_1fr] gap-6 lg:gap-8">
           {/* Contact Form */}
           <Motion.div
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="lg:col-span-2"
           >
             <div className="ultra-glass bg-white/5 rounded-[2.5rem] lg:rounded-[3rem] shadow-2xl p-6 lg:p-10 border border-white/10 h-full">
               <div className="text-center mb-8">
@@ -307,7 +306,7 @@ const ContactUs = () => {
                   <Motion.form
                     key="form"
                     onSubmit={handleSubmit}
-                    className="space-y-4 lg:space-y-6"
+                    className="space-y-4 lg:space-y-5"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.2 }}
@@ -350,7 +349,7 @@ const ContactUs = () => {
                                   ? "IDENTIFY..."
                                   : "+880Pulse..."
                               }
-                              className="w-full pl-12 pr-5 py-4 bg-white/5 border border-white/10 rounded-xl lg:rounded-2xl focus:border-red-600/50 focus:bg-white/10 outline-none transition-all text-sm lg:text-base text-[var(--text-primary)] font-black uppercase tracking-widest"
+                              className="w-full pl-12 pr-5 py-3.5 lg:py-4 bg-white/5 border border-white/10 rounded-xl lg:rounded-2xl focus:border-red-600/50 focus:bg-white/10 outline-none transition-all text-sm lg:text-base text-[var(--text-primary)] font-black uppercase tracking-widest"
                               required
                             />
                           </div>
@@ -379,7 +378,7 @@ const ContactUs = () => {
                           onFocus={() => setFocusedField("email")}
                           onBlur={() => setFocusedField(null)}
                           placeholder="CORE@NETWORK..."
-                          className="w-full pl-12 pr-5 py-4 bg-white/5 border border-white/10 rounded-xl lg:rounded-2xl focus:border-red-600/50 focus:bg-white/10 outline-none transition-all text-sm lg:text-base text-[var(--text-primary)] font-black uppercase tracking-widest"
+                          className="w-full pl-12 pr-5 py-3.5 lg:py-4 bg-white/5 border border-white/10 rounded-xl lg:rounded-2xl focus:border-red-600/50 focus:bg-white/10 outline-none transition-all text-sm lg:text-base text-[var(--text-primary)] font-black uppercase tracking-widest"
                           required
                         />
                       </div>
@@ -393,7 +392,7 @@ const ContactUs = () => {
                         name="subject"
                         value={formData.subject}
                         onChange={handleChange}
-                        className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl lg:rounded-2xl focus:border-red-600/50 focus:bg-white/10 outline-none transition-all cursor-pointer font-black text-xs lg:text-sm text-[var(--text-primary)] uppercase tracking-widest"
+                        className="w-full px-5 py-3.5 lg:py-4 bg-white/5 border border-white/10 rounded-xl lg:rounded-2xl focus:border-red-600/50 focus:bg-white/10 outline-none transition-all cursor-pointer font-black text-xs lg:text-sm text-[var(--text-primary)] uppercase tracking-widest"
                         required
                       >
                         <option value="" className="bg-black text-white">Select Sector</option>
@@ -414,7 +413,7 @@ const ContactUs = () => {
                         onChange={handleChange}
                         placeholder="INPUT BROADCAST MESSAGE..."
                         rows={4}
-                        className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl lg:rounded-2xl focus:border-red-600/50 focus:bg-white/10 outline-none transition-all resize-none font-medium text-sm lg:text-base text-[var(--text-primary)] uppercase tracking-tight"
+                        className="w-full px-5 py-3.5 lg:py-4 bg-white/5 border border-white/10 rounded-xl lg:rounded-2xl focus:border-red-600/50 focus:bg-white/10 outline-none transition-all resize-none font-medium text-sm lg:text-base text-[var(--text-primary)] uppercase tracking-tight"
                         required
                       />
                     </div>
@@ -424,7 +423,7 @@ const ContactUs = () => {
                       disabled={isSubmitting}
                       whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
                       whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
-                      className="group w-full py-4 lg:py-5 bg-white text-black font-black text-base lg:text-lg rounded-xl lg:rounded-2xl flex items-center justify-center gap-3 transition-all shadow-2xl disabled:opacity-50"
+                      className="group w-full py-3 lg:py-4 bg-white text-black font-black text-base lg:text-lg rounded-xl lg:rounded-2xl flex items-center justify-center gap-3 transition-all shadow-2xl disabled:opacity-50"
                     >
                       {isSubmitting ? (
                         <>
@@ -454,7 +453,7 @@ const ContactUs = () => {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="space-y-6 lg:space-y-8"
+            className="space-y-8.5"
           >
             {/* Working Hours */}
             <div className="bg-premium-gradient rounded-[2rem] lg:rounded-[3.5rem] p-6 lg:p-8 text-white shadow-2xl overflow-hidden relative border border-white/20">

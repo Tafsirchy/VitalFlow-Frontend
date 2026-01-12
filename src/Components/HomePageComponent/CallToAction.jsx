@@ -59,7 +59,7 @@ const CallToAction = () => {
            </Motion.div>
 
             <div className="space-y-3 lg:space-y-4">
-               <h2 className="text-3xl md:text-5xl lg:text-7xl font-black text-white leading-[1.1] tracking-tighter">
+               <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-white leading-tight tracking-tighter uppercase">
                   IGNITE THE <br />
                   <span className="italic font-light">LIFE CIRCUIT</span>
                </h2>

@@ -466,7 +466,7 @@ const Feature = () => {
                 <div className="h-8 w-1.5 bg-red-600 rounded-full" />
                 <p className="text-[11px] font-black text-red-600 tracking-[0.3em] uppercase">Emergency Response Pipeline</p>
              </div>
-             <h2 className="text-4xl md:text-6xl font-black text-[var(--text-primary)] leading-[0.85] tracking-tighter uppercase">
+             <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-[var(--text-primary)] leading-tight tracking-tighter uppercase">
                 Critical <br />
                 <span className="text-gradient-crimson italic">Demands</span>
              </h2>
