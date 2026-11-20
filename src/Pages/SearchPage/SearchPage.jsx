@@ -8,77 +8,19 @@ import {
   Hospital,
   User,
   Mail,
-  MessageSquare,
   Heart,
   Activity,
-  Target,
+  ArrowRight,
+  ShieldCheck,
+  CheckCircle2,
   Users,
+  RotateCcw,
+  PhoneCall,
+  ExternalLink,
 } from "lucide-react";
-import React, { useEffect, useState, useMemo } from "react";
-import { motion as Motion, AnimatePresence } from "framer-motion";
-import useAxios from "../../hooks/useAxios";
+import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router";
-import Navbar from "../../Components/Navbar";
-import Footer from "../../Components/Footer";
-import { Eye } from "lucide-react";
-
-// --- Sub-component: Neural Background ---
-const NeuralBackground = () => {
-  const circles = useMemo(() => 
-    [...Array(20)].map(() => ({
-      cx: Math.random() * 1000,
-      cy: Math.random() * 1000,
-      r: Math.random() * 2 + 1,
-      duration: Math.random() * 3 + 2,
-      delay: Math.random() * 5
-    })), []);
-
-  const paths = useMemo(() => [
-    { d: "M0,500 Q250,200 500,500 T1000,500", duration: 5, delay: 0 },
-    { d: "M0,300 Q300,600 600,300 T1000,300", duration: 7, delay: 1 }
-  ], []);
-
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-[0.4] dark:opacity-[0.15]">
-      <svg className="w-full h-full" viewBox="0 0 1000 1000">
-        <defs>
-          <linearGradient id="neural-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="var(--primary-red)" stopOpacity="0.2" />
-            <stop offset="100%" stopColor="transparent" />
-          </linearGradient>
-        </defs>
-        {paths.map((p, i) => (
-          <Motion.path
-            key={i}
-            d={p.d}
-            fill="none"
-            stroke="url(#neural-grad)"
-            strokeWidth="1"
-            initial={{ pathLength: 0, opacity: 0 }}
-            animate={{ pathLength: 1, opacity: 1 }}
-            transition={{ duration: p.duration, repeat: Infinity, ease: "linear", delay: p.delay }}
-          />
-        ))}
-        {circles.map((c, i) => (
-          <Motion.circle
-            key={i}
-            cx={c.cx}
-            cy={c.cy}
-            r={c.r}
-            fill="var(--primary-red)"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: [0, 0.5, 0] }}
-            transition={{ 
-              duration: c.duration, 
-              repeat: Infinity, 
-              delay: c.delay 
-            }}
-          />
-        ))}
-      </svg>
-    </div>
-  );
-};
+import useAxios from "../../Hooks/useAxios";
 
 const SearchPage = () => {
   const [bloodGroup, setBloodGroup] = useState("");
@@ -87,13 +29,19 @@ const SearchPage = () => {
 
   const [districts, setDistricts] = useState([]);
   const [upazilas, setUpazilas] = useState([]);
-  const [searchResults, setSearchResults] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasSearched, setHasSearched] = useState(false);
+  const [filteredUpazilas, setFilteredUpazilas] = useState([]);
+
+  const [donors, setDonors] = useState([]);
+  const [requests, setRequests] = useState([]);
+  const [activeTab, setActiveTab] = useState("donors"); // "donors" | "requests"
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSearching, setIsSearching] = useState(false);
+  const [hasFiltered, setHasFiltered] = useState(false);
 
   const axiosInstance = useAxios();
   const navigate = useNavigate();
 
+  // Load districts and upazilas
   useEffect(() => {
     axios.get("/districts.json").then((res) => {
       const sorted = [...res.data.districts].sort((a, b) =>
@@ -107,450 +55,533 @@ const SearchPage = () => {
         a.name.localeCompare(b.name, "en", { sensitivity: "base" })
       );
       setUpazilas(sorted);
+      setFilteredUpazilas(sorted);
     });
   }, []);
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setHasSearched(true);
+  // Filter upazilas when district changes
+  useEffect(() => {
+    if (!district) {
+      setFilteredUpazilas(upazilas);
+      return;
+    }
 
-    axiosInstance
-      .get(
-        `/search-requests?bloodGroup=${bloodGroup}&district=${district}&upazila=${upazila}`
-      )
-      .then((res) => {
-        setSearchResults(res.data);
-      })
-      .catch((err) => {
-        console.error("Search failed:", err);
-        setSearchResults([]);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+    const selectedDistrictObj = districts.find(
+      (d) => d.name.toLowerCase() === district.toLowerCase()
+    );
+
+    if (selectedDistrictObj && selectedDistrictObj.id) {
+      const matched = upazilas.filter(
+        (u) => u.district_id === selectedDistrictObj.id
+      );
+      setFilteredUpazilas(matched.length > 0 ? matched : upazilas);
+    } else {
+      setFilteredUpazilas(upazilas);
+    }
+  }, [district, districts, upazilas]);
+
+  // Initial load: By default, fetch all donors and requests
+  const fetchInitialData = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const [donorsRes, requestsRes] = await Promise.all([
+        axiosInstance.get("/search-donors"),
+        axiosInstance.get("/search-requests"),
+      ]);
+
+      setDonors(donorsRes.data || []);
+      setRequests(requestsRes.data || []);
+    } catch (err) {
+      console.error("Failed to load initial directory data:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [axiosInstance]);
+
+  useEffect(() => {
+    fetchInitialData();
+  }, [fetchInitialData]);
+
+  // Handle Search Submission
+  const handleSearch = async (e) => {
+    if (e) e.preventDefault();
+    setIsSearching(true);
+    setHasFiltered(true);
+
+    try {
+      const encodedBlood = bloodGroup ? encodeURIComponent(bloodGroup) : "";
+      const queryParams = `bloodGroup=${encodedBlood}&district=${encodeURIComponent(
+        district
+      )}&upazila=${encodeURIComponent(upazila)}`;
+
+      const [donorsRes, requestsRes] = await Promise.all([
+        axiosInstance.get(`/search-donors?${queryParams}`),
+        axiosInstance.get(`/search-requests?${queryParams}`),
+      ]);
+
+      setDonors(donorsRes.data || []);
+      setRequests(requestsRes.data || []);
+    } catch (err) {
+      console.error("Search failed:", err);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  // Reset Search Filters
+  const handleReset = async () => {
+    setBloodGroup("");
+    setDistrict("");
+    setUpazila("");
+    setHasFiltered(false);
+    await fetchInitialData();
   };
 
   const getStatusBadge = (status) => {
     const statusStyles = {
-      inprogress: "bg-gradient-to-r from-yellow-400 to-orange-400 text-white",
-      completed: "bg-gradient-to-r from-green-400 to-emerald-400 text-white",
-      cancelled: "bg-gradient-to-r from-red-400 to-rose-400 text-white",
+      inprogress:
+        "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20",
+      completed:
+        "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
+      done:
+        "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
+      pending:
+        "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
+      canceled:
+        "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20",
     };
 
     return (
-      <Motion.span
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ type: "spring", stiffness: 500, damping: 30 }}
-        className={`px-3 py-1 rounded-full text-[10px] font-black shadow-lg uppercase tracking-wider ${
-          statusStyles[status] || "bg-gray-100 text-gray-800"
+      <span
+        className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${
+          statusStyles[status] || "bg-zinc-100 text-zinc-700 border-zinc-200"
         }`}
       >
         {status === "inprogress"
           ? "In Progress"
+          : status === "done"
+          ? "Completed"
           : status.charAt(0).toUpperCase() + status.slice(1)}
-      </Motion.span>
+      </span>
     );
   };
 
   return (
-    <section className="bg-[var(--background-main)] min-h-screen font-sans selection:bg-red-500/30">
-      <navbar>
-        <Navbar></Navbar>
-      </navbar>
-      <main className="relative pt-10 overflow-hidden">
-        <NeuralBackground />
-        
-        <div className="container mx-auto px-6 lg:px-12 relative z-10">
-          {/* Header Section */}
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-16 px-4">
-            <div className="space-y-4 text-left">
-              <Motion.div
-                initial={{ opacity: 0, x: -30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                className="inline-flex items-center gap-3 px-5 py-2 rounded-full ultra-glass border border-white/10"
-              >
-                <Activity size={14} className="text-red-600 animate-pulse" />
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--text-primary)]">
-                  Tactical Search Console v.04
-                </span>
-              </Motion.div>
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-[var(--text-primary)] leading-tight tracking-tighter uppercase">
-                Find Life <br />
-                <span className="text-gradient-crimson italic">Carriers</span>
-              </h1>
-            </div>
-            
-            <div className="max-w-md space-y-4 mb-4">
-              <div className="flex items-center gap-2 text-red-600">
-                <Activity size={16} />
-                <span className="text-[10px] font-black uppercase tracking-widest">Global Sync: Active</span>
-              </div>
-              <p className="text-base text-[var(--text-secondary)] font-medium opacity-60 leading-relaxed">
-                Connect with the vital network to identify donors in your specified sector. Every signal counts towards the collective life-circuit.
-              </p>
-            </div>
+    <div className="bg-[var(--background-main)] min-h-screen text-[var(--text-primary)]">
+      <main className="py-8 sm:py-12 lg:py-14">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Symmetrical Section Header */}
+          <div className="text-center max-w-3xl mx-auto mb-6 sm:mb-8">
+            <span className="section-eyebrow block">NATIONAL LIFELINE DIRECTORY</span>
+            <h1 className="section-title">
+              Find Verified Donors & <br />
+              <span className="text-gradient-crimson italic">Emergency Blood Requests</span>
+            </h1>
+            <p className="section-subtitle">
+              Browse verified voluntary blood donors and open transfusion requests across all 64 districts in Bangladesh. Filter instantly by blood group and locality.
+            </p>
           </div>
 
-          <Motion.form
+          {/* Search Filter Box */}
+          <form
             onSubmit={handleSearch}
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="relative ultra-glass rounded-[2rem] p-8 md:p-10 border border-white/10 shadow-[0_40px_80px_-20px_rgba(0,0,0,0.4)] mb-20 group"
+            className="bg-[var(--background-card)] border border-[var(--border-light)] rounded-2xl p-4 sm:p-5 lg:p-6 shadow-sm mb-6 transition-all"
           >
-            {/* Scanline decoration */}
-            <Motion.div 
-              animate={{ top: ["0%", "100%", "0%"] }}
-              transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-              className="absolute left-0 right-0 h-px bg-red-600/10 blur-[1px] -z-10" 
-            />
-
-            <div className="relative z-10 grid grid-cols-1 md:grid-cols-4 gap-6">
-              <Motion.div
-                whileHover={{ scale: 1.02 }}
-                className="space-y-2"
-              >
-                <label className="text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)] flex items-center gap-2">
-                  <Droplet size={14} className="text-red-600" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 items-end">
+              {/* Blood Group */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] flex items-center gap-1.5">
+                  <Droplet size={13} className="text-[var(--primary-red)]" />
                   Blood Group
                 </label>
                 <select
                   value={bloodGroup}
                   onChange={(e) => setBloodGroup(e.target.value)}
-                  className="w-full h-14 bg-black/5 dark:bg-white/5 border border-white/10 rounded-xl px-4 text-sm font-bold text-[var(--text-primary)] focus:outline-none focus:border-red-600/50 transition-all cursor-pointer hover:bg-white/10"
+                  className="w-full h-11 bg-[var(--background-main)] border border-[var(--border-light)] rounded-xl px-3 text-sm font-semibold text-[var(--text-primary)] focus:outline-none focus:border-[var(--primary-red)] focus:ring-2 focus:ring-red-500/10 transition-all cursor-pointer"
                 >
-                  <option value="" className="bg-[var(--background-main)]">All Sectors</option>
-                  {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map(group => (
-                    <option key={group} value={group} className="bg-[var(--background-main)]">{group}</option>
-                  ))}
+                  <option value="">All Blood Groups</option>
+                  {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map(
+                    (group) => (
+                      <option key={group} value={group}>
+                        Blood Group {group}
+                      </option>
+                    )
+                  )}
                 </select>
-              </Motion.div>
+              </div>
 
               {/* District */}
-              <Motion.div
-                whileHover={{ scale: 1.02 }}
-                className="space-y-2"
-              >
-                <label className="text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)] flex items-center gap-2">
-                  <MapPin size={14} className="text-red-600" />
-                  District Cluster
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] flex items-center gap-1.5">
+                  <MapPin size={13} className="text-[var(--primary-red)]" />
+                  District
                 </label>
                 <select
                   value={district}
-                  onChange={(e) => setDistrict(e.target.value)}
-                  className="w-full h-14 bg-black/5 dark:bg-white/5 border border-white/10 rounded-xl px-4 text-sm font-bold text-[var(--text-primary)] focus:outline-none focus:border-red-600/50 transition-all cursor-pointer hover:bg-white/10"
+                  onChange={(e) => {
+                    setDistrict(e.target.value);
+                    setUpazila("");
+                  }}
+                  className="w-full h-11 bg-[var(--background-main)] border border-[var(--border-light)] rounded-xl px-3 text-sm font-semibold text-[var(--text-primary)] focus:outline-none focus:border-[var(--primary-red)] focus:ring-2 focus:ring-red-500/10 transition-all cursor-pointer"
                 >
-                  <option value="" className="bg-[var(--background-main)]">Global Sector</option>
+                  <option value="">All Districts</option>
                   {districts.map((d) => (
-                    <option key={d.name} value={d.name} className="bg-[var(--background-main)]">
-                      {d.name.toUpperCase()}
+                    <option key={d.name} value={d.name}>
+                      {d.name}
                     </option>
                   ))}
                 </select>
-              </Motion.div>
+              </div>
 
-              <Motion.div
-                whileHover={{ scale: 1.02 }}
-                className="space-y-2"
-              >
-                <label className="text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)] flex items-center gap-2">
-                  <MapPin size={14} className="text-red-600" />
-                  Sub-Sector
+              {/* Upazila */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] flex items-center gap-1.5">
+                  <MapPin size={13} className="text-[var(--primary-red)]" />
+                  Upazila / Area
                 </label>
                 <select
                   value={upazila}
                   onChange={(e) => setUpazila(e.target.value)}
-                  className="w-full h-14 bg-black/5 dark:bg-white/5 border border-white/10 rounded-xl px-4 text-sm font-bold text-[var(--text-primary)] focus:outline-none focus:border-red-600/50 transition-all cursor-pointer hover:bg-white/10"
+                  className="w-full h-11 bg-[var(--background-main)] border border-[var(--border-light)] rounded-xl px-3 text-sm font-semibold text-[var(--text-primary)] focus:outline-none focus:border-[var(--primary-red)] focus:ring-2 focus:ring-red-500/10 transition-all cursor-pointer"
                 >
-                  <option value="" className="bg-[var(--background-main)]">All Nodes</option>
-                  {upazilas.map((u) => (
-                    <option key={u.name} value={u.name} className="bg-[var(--background-main)]">
-                      {u.name.toUpperCase()}
+                  <option value="">All Upazilas</option>
+                  {filteredUpazilas.map((u) => (
+                    <option key={u.id || u.name} value={u.name}>
+                      {u.name}
                     </option>
                   ))}
                 </select>
-              </Motion.div>
+              </div>
 
-              <Motion.div
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="flex items-end"
-              >
+              {/* Search & Reset CTAs */}
+              <div className="flex items-center gap-2.5">
                 <button
                   type="submit"
-                  disabled={isLoading}
-                  className="relative overflow-hidden w-full h-14 rounded-xl bg-red-600 text-white font-black text-sm uppercase tracking-widest transition-all shadow-[0_10px_30px_rgba(220,38,38,0.3)] hover:shadow-[0_20px_40px_rgba(220,38,38,0.5)] disabled:opacity-50 group px-6 flex items-center justify-center gap-3"
+                  disabled={isSearching}
+                  className="flex-1 h-11 rounded-xl bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white text-xs uppercase tracking-wider font-bold shadow-md shadow-red-600/20 flex items-center justify-center gap-2 disabled:opacity-50 transition-smooth"
                 >
-                  {isLoading ? (
-                    <Activity className="animate-spin" size={20} />
+                  {isSearching ? (
+                    <>
+                      <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <span>Filtering...</span>
+                    </>
                   ) : (
-                    <Search size={20} />
+                    <>
+                      <Search size={15} />
+                      <span>Search Donors</span>
+                    </>
                   )}
-                  <span>{isLoading ? "Syncing..." : "Initiate Search"}</span>
-                  <div className="absolute inset-0 bg-white/20 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
                 </button>
-              </Motion.div>
-            </div>
-          </Motion.form>
 
-          <AnimatePresence mode="wait">
-            {!hasSearched ? (
-              <Motion.div
-                key="welcome"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95, y: -20 }}
-                transition={{ duration: 0.5 }}
-                className="py-10"
-              >
-                <div className="text-center space-y-12 py-16 ultra-glass rounded-[3rem] border border-white/10 relative overflow-hidden">
-                  {/* Pulsing Core */}
-                  <div className="absolute inset-0 flex items-center justify-center -z-10">
-                    <Motion.div 
-                      animate={{ scale: [1, 2, 1], opacity: [0.1, 0.2, 0.1] }}
-                      transition={{ duration: 4, repeat: Infinity }}
-                      className="w-64 h-64 bg-red-600 rounded-full blur-[100px]"
-                    />
-                  </div>
-
-                  <div className="flex justify-center gap-12">
-                    {[0, 1, 2].map((i) => (
-                      <Motion.div
-                        key={i}
-                        animate={{
-                          y: [0, -20, 0],
-                          scale: [1, 1.1, 1],
-                        }}
-                        transition={{
-                          duration: 3,
-                          repeat: Infinity,
-                          delay: i * 0.5,
-                        }}
-                      >
-                        <div className="p-4 rounded-2xl bg-red-600/10 border border-red-500/20 shadow-[0_0_20px_rgba(220,38,38,0.1)]">
-                          <Heart className="text-red-600" size={40} fill="currentColor" />
-                        </div>
-                      </Motion.div>
-                    ))}
-                  </div>
-
-                  <div className="space-y-4 px-6">
-                    <h2 className="text-3xl md:text-4xl font-black text-[var(--text-primary)] tracking-tighter uppercase">
-                      Ready to Synchronize?
-                    </h2>
-                    <p className="text-base text-[var(--text-secondary)] font-medium max-w-2xl mx-auto leading-relaxed opacity-70">
-                      Scan the biological database to identify available carriers in your current coordinate cluster. Immediate response protocols active.
-                    </p>
-                  </div>
-
-                  <div className="flex justify-center gap-6 flex-wrap px-6">
-                    {[
-                      { icon: Droplet, label: "BIOTYPES", value: "8" },
-                      { icon: Activity, label: "RESTORED", value: "1.2K" },
-                      { icon: Users, label: "CARRIERS", value: "850+" }
-                    ].map((stat, i) => (
-                      <Motion.div
-                        key={i}
-                        whileHover={{ y: -5, borderColor: "var(--primary-red)" }}
-                        className="ultra-glass rounded-2xl p-6 border border-white/10 min-w-[160px] text-center transition-colors shadow-xl"
-                      >
-                        <stat.icon className="text-red-600 mx-auto mb-3" size={28} />
-                        <div className="text-3xl font-black text-[var(--text-primary)] tracking-tight">
-                          {stat.value}
-                        </div>
-                        <div className="text-[9px] font-black text-[var(--text-muted)] tracking-widest uppercase mt-1">
-                          {stat.label}
-                        </div>
-                      </Motion.div>
-                    ))}
-                  </div>
-                </div>
-              </Motion.div>
-            ) : (
-              <Motion.div
-                key="results"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="pb-20"
-              >
-                {isLoading ? (
-                  <div className="text-center py-20">
-                    <Motion.div
-                      animate={{ rotate: 360, scale: [1, 1.2, 1] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                      className="inline-block p-6 rounded-full ultra-glass border border-red-500/30"
-                    >
-                      <Droplet className="text-red-600" size={48} />
-                    </Motion.div>
-                    <p className="mt-8 text-[11px] font-black text-red-600 tracking-[0.5em] uppercase animate-pulse">
-                      Synchronizing Neural Network...
-                    </p>
-                  </div>
-                ) : searchResults.length > 0 ? (
-                  <>
-                    <Motion.div
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className="flex items-center gap-4 mb-10"
-                    >
-                      <div className="h-10 w-1.5 bg-red-600 rounded-full" />
-                      <h2 className="text-2xl font-black text-[var(--text-primary)] uppercase tracking-tighter">
-                        Identified <span className="text-red-600">{searchResults.length}</span> Active Carrier{searchResults.length !== 1 ? "s" : ""}
-                      </h2>
-                    </Motion.div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                      {searchResults.map((request, index) => (
-                        <Motion.div
-                          key={request._id}
-                          initial={{ opacity: 0, y: 30 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: index * 0.1 }}
-                          whileHover={{ y: -5 }}
-                          className="group relative ultra-glass rounded-[2.5rem] border border-white/10 overflow-hidden hover:border-red-500/30 transition-all duration-500 shadow-xl"
-                        >
-                          <div className="p-6 space-y-4">
-                            {/* Card Header */}
-                            <div className="flex justify-between items-start">
-                              <div className="flex items-center gap-4">
-                                <Motion.div 
-                                  whileHover={{ scale: 1.05 }}
-                                  className="w-16 h-16 rounded-3xl bg-white dark:bg-white shadow-[0_8px_16px_rgba(0,0,0,0.15)] flex items-center justify-center border border-white/20"
-                                >
-                                  <span className="text-xl font-black text-red-600 tracking-tighter">
-                                    {request.bloodGroup}
-                                  </span>
-                                </Motion.div>
-                                <div>
-                                  <h3 className="text-lg font-black text-[var(--text-primary)] uppercase tracking-tight leading-none mb-1">
-                                    {request.recipient_name}
-                                  </h3>
-                                  <div className="flex items-center gap-1.5 text-red-600 dark:text-red-500 font-bold">
-                                    <Hospital size={12} />
-                                    <span className="text-[10px] uppercase tracking-wide truncate max-w-[140px]">
-                                      {request.hospital || "Central Medical Nodes"}
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="flex flex-col items-end gap-2">
-                                {getStatusBadge(request.donation_status)}
-                              </div>
-                            </div>
-
-                            {/* Card Info Grid */}
-                            <div className="grid grid-cols-2 gap-4 pb-2">
-                              <div className="space-y-3">
-                                <div className="space-y-0.5">
-                                  <p className="text-[8px] font-black text-[var(--text-muted)] tracking-widest uppercase opacity-80">CLUSTER</p>
-                                  <div className="flex items-center gap-1.5 text-[var(--text-primary)]">
-                                    <MapPin size={12} className="text-red-600 dark:text-red-500" />
-                                    <span className="text-xs font-black uppercase truncate">{request.recipient_district}</span>
-                                  </div>
-                                </div>
-                                <div className="space-y-0.5">
-                                  <p className="text-[8px] font-black text-[var(--text-muted)] tracking-widest uppercase opacity-80">SYNC DATE</p>
-                                  <div className="flex items-center gap-1.5 text-[var(--text-primary)]">
-                                    <Calendar size={12} className="text-red-600 dark:text-red-500" />
-                                    <span className="text-xs font-black uppercase">{request.date}</span>
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="space-y-3">
-                                <div className="space-y-0.5">
-                                  <p className="text-[8px] font-black text-[var(--text-muted)] tracking-widest uppercase opacity-80">SUB-SECTOR</p>
-                                  <div className="flex items-center gap-1.5 text-[var(--text-primary)]">
-                                    <Target size={12} className="text-red-600 dark:text-red-500" />
-                                    <span className="text-xs font-black uppercase truncate">{request.recipient_upazila}</span>
-                                  </div>
-                                </div>
-                                <div className="space-y-0.5">
-                                  <p className="text-[8px] font-black text-[var(--text-muted)] tracking-widest uppercase opacity-80">SYNC TIME</p>
-                                  <div className="flex items-center gap-1.5 text-[var(--text-primary)]">
-                                    <Clock size={12} className="text-red-600 dark:text-red-500" />
-                                    <span className="text-xs font-black uppercase">{request.time}</span>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Requester Metadata */}
-                            <div className="pt-4 border-t border-white/10 space-y-3">
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                  <div className="w-8 h-8 rounded-full bg-black/5 dark:bg-white/10 border border-white/10 flex items-center justify-center">
-                                    <User size={12} className="text-[var(--text-muted)]" />
-                                  </div>
-                                  <div className="text-[9px] uppercase font-black tracking-widest text-[var(--text-secondary)]">
-                                    REQ: <span className="text-red-600 dark:text-red-500 font-bold">{request.requester_name.split(' ')[0]}</span>
-                                  </div>
-                                </div>
-                                <a
-                                  href={`mailto:${request.requester_email}`}
-                                  className="w-8 h-8 rounded-xl bg-black/5 dark:bg-white/10 border border-white/10 flex items-center justify-center hover:bg-red-600/10 transition-colors group/mail"
-                                >
-                                  <Mail size={12} className="text-[var(--text-muted)] group-hover/mail:text-red-600 dark:group-hover/mail:text-red-500" />
-                                </a>
-                              </div>
-                              {request.message && (
-                                <div className="p-3 rounded-2xl bg-black/5 dark:bg-white/10 border border-white/5 italic shadow-inner">
-                                  <p className="text-[10px] text-[var(--text-secondary)] opacity-90 leading-relaxed font-semibold">
-                                    "{request.message}"
-                                  </p>
-                                </div>
-                              )}
-                            </div>
-
-                            {/* Result action button */}
-                            <Motion.button
-                              whileHover={{ scale: 1.02 }}
-                              whileTap={{ scale: 0.98 }}
-                              onClick={() => navigate(`/donation-details/${request._id}`)}
-                              className="w-full bg-[var(--primary-red)] text-white font-black py-4 rounded-2xl shadow-[0_10px_20px_rgba(100,13,20,0.2)] hover:shadow-[0_15px_30px_rgba(100,13,20,0.4)] transition-all flex items-center justify-center gap-3 group/btn relative overflow-hidden"
-                            >
-                              <Eye size={18} />
-                              <span className="text-xs uppercase tracking-widest">Connect</span>
-                              <div className="absolute inset-0 bg-white/20 translate-y-full group-hover/btn:translate-y-0 transition-transform" />
-                            </Motion.button>
-                          </div>
-                        </Motion.div>
-                      ))}
-                    </div>
-                  </>
-                ) : (
-                  <Motion.div
-                    key="empty"
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="text-center py-32 ultra-glass rounded-[3rem] border border-white/10 shadow-2xl"
+                {hasFiltered && (
+                  <button
+                    type="button"
+                    onClick={handleReset}
+                    className="h-11 px-3.5 rounded-xl border border-[var(--border-light)] bg-[var(--background-main)] hover:bg-black/5 dark:hover:bg-white/5 text-[var(--text-secondary)] transition-smooth"
+                    title="Reset all filters"
                   >
-                    <Motion.div
-                      animate={{ y: [0, -10, 0] }}
-                      transition={{ duration: 3, repeat: Infinity }}
-                      className="inline-block p-8 rounded-full bg-red-600/5 border border-red-500/10 mb-8 shadow-inner"
-                    >
-                      <Search className="text-red-600/30" size={64} />
-                    </Motion.div>
-                    <h3 className="text-2xl font-black text-[var(--text-primary)] uppercase tracking-tight mb-3">
-                      Zero Carriers Identified
-                    </h3>
-                    <p className="text-base text-[var(--text-secondary)] font-medium max-w-md mx-auto opacity-60 leading-relaxed">
-                      Biological scan yielded no results for this specific sector. Adjust your tactical parameters and re-probe the neural network.
-                    </p>
-                  </Motion.div>
+                    <RotateCcw size={16} />
+                  </button>
                 )}
-              </Motion.div>
-            )}
-          </AnimatePresence>
+              </div>
+            </div>
+          </form>
+
+          {/* Directory Tabs: Donors (Default) & Blood Requests */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 mb-6 border-b border-[var(--border-light)]">
+            <div className="flex items-center gap-2 p-1 bg-[var(--background-card)] border border-[var(--border-light)] rounded-xl">
+              <button
+                type="button"
+                onClick={() => setActiveTab("donors")}
+                className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
+                  activeTab === "donors"
+                    ? "bg-red-600 text-white shadow-md shadow-red-600/20"
+                    : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                }`}
+              >
+                <Users size={14} />
+                <span>Volunteer Donors</span>
+                <span
+                  className={`px-1.5 py-0.5 rounded-full text-[10px] ${
+                    activeTab === "donors"
+                      ? "bg-white/20 text-white"
+                      : "bg-[var(--background-main)] text-[var(--text-muted)]"
+                  }`}
+                >
+                  {donors.length}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveTab("requests")}
+                className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
+                  activeTab === "requests"
+                    ? "bg-red-600 text-white shadow-md shadow-red-600/20"
+                    : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                }`}
+              >
+                <Droplet size={14} />
+                <span>Emergency Requests</span>
+                <span
+                  className={`px-1.5 py-0.5 rounded-full text-[10px] ${
+                    activeTab === "requests"
+                      ? "bg-white/20 text-white"
+                      : "bg-[var(--background-main)] text-[var(--text-muted)]"
+                  }`}
+                >
+                  {requests.length}
+                </span>
+              </button>
+            </div>
+
+            <div className="text-xs text-[var(--text-muted)] font-medium">
+              {hasFiltered ? (
+                <span>
+                  Filtered for{" "}
+                  <strong className="text-[var(--text-primary)]">
+                    {bloodGroup || "all blood"}
+                  </strong>{" "}
+                  in{" "}
+                  <strong className="text-[var(--text-primary)]">
+                    {district || "all districts"}
+                  </strong>
+                </span>
+              ) : (
+                <span>Showing all verified records by default</span>
+              )}
+            </div>
+          </div>
+
+          {/* Tab 1: Donors Grid (Default Visible on Load) */}
+          {activeTab === "donors" && (
+            <div>
+              {isLoading ? (
+                <div className="text-center py-16">
+                  <div className="w-10 h-10 rounded-full border-3 border-red-500/20 border-t-red-600 animate-spin mx-auto mb-3" />
+                  <p className="text-xs font-semibold text-[var(--text-secondary)]">
+                    Loading verified volunteer donors...
+                  </p>
+                </div>
+              ) : donors.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+                  {donors.map((donor) => {
+                    const blood = donor.blood || donor.bloodGroup || "O+";
+                    return (
+                      <div
+                        key={donor._id || donor.email}
+                        className="bg-[var(--background-card)] border border-[var(--border-light)] rounded-2xl p-4 sm:p-5 hover:border-red-500/40 transition-all duration-300 shadow-sm hover:shadow-lg flex flex-col justify-between group"
+                      >
+                        <div>
+                          {/* Top: Avatar & Blood Badge */}
+                          <div className="flex items-start justify-between gap-3 mb-3.5">
+                            <div className="flex items-center gap-3">
+                              <div className="relative">
+                                <img
+                                  src={donor.mainPhotoUrl || "/default-avatar.png"}
+                                  alt={donor.name}
+                                  className="w-12 h-12 rounded-xl object-cover border border-[var(--border-light)] shadow-sm"
+                                  onError={(e) => {
+                                    e.currentTarget.src =
+                                      "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=120";
+                                  }}
+                                />
+                                <span className="absolute -bottom-1 -right-1 w-3 h-3 bg-emerald-500 border-2 border-[var(--background-card)] rounded-full" />
+                              </div>
+
+                              <div>
+                                <h3 className="font-bold text-sm sm:text-base text-[var(--text-primary)] group-hover:text-red-600 transition-colors">
+                                  {donor.name}
+                                </h3>
+                                <span className="text-xs text-[var(--text-muted)] font-medium">
+                                  {donor.role === "Volunteer"
+                                    ? "Volunteer Coordinator"
+                                    : "Volunteer Blood Donor"}
+                                </span>
+                              </div>
+                            </div>
+
+                            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-red-600 to-red-700 text-white font-black text-sm flex items-center justify-center shadow-md shadow-red-500/20 shrink-0">
+                              {blood}
+                            </div>
+                          </div>
+
+                          {/* Location & Status Card */}
+                          <div className="space-y-1.5 p-3 rounded-xl bg-[var(--background-main)] border border-[var(--border-light)] text-xs mb-3.5">
+                            <div className="flex items-center gap-1.5 text-[var(--text-secondary)]">
+                              <MapPin size={13} className="text-red-600 shrink-0" />
+                              <span className="font-semibold text-[var(--text-primary)]">
+                                {donor.district || "Bangladesh"}
+                                {donor.upazila ? `, ${donor.upazila}` : ""}
+                              </span>
+                            </div>
+
+                            <div className="flex items-center justify-between pt-1.5 border-t border-[var(--border-light)] text-[11px]">
+                              <span className="text-[var(--text-muted)] font-medium">Availability</span>
+                              <span className="inline-flex items-center gap-1.5 text-emerald-600 font-bold">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                Ready to Donate
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Card Bottom CTA */}
+                        <div className="pt-3 border-t border-[var(--border-light)] flex items-center justify-between gap-2.5">
+                          <span className="text-xs text-[var(--text-muted)] font-medium truncate">
+                            {donor.email}
+                          </span>
+
+                          <a
+                            href={`mailto:${donor.email}?subject=Emergency%20Blood%20Donation%20Inquiry%20via%20VitalFlow&body=Hello%20${encodeURIComponent(
+                              donor.name
+                            )},%0A%0AWe%20found%20your%20verified%20donor%20profile%20on%20VitalFlow%20and%20are%20reaching%20out%20regarding%20a%20blood%20donation%20inquiry.`}
+                            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-md shadow-red-500/20 transition-smooth shrink-0"
+                          >
+                            <Mail size={12} />
+                            <span>Contact</span>
+                          </a>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="bg-[var(--background-card)] border border-[var(--border-light)] rounded-3xl p-12 text-center max-w-xl mx-auto shadow-sm">
+                  <div className="w-16 h-16 rounded-2xl bg-red-500/10 text-red-600 flex items-center justify-center mx-auto mb-4">
+                    <Users size={28} />
+                  </div>
+                  <h3 className="text-xl font-bold text-[var(--text-primary)] mb-2">
+                    No Donors Match Your Filter
+                  </h3>
+                  <p className="text-sm text-[var(--text-secondary)] leading-relaxed mb-6">
+                    No volunteer donors were found for blood group "{bloodGroup || "all"}" in "{district || "all districts"}". Try selecting a different blood group or reset filters to see all available donors.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleReset}
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs uppercase tracking-wider transition-smooth"
+                  >
+                    <RotateCcw size={15} />
+                    View All Donors
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Tab 2: Emergency Requests Grid */}
+          {activeTab === "requests" && (
+            <div>
+              {isLoading ? (
+                <div className="text-center py-10">
+                  <div className="w-10 h-10 rounded-full border-3 border-red-500/20 border-t-red-600 animate-spin mx-auto mb-3" />
+                  <p className="text-xs font-semibold text-[var(--text-secondary)]">
+                    Loading emergency transfusion requests...
+                  </p>
+                </div>
+              ) : requests.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+                  {requests.map((request) => (
+                    <div
+                      key={request._id}
+                      className="bg-[var(--background-card)] border border-[var(--border-light)] rounded-2xl p-4 sm:p-5 hover:border-red-500/40 transition-all duration-300 shadow-sm hover:shadow-md flex flex-col justify-between group"
+                    >
+                      <div>
+                        {/* Card Top */}
+                        <div className="flex items-start justify-between gap-3 mb-3">
+                          <div className="flex items-center gap-2.5">
+                            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-red-600 to-red-700 text-white font-black text-base flex items-center justify-center shadow-md shadow-red-600/20 shrink-0">
+                              {request.bloodGroup}
+                            </div>
+                            <div>
+                              <h3 className="text-sm sm:text-base font-bold text-[var(--text-primary)] group-hover:text-red-600 transition-colors leading-snug">
+                                {request.recipient_name}
+                              </h3>
+                              <div className="flex items-center gap-1.5 text-xs text-[var(--text-secondary)] font-medium mt-0.5">
+                                <Hospital size={12} className="text-red-600 shrink-0" />
+                                <span className="truncate max-w-[170px]">
+                                  {request.hospital || "Central Medical Facility"}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          {getStatusBadge(request.donation_status)}
+                        </div>
+
+                        {/* Location & Time */}
+                        <div className="grid grid-cols-2 gap-2.5 p-3 rounded-xl bg-[var(--background-main)] border border-[var(--border-light)] text-xs mb-3">
+                          <div>
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)] block mb-0.5">
+                              Location
+                            </span>
+                            <span className="font-semibold text-[var(--text-primary)] truncate block">
+                              {request.recipient_district}, {request.recipient_upazila}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)] block mb-0.5">
+                              Schedule
+                            </span>
+                            <span className="font-semibold text-[var(--text-primary)] truncate block">
+                              {request.date} ({request.time})
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Message Quote */}
+                        {request.message && (
+                          <p className="text-xs text-[var(--text-secondary)] italic bg-[var(--background-main)]/60 p-2.5 rounded-xl border border-[var(--border-light)]/60 mb-3 line-clamp-2">
+                            "{request.message}"
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Footer & CTA */}
+                      <div className="pt-3 border-t border-[var(--border-light)] flex items-center justify-between gap-3">
+                        <div className="text-xs text-[var(--text-muted)]">
+                          Requested by{" "}
+                          <span className="font-bold text-[var(--text-primary)]">
+                            {request.requester_name?.split(" ")[0]}
+                          </span>
+                        </div>
+                        <button
+                          onClick={() => navigate(`/donation-details/${request._id}`)}
+                          className="px-3.5 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 shrink-0"
+                        >
+                          <span>View Details</span>
+                          <ArrowRight size={13} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="bg-[var(--background-card)] border border-[var(--border-light)] rounded-2xl p-6 sm:p-8 text-center max-w-xl mx-auto shadow-sm">
+                  <div className="w-12 h-12 rounded-xl bg-red-500/10 text-red-600 flex items-center justify-center mx-auto mb-3">
+                    <Droplet size={24} />
+                  </div>
+                  <h3 className="text-lg font-bold text-[var(--text-primary)] mb-1.5">
+                    No Blood Requests Found
+                  </h3>
+                  <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed mb-4">
+                    No active emergency donation requests matched your selected filter.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleReset}
+                    className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs uppercase tracking-wider transition-smooth"
+                  >
+                    <RotateCcw size={14} />
+                    Reset Filters
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </main>
-      <footer>
-        <Footer></Footer>
-      </footer>
-    </section>
+    </div>
   );
 };
 
