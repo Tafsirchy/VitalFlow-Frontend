@@ -4,7 +4,7 @@ import { AuthContext } from "../Provider/AuthProvider";
 import { toast } from "react-toastify";
 
 const axiosSecure = axios.create({
-  baseURL: "https://vital-flow-backend-khaki.vercel.app",
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000",
 });
 
 const useAxiosSecure = () => {
