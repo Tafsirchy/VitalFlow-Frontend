@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { Link, NavLink, useNavigate } from "react-router";
+import { Link, NavLink, useNavigate, useLocation } from "react-router";
 import { AuthContext } from "../Provider/AuthProvider";
 import { toast } from "react-toastify";
 import {
@@ -19,17 +19,29 @@ import {
   Mail,
   BookOpen,
   HelpCircle,
+  Search,
 } from "lucide-react";
 import { motion as Motion, AnimatePresence } from "framer-motion";
 import logo from "../assets/image.png";
 import ThemeToggle from "./ThemeToggle";
 
 const Navbar = () => {
-  const { user, logOut } = useContext(AuthContext);
+  const { user, logOut, loading } = useContext(AuthContext);
   const navigate = useNavigate();
+  const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isAboutDropdownOpen, setIsAboutDropdownOpen] = useState(false);
+
+  // Check if any route under About Us dropdown is currently active
+  const aboutRoutes = ["/about", "/contact", "/blog", "/help"];
+  const isAboutActive = aboutRoutes.some(
+    (path) =>
+      location.pathname === path || location.pathname.startsWith(`${path}/`)
+  );
+
+  // Optimistic Auth State to prevent flickering
+  const isLikelyLoggedIn = typeof window !== "undefined" && localStorage.getItem("vitalflow-is-logged-in") === "true";
 
   const handleLogOut = () => {
     setIsDropdownOpen(false);
@@ -42,14 +54,15 @@ const Navbar = () => {
   };
 
   const navLinkStyle = ({ isActive }) =>
-    `px-4 py-2 rounded-xl font-semibold transition-all duration-300 ${
+    `px-3.5 py-1.5 rounded-xl font-semibold transition-all duration-200 text-sm ${
       isActive
-        ? "bg-[var(--primary-red)] text-white shadow-lg shadow-[var(--primary-red)]/50"
-        : "text-gray-700 dark:text-gray-200 hover:bg-[var(--primary-red-light)]/10 hover:text-[var(--primary-red)]"
+        ? "bg-[var(--primary-red)] text-white shadow-md shadow-[var(--primary-red)]/40"
+        : "text-[var(--text-primary)] hover:bg-[var(--primary-red-light)]/10 hover:text-[var(--primary-red)]"
     }`;
 
   const navigationItems = [
     { path: "/", label: "Home", icon: Home, color: "from-[var(--primary-red-dark)] to-[var(--primary-red)]" },
+    { path: "/search", label: "Search", icon: Search, color: "from-red-600 to-rose-600" },
     {
       path: "/donation-requests",
       label: "Donations",
@@ -74,16 +87,13 @@ const Navbar = () => {
 
   return (
     <>
-      <Motion.nav
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ type: "spring", stiffness: 100, damping: 20 }}
-        className="sticky top-0 z-50 glass-morphism !border-b-0"
+      <nav
+        className="sticky top-0 z-50 bg-[var(--background-main)]/95 border-b border-[var(--border-light)] dark:border-zinc-800 transition-colors"
       >
-        <div className="w-11/12 mx-auto px-0">
-          <div className="flex items-center justify-between py-1">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
             {/* -------- Logo Section -------- */}
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-2.5">
               <a
                 href="/"
                 onClick={(e) => {
@@ -92,28 +102,22 @@ const Navbar = () => {
                     window.location.reload();
                   }
                 }}
-                className="flex items-center gap-1 group pointer-events-auto cursor-pointer"
+                className="flex items-center gap-3 group cursor-pointer"
               >
-                <Motion.div
-                  whileHover={{ scale: 1.1 }}
-                  transition={{ type: "spring", stiffness: 260, damping: 20 }}
-                  className="relative"
-                >
-                  <div className="w-14 h-14 flex items-center justify-center p-1">
-                    <img
-                      src={logo}
-                      alt="VitalFlow Logo"
-                      className="w-full h-full object-contain"
-                    />
-                  </div>
-                </Motion.div>
+                <div className="w-11 h-11 flex items-center justify-center p-1 rounded-xl bg-red-500/10 border border-red-500/20">
+                  <img
+                    src={logo}
+                    alt="VitalFlow Logo"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
                 <div>
-                  <h1 className="text-2xl font-bold text-gradient-crimson">
+                  <h1 className="text-xl font-extrabold tracking-tight text-gradient-crimson">
                     VitalFlow
                   </h1>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                    <Activity size={12} />
-                    Blood Donation
+                  <p className="text-[11px] font-semibold tracking-wider text-[var(--text-muted)] uppercase flex items-center gap-1.5">
+                    <Activity size={11} className="text-red-600" />
+                    Life-Saving Network
                   </p>
                 </div>
               </a>
@@ -168,7 +172,7 @@ const Navbar = () => {
                 Donations
               </NavLink>
 
-              {user && (
+              {(user || (loading && isLikelyLoggedIn)) && (
                 <NavLink to="/funding" className={navLinkStyle}>
                   Funding
                 </NavLink>
@@ -180,7 +184,11 @@ const Navbar = () => {
                   onClick={() => setIsAboutDropdownOpen(!isAboutDropdownOpen)}
                   onMouseEnter={() => setIsAboutDropdownOpen(true)}
                   onMouseLeave={() => setIsAboutDropdownOpen(false)}
-                  className="flex items-center gap-1 px-4 py-2 rounded-xl text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all font-semibold"
+                  className={`flex items-center gap-1.5 px-4 py-2 rounded-xl font-semibold transition-all duration-200 ${
+                    isAboutActive
+                      ? "bg-[var(--primary-red)] text-white shadow-lg shadow-[var(--primary-red)]/50"
+                      : "text-[var(--text-primary)] hover:bg-[var(--primary-red-light)]/10 hover:text-[var(--primary-red)]"
+                  }`}
                 >
                   <Info size={18} />
                   <span>About Us</span>
@@ -202,53 +210,139 @@ const Navbar = () => {
                       transition={{ duration: 0.2 }}
                       onMouseEnter={() => setIsAboutDropdownOpen(true)}
                       onMouseLeave={() => setIsAboutDropdownOpen(false)}
-                      className="absolute top-full right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border-2 border-gray-200 dark:border-gray-700 overflow-hidden z-50"
+                      className="absolute top-full right-0 mt-2 w-60 bg-[var(--background-card)] rounded-2xl shadow-2xl border border-[var(--border-light)] overflow-hidden z-50 p-2 space-y-1"
                     >
-                      <div className="p-2">
-                        <NavLink
-                          to="/about"
-                          onClick={() => setIsAboutDropdownOpen(false)}
-                          className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[var(--primary-red-light)]/10 transition-all group"
-                        >
-                          <Info className="text-[var(--primary-red)]" size={20} />
-                          <span className="font-semibold text-gray-700 dark:text-gray-200 group-hover:text-[var(--primary-red)]">
-                            About VitalFlow
-                          </span>
-                        </NavLink>
-                        
-                        <NavLink
-                          to="/contact"
-                          onClick={() => setIsAboutDropdownOpen(false)}
-                          className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-blue-50 dark:hover:bg-gray-700 transition-all group"
-                        >
-                          <Mail className="text-blue-600 dark:text-blue-400" size={20} />
-                          <span className="font-semibold text-gray-700 dark:text-gray-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">
-                            Contact Us
-                          </span>
-                        </NavLink>
-                        
-                        <NavLink
-                          to="/blog"
-                          onClick={() => setIsAboutDropdownOpen(false)}
-                          className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-purple-50 dark:hover:bg-gray-700 transition-all group"
-                        >
-                          <BookOpen className="text-purple-600 dark:text-purple-400" size={20} />
-                          <span className="font-semibold text-gray-700 dark:text-gray-200 group-hover:text-purple-600 dark:group-hover:text-purple-400">
-                            Blog
-                          </span>
-                        </NavLink>
-                        
-                        <NavLink
-                          to="/help"
-                          onClick={() => setIsAboutDropdownOpen(false)}
-                          className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-green-50 dark:hover:bg-gray-700 transition-all group"
-                        >
-                          <HelpCircle className="text-green-600 dark:text-green-400" size={20} />
-                          <span className="font-semibold text-gray-700 dark:text-gray-200 group-hover:text-green-600 dark:group-hover:text-green-400">
-                            Help & Support
-                          </span>
-                        </NavLink>
-                      </div>
+                      <NavLink
+                        to="/about"
+                        onClick={() => setIsAboutDropdownOpen(false)}
+                        className={({ isActive }) =>
+                          `flex items-center justify-between px-3.5 py-2.5 rounded-xl transition-all ${
+                            isActive
+                              ? "bg-red-500/10 dark:bg-red-500/20 text-red-600 dark:text-red-400 font-bold border border-red-500/20"
+                              : "text-[var(--text-secondary)] hover:bg-black/5 dark:hover:bg-white/5 hover:text-[var(--text-primary)] font-medium"
+                          }`
+                        }
+                      >
+                        {({ isActive }) => (
+                          <div className="flex items-center justify-between w-full">
+                            <div className="flex items-center gap-3">
+                              <div
+                                className={`p-1.5 rounded-lg transition-colors ${
+                                  isActive
+                                    ? "bg-red-600 text-white shadow-sm"
+                                    : "bg-red-500/10 text-red-600"
+                                }`}
+                              >
+                                <Info size={16} />
+                              </div>
+                              <span className="text-sm">About VitalFlow</span>
+                            </div>
+                            {isActive && (
+                              <span className="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse" />
+                            )}
+                          </div>
+                        )}
+                      </NavLink>
+                      
+                      <NavLink
+                        to="/contact"
+                        onClick={() => setIsAboutDropdownOpen(false)}
+                        className={({ isActive }) =>
+                          `flex items-center justify-between px-3.5 py-2.5 rounded-xl transition-all ${
+                            isActive
+                              ? "bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 font-bold border border-blue-500/20"
+                              : "text-[var(--text-secondary)] hover:bg-black/5 dark:hover:bg-white/5 hover:text-[var(--text-primary)] font-medium"
+                          }`
+                        }
+                      >
+                        {({ isActive }) => (
+                          <div className="flex items-center justify-between w-full">
+                            <div className="flex items-center gap-3">
+                              <div
+                                className={`p-1.5 rounded-lg transition-colors ${
+                                  isActive
+                                    ? "bg-blue-600 text-white shadow-sm"
+                                    : "bg-blue-500/10 text-blue-600"
+                                }`}
+                              >
+                                <Mail size={16} />
+                              </div>
+                              <span className="text-sm">Contact Us</span>
+                            </div>
+                            {isActive && (
+                              <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
+                            )}
+                          </div>
+                        )}
+                      </NavLink>
+                      
+                      <NavLink
+                        to="/blog"
+                        onClick={() => setIsAboutDropdownOpen(false)}
+                        className={({ isActive }) => {
+                          const active = isActive || location.pathname.startsWith("/blog");
+                          return `flex items-center justify-between px-3.5 py-2.5 rounded-xl transition-all ${
+                            active
+                              ? "bg-purple-500/10 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400 font-bold border border-purple-500/20"
+                              : "text-[var(--text-secondary)] hover:bg-black/5 dark:hover:bg-white/5 hover:text-[var(--text-primary)] font-medium"
+                          }`;
+                        }}
+                      >
+                        {({ isActive }) => {
+                          const active = isActive || location.pathname.startsWith("/blog");
+                          return (
+                            <div className="flex items-center justify-between w-full">
+                              <div className="flex items-center gap-3">
+                                <div
+                                  className={`p-1.5 rounded-lg transition-colors ${
+                                    active
+                                      ? "bg-purple-600 text-white shadow-sm"
+                                      : "bg-purple-500/10 text-purple-600"
+                                  }`}
+                                >
+                                  <BookOpen size={16} />
+                                </div>
+                                <span className="text-sm">Blog</span>
+                              </div>
+                              {active && (
+                                <span className="w-1.5 h-1.5 rounded-full bg-purple-600 animate-pulse" />
+                              )}
+                            </div>
+                          );
+                        }}
+                      </NavLink>
+                      
+                      <NavLink
+                        to="/help"
+                        onClick={() => setIsAboutDropdownOpen(false)}
+                        className={({ isActive }) =>
+                          `flex items-center justify-between px-3.5 py-2.5 rounded-xl transition-all ${
+                            isActive
+                              ? "bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold border border-emerald-500/20"
+                              : "text-[var(--text-secondary)] hover:bg-black/5 dark:hover:bg-white/5 hover:text-[var(--text-primary)] font-medium"
+                          }`
+                        }
+                      >
+                        {({ isActive }) => (
+                          <div className="flex items-center justify-between w-full">
+                            <div className="flex items-center gap-3">
+                              <div
+                                className={`p-1.5 rounded-lg transition-colors ${
+                                  isActive
+                                    ? "bg-emerald-600 text-white shadow-sm"
+                                    : "bg-emerald-500/10 text-emerald-600"
+                                }`}
+                              >
+                                <HelpCircle size={16} />
+                              </div>
+                              <span className="text-sm">Help & Support</span>
+                            </div>
+                            {isActive && (
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
+                            )}
+                          </div>
+                        )}
+                      </NavLink>
                     </Motion.div>
                   )}
                 </AnimatePresence>
@@ -260,7 +354,15 @@ const Navbar = () => {
               {/* Theme Toggle */}
               <ThemeToggle />
               
-              {!user ? (
+              {loading ? (
+                isLikelyLoggedIn ? (
+                  /* Profile Skeleton */
+                  <div className="w-11 h-11 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse ring ring-[var(--primary-red)]/20" />
+                ) : (
+                  /* Login Skeleton */
+                  <div className="w-24 h-10 rounded-xl bg-[var(--primary-red)]/10 animate-pulse hidden lg:block" />
+                )
+              ) : !user ? (
                 <>
                   {/* Mobile/Tablet Grid Menu Button - SHOWN WHEN USER IS LOGGED OUT */}
                   <div className="lg:hidden relative">
@@ -357,10 +459,10 @@ const Navbar = () => {
                                 </div>
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className="font-bold text-sm truncate text-gray-900">
+                                <p className="font-bold text-sm truncate text-[var(--text-primary)]">
                                   {user.displayName || "User"}
                                 </p>
-                                <p className="text-xs text-gray-500 truncate">
+                                <p className="text-xs text-[var(--text-secondary)] truncate">
                                   {user.email}
                                 </p>
                               </div>
@@ -391,7 +493,7 @@ const Navbar = () => {
             </div>
           </div>
         </div>
-      </Motion.nav>
+      </nav>
 
       {/* -------- Mobile Menu (MOVED OUTSIDE NAVBAR) -------- */}
       <AnimatePresence>
@@ -506,6 +608,38 @@ const Navbar = () => {
                       </Motion.div>
                     );
                   })}
+                </div>
+
+                {/* About & Information Links in Mobile Menu */}
+                <div className="pt-2 mb-3 border-t border-gray-100 dark:border-gray-800 space-y-1">
+                  <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
+                    About & Support
+                  </div>
+                  {[
+                    { path: "/about", label: "About VitalFlow", icon: Info },
+                    { path: "/contact", label: "Contact Us", icon: Mail },
+                    { path: "/blog", label: "Blog", icon: BookOpen },
+                    { path: "/help", label: "Help & Support", icon: HelpCircle },
+                  ].map((sub) => (
+                    <NavLink
+                      key={sub.path}
+                      to={sub.path}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className={({ isActive }) => {
+                        const active = isActive || (sub.path === "/blog" && location.pathname.startsWith("/blog"));
+                        return `flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
+                          active
+                            ? "bg-red-500/10 text-red-600 font-bold border border-red-500/20"
+                            : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                        }`;
+                      }}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <sub.icon size={15} />
+                        <span>{sub.label}</span>
+                      </div>
+                    </NavLink>
+                  ))}
                 </div>
 
                 {/* Logout/Login Button */}
