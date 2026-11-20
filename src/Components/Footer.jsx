@@ -8,91 +8,98 @@ import {
   Instagram,
   Linkedin,
   Youtube,
+  Heart,
+  ShieldCheck
 } from "lucide-react";
-import { motion as Motion } from "framer-motion";
 
 const Footer = () => {
   const footerLinks = {
     quickLinks: [
-      { name: "Donation Requests", path: "/donation-requests" },
-      { name: "Funding", path: "/funding" },
-      { name: "Dashboard", path: "/dashboard" },
-      { name: "About Us", path: "/about" },
+      { name: "Emergency Requests", path: "/donation-requests" },
+      { name: "Funding & Support", path: "/funding" },
+      { name: "Donor Dashboard", path: "/dashboard" },
+      { name: "About VitalFlow", path: "/about" },
     ],
     resources: [
-      { name: "Help & Support", path: "/help" },
-      { name: "Blog", path: "/blog" },
-      { name: "Contact Us", path: "/contact" },
-      { name: "Search Donors", path: "/search" },
+      { name: "Help & FAQ", path: "/help" },
+      { name: "Medical Blog", path: "/blog" },
+      { name: "Contact & Desk", path: "/contact" },
+      { name: "Find Donors Near You", path: "/search" },
     ],
     legal: [
       { name: "Privacy Policy", path: "/privacy" },
       { name: "Terms of Service", path: "/terms" },
       { name: "Cookie Policy", path: "/cookies" },
-      { name: "About VitalFlow", path: "/about" },
+      { name: "Health Verification Policy", path: "/about" },
     ],
   };
 
   const socialLinks = [
-    { icon: Facebook, href: "#", label: "Facebook", color: "hover:text-[var(--primary-red)] hover:border-[var(--primary-red)] hover:bg-[var(--primary-red-light)]/10" },
-    { icon: Twitter, href: "#", label: "Twitter", color: "hover:text-[var(--primary-red)] hover:border-[var(--primary-red)] hover:bg-[var(--primary-red-light)]/10" },
-    { icon: Instagram, href: "#", label: "Instagram", color: "hover:text-[var(--primary-red)] hover:border-[var(--primary-red)] hover:bg-[var(--primary-red-light)]/10" },
-    { icon: Linkedin, href: "#", label: "LinkedIn", color: "hover:text-[var(--primary-red)] hover:border-[var(--primary-red)] hover:bg-[var(--primary-red-light)]/10" },
-    { icon: Youtube, href: "#", label: "YouTube", color: "hover:text-[var(--primary-red)] hover:border-[var(--primary-red)] hover:bg-[var(--primary-red-light)]/10" },
+    { icon: Facebook, href: "#", label: "Facebook" },
+    { icon: Twitter, href: "#", label: "Twitter" },
+    { icon: Instagram, href: "#", label: "Instagram" },
+    { icon: Linkedin, href: "#", label: "LinkedIn" },
+    { icon: Youtube, href: "#", label: "YouTube" },
   ];
 
   return (
-    <footer className="relative bg-[var(--background-main)] border-t border-[var(--border-light)] overflow-hidden">
-      {/* Decorative Gradient Blob */}
-      <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-[var(--primary-red)]/5 rounded-full blur-3xl pointer-events-none"></div>
-      <div className="absolute -top-24 -right-24 w-96 h-96 bg-[var(--primary-red)]/5 rounded-full blur-3xl pointer-events-none"></div>
-      {/* Main Footer Content */}
-      <div className="w-11/12 mx-auto py-12 lg:py-16">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12">
-          {/* Brand Section - Takes 2 columns on large screens */}
-          <div className="sm:col-span-2 lg:col-span-2 space-y-4">
+    <footer className="relative bg-[var(--background-main)] border-t border-[var(--border-light)] dark:border-zinc-800/80 select-none">
+      
+      {/* Main Content Area */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-14">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-10">
+          
+          {/* Brand Column */}
+          <div className="lg:col-span-2 space-y-3.5">
             <Link to="/" className="inline-flex items-center gap-3 group">
-              <Motion.div
-                whileHover={{ scale: 1.1, rotate: 360 }}
-                transition={{ type: "spring", stiffness: 260, damping: 20 }}
-                className="w-12 h-12 flex items-center justify-center p-1"
-              >
+              <div className="w-12 h-12 flex items-center justify-center p-1 rounded-xl bg-red-500/10 border border-red-500/20">
                 <img
                   src={logo}
                   alt="VitalFlow Logo"
-                  className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(100,13,20,0.3)]"
+                  className="w-full h-full object-contain"
                 />
-              </Motion.div>
+              </div>
               <div>
-                <h2 className="text-2xl font-bold text-gradient-crimson">
+                <h2 className="text-xl font-extrabold text-gradient-crimson tracking-tight">
                   VitalFlow
                 </h2>
-                <p className="text-xs text-gray-500 flex items-center gap-1">
-                  <Activity size={12} />
-                  Blood Donation Platform
+                <p className="text-[11px] font-semibold tracking-wider text-[var(--text-muted)] uppercase flex items-center gap-1.5">
+                  <Activity size={11} className="text-red-600" />
+                  National Life Grid
                 </p>
               </div>
             </Link>
-            <p className="text-gray-600 text-sm leading-relaxed max-w-md">
-              Connecting life-savers with those in need. VitalFlow is dedicated
-              to making blood donation accessible, efficient, and impactful for
-              communities worldwide.
+
+            <p className="text-sm text-[var(--text-secondary)] leading-relaxed max-w-sm font-normal">
+              VitalFlow is dedicated to making voluntary blood donation accessible, swift, and transparent across every district. Every donor is a verified life-saver.
             </p>
+
+            <div className="flex items-center gap-3">
+              {socialLinks.map((social) => (
+                <a
+                  key={social.label}
+                  href={social.href}
+                  className="w-10 h-10 rounded-xl border border-[var(--border-light)] dark:border-zinc-800 flex items-center justify-center text-[var(--text-secondary)] hover:text-red-600 hover:border-red-500/30 transition-colors shadow-sm"
+                  aria-label={social.label}
+                >
+                  <social.icon size={16} />
+                </a>
+              ))}
+            </div>
           </div>
 
           {/* Quick Links */}
-          <div>
-            <h3 className="text-gray-900 font-bold mb-4 text-base uppercase tracking-wider">
-              Quick Links
+          <div className="space-y-4">
+            <h3 className="text-[var(--text-primary)] font-bold text-sm uppercase tracking-wider">
+              Emergency Grid
             </h3>
-            <ul className="space-y-2.5">
+            <ul className="space-y-3">
               {footerLinks.quickLinks.map((link) => (
                 <li key={link.name}>
                   <Link
                     to={link.path}
-                    className="text-[var(--text-secondary)] hover:text-[var(--primary-red)] transition-colors text-sm inline-flex items-center gap-2 group"
+                    className="text-xs sm:text-sm text-[var(--text-secondary)] hover:text-[var(--primary-red)] transition-colors inline-block"
                   >
-                    <span className="w-0 h-0.5 bg-[var(--primary-red)] group-hover:w-3 transition-all duration-300"></span>
                     {link.name}
                   </Link>
                 </li>
@@ -101,18 +108,17 @@ const Footer = () => {
           </div>
 
           {/* Resources */}
-          <div>
-            <h3 className="text-gray-900 font-bold mb-4 text-base uppercase tracking-wider">
-              Resources
+          <div className="space-y-4">
+            <h3 className="text-[var(--text-primary)] font-bold text-sm uppercase tracking-wider">
+              Support & Guide
             </h3>
-            <ul className="space-y-2.5">
+            <ul className="space-y-3">
               {footerLinks.resources.map((link) => (
                 <li key={link.name}>
                   <Link
                     to={link.path}
-                    className="text-gray-600 hover:text-blue-600 transition-colors text-sm inline-flex items-center gap-2 group"
+                    className="text-xs sm:text-sm text-[var(--text-secondary)] hover:text-[var(--primary-red)] transition-colors inline-block"
                   >
-                    <span className="w-0 h-0.5 bg-blue-600 group-hover:w-3 transition-all duration-300"></span>
                     {link.name}
                   </Link>
                 </li>
@@ -121,54 +127,39 @@ const Footer = () => {
           </div>
 
           {/* Legal */}
-          <div>
-            <h3 className="text-gray-900 font-bold mb-4 text-base uppercase tracking-wider">
-              Legal
+          <div className="space-y-4">
+            <h3 className="text-[var(--text-primary)] font-bold text-sm uppercase tracking-wider">
+              Verification & Trust
             </h3>
-            <ul className="space-y-2.5">
+            <ul className="space-y-3">
               {footerLinks.legal.map((link) => (
                 <li key={link.name}>
                   <Link
                     to={link.path}
-                    className="text-gray-600 hover:text-gray-900 transition-colors text-sm inline-flex items-center gap-2 group"
+                    className="text-xs sm:text-sm text-[var(--text-secondary)] hover:text-[var(--primary-red)] transition-colors inline-block"
                   >
-                    <span className="w-0 h-0.5 bg-gray-900 group-hover:w-3 transition-all duration-300"></span>
                     {link.name}
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
+
         </div>
       </div>
 
-      {/* Bottom Bar - Centered Copyright and Social Icons */}
-      <div className="border-t border-[var(--border-light)]">
-        <div className="w-11/12 mx-auto py-6">
-          <div className="flex flex-col items-center gap-4">
-            {/* Social Media Icons */}
-            <div className="flex items-center gap-4">
-              {socialLinks.map((social) => (
-                <Motion.a
-                  key={social.label}
-                  whileHover={{ scale: 1.15, y: -2 }}
-                  whileTap={{ scale: 0.95 }}
-                  href={social.href}
-                  className={`w-10 h-10 rounded-xl border border-[var(--border-light)] flex items-center justify-center text-[var(--text-secondary)] transition-all duration-300 glass-morphism ${social.color}`}
-                  aria-label={social.label}
-                >
-                  <social.icon size={18} strokeWidth={2} />
-                </Motion.a>
-              ))}
-            </div>
-
-            {/* Copyright - Centered */}
-            <p className="text-gray-600 text-sm text-center">
-              © {new Date().getFullYear()} VitalFlow. All rights reserved.
-            </p>
+      {/* Symmetrical Bottom Copyright Bar */}
+      <div className="border-t border-[var(--border-light)] dark:border-zinc-800/80 py-4 sm:py-5">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[var(--text-muted)]">
+          <p>© {new Date().getFullYear()} VitalFlow National Emergency Network. All rights reserved.</p>
+          <div className="flex items-center gap-6">
+            <span>Encrypted Medical Standards</span>
+            <span>•</span>
+            <span>24/7 Verified Matching</span>
           </div>
         </div>
       </div>
+
     </footer>
   );
 };
