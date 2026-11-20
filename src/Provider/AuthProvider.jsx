@@ -46,6 +46,11 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
+      if (currentUser) {
+        localStorage.setItem("vitalflow-is-logged-in", "true");
+      } else {
+        localStorage.removeItem("vitalflow-is-logged-in");
+      }
       setLoading(false);
     });
     return () => unsubscribe();
@@ -61,9 +66,10 @@ const AuthProvider = ({ children }) => {
     }
 
     setRoleLoading(true);
+    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
     axios
       .get(
-        `https://vital-flow-backend-khaki.vercel.app/donor/role/${user.email}`
+        `${apiUrl}/donor/role/${user.email}`
       )
       .then((res) => {
         setRole(res.data?.role || "");
