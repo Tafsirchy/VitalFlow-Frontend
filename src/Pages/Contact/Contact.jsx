@@ -1,5 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
-import { motion as Motion, AnimatePresence } from "framer-motion";
+import React, { useState } from "react";
 import {
   Mail,
   Phone,
@@ -9,76 +8,12 @@ import {
   MessageSquare,
   Clock,
   CheckCircle,
-  Zap,
-  Globe,
-  Radio,
-  Wifi,
-  Terminal,
-  ChevronRight
+  Activity,
+  ShieldCheck,
+  Building,
+  CheckCircle2,
 } from "lucide-react";
 import { toast } from "react-toastify";
-import Navbar from "../../Components/Navbar";
-import Footer from "../../Components/Footer";
-
-// --- Sub-component: Neural Background ---
-const NeuralBackground = () => {
-  const points = useMemo(() => 
-    [...Array(20)].map(() => ({
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      size: Math.random() * 2 + 1,
-      duration: Math.random() * 5 + 5
-    })), []);
-
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-20">
-      {points.map((p, i) => (
-        <Motion.div
-          key={i}
-          className="absolute bg-[var(--primary-red)] rounded-full blur-[1px]"
-          style={{
-            left: `${p.x}%`,
-            top: `${p.y}%`,
-            width: p.size,
-            height: p.size,
-          }}
-          animate={{
-            opacity: [0.2, 0.8, 0.2],
-            scale: [1, 1.5, 1],
-          }}
-          transition={{
-            duration: p.duration,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
-      ))}
-    </div>
-  );
-};
-
-// --- Sub-component: Scramble Text ---
-const ScrambleText = ({ text }) => {
-  const [displayText, setDisplayText] = useState(text);
-  const chars = "!<>-_\\/[]{}—=+*^?#________";
-
-  useEffect(() => {
-    let iteration = 0;
-    const interval = setInterval(() => {
-      setDisplayText(prev => 
-        text.split("").map((char, index) => {
-          if (index < iteration) return text[index];
-          return chars[Math.floor(Math.random() * chars.length)];
-        }).join("")
-      );
-      if (iteration >= text.length) clearInterval(interval);
-      iteration += 1 / 2;
-    }, 30);
-    return () => clearInterval(interval);
-  }, [text]);
-
-  return <span>{displayText}</span>;
-};
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -99,308 +34,256 @@ const Contact = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate Signal Syncing
     setTimeout(() => {
       setIsSubmitting(false);
       setIsSubmitted(true);
-      toast.success("Uplink Established. Message data encrypted and sent.");
+      toast.success("Thank you! Your message has been sent to our coordination team.");
       setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
       setTimeout(() => setIsSubmitted(false), 8000);
-    }, 2500);
+    }, 1200);
   };
 
   const contactInfo = [
     {
       icon: Phone,
-      title: "Voice Channel",
+      title: "Emergency Hotline",
       value: "+880 1712-345678",
-      subtitle: "Emergency High-Priority Line",
-      glow: "red",
+      subtitle: "24/7 National Emergency Blood Helpline",
       href: "tel:+8801712345678",
     },
     {
       icon: Mail,
-      title: "Data Packet",
+      title: "Support Email",
       value: "support@vitalflow.com",
-      subtitle: "Encrypted Communication Path",
-      glow: "blue",
+      subtitle: "Inquiries & Hospital Coordination",
       href: "mailto:support@vitalflow.com",
     },
     {
       icon: MapPin,
-      title: "Geospatial Node",
-      value: "Agrabad, Chittagong",
-      subtitle: "Main Operational Hub",
-      glow: "emerald",
+      title: "Headquarters",
+      value: "Agrabad C/A, Chittagong",
+      subtitle: "Central Operations & Volunteer Center",
       href: "#",
     },
   ];
 
   return (
-    <div className="bg-[var(--background-main)] selection:bg-red-500/30">
-      <main className="relative pt-10 overflow-hidden">
-        <NeuralBackground />
-
-        <div className="container mx-auto px-6 lg:px-12 relative z-10">
-          {/* Hero Section */}
-          <div className="text-center mb-24 mt-10 max-w-4xl mx-auto space-y-8">
-            <Motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="inline-flex items-center gap-3 px-6 py-2 rounded-full ultra-glass border border-[var(--primary-red)]/20 shadow-[0_0_20px_rgba(100,13,20,0.1)]"
-            >
-              <Radio size={14} className="text-[var(--primary-red)] animate-pulse" />
-              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[var(--text-primary)]">
-                Uplink Protocol Initialized
-              </span>
-            </Motion.div>
-            
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-black text-[var(--text-primary)] leading-none tracking-tighter uppercase">
-              Establish <br />
-              <span className="text-gradient-crimson italic"><ScrambleText text="Communications" /></span>
+    <div className="bg-[var(--background-main)] min-h-screen text-[var(--text-primary)]">
+      <main className="py-8 sm:py-12 lg:py-14">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Symmetrical Section Header */}
+          <div className="text-center max-w-3xl mx-auto mb-6 lg:mb-8">
+            <div className="section-eyebrow">
+              <Phone size={13} className="text-[var(--primary-red)]" />
+              <span>We Are Here 24/7</span>
+            </div>
+            <h1 className="section-title">
+              Contact VitalFlow & <br />
+              <span className="text-gradient-crimson italic">Emergency Support</span>
             </h1>
-            
-            <p className="text-lg md:text-xl text-[var(--text-secondary)] font-medium opacity-60 max-w-2xl mx-auto leading-relaxed italic">
-              Synchronize with the VitalFlow command center. Our neural operatives are standing by for immediate data transmission.
+            <p className="section-subtitle">
+              Need immediate blood for a critical patient, have questions about donation, or wish to partner as a hospital? Our coordination desk is always available.
             </p>
           </div>
 
-          {/* Contact Nodes */}
-          <section className="mb-32">
-            <div className="grid md:grid-cols-3 gap-8">
-              {contactInfo.map((info, index) => {
-                const Icon = info.icon;
-                return (
-                  <Motion.a
-                    key={index}
-                    href={info.href}
-                    initial={{ opacity: 0, y: 40 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.1 }}
-                    whileHover={{ y: -10, scale: 1.02 }}
-                    className="relative group block"
-                  >
-                    <div className="relative ultra-glass rounded-[2.5rem] p-10 border border-white/10 group-hover:border-[var(--primary-red)]/30 transition-all duration-500 flex flex-col items-center h-full text-center shadow-2xl overflow-hidden">
-                      <div className="absolute top-0 right-0 w-32 h-32 bg-[var(--primary-red)]/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700" />
-                      
-                      <div className="w-20 h-20 bg-white dark:bg-white/5 rounded-2xl flex items-center justify-center mb-8 border border-white/10 shadow-lg group-hover:shadow-[0_0_30px_rgba(100,13,20,0.2)] transition-all">
-                        <Icon className="text-[var(--primary-red)]" size={36} />
-                      </div>
-                      <h3 className="text-2xl font-black text-[var(--text-primary)] uppercase tracking-tight mb-2 group-hover:text-gradient-crimson transition-all">{info.title}</h3>
-                      <p className="text-lg font-black text-[var(--text-primary)] mb-2 tracking-tight">
-                        {info.value}
-                      </p>
-                      <p className="text-xs text-[var(--text-muted)] font-bold uppercase tracking-widest opacity-60">
-                        {info.subtitle}
-                      </p>
-                    </div>
-                  </Motion.a>
-                );
-              })}
-            </div>
-          </section>
+          {/* 3 Contact Info Cards */}
+          <div className="grid md:grid-cols-3 gap-4 mb-8 lg:mb-10">
+            {contactInfo.map((info, idx) => {
+              const Icon = info.icon;
+              return (
+                <a
+                  key={idx}
+                  href={info.href}
+                  className="bg-[var(--background-card)] border border-[var(--border-light)] rounded-2xl p-4 sm:p-5 text-center shadow-sm hover:border-[var(--primary-red)]/40 hover:shadow-lg transition-all duration-300 flex flex-col items-center group"
+                >
+                  <div className="w-12 h-12 rounded-xl bg-red-500/10 text-[var(--primary-red)] flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
+                    <Icon size={22} />
+                  </div>
+                  <h3 className="text-base font-black text-[var(--text-primary)] mb-1">
+                    {info.title}
+                  </h3>
+                  <p className="text-sm font-black text-[var(--primary-red)] mb-1">
+                    {info.value}
+                  </p>
+                  <p className="text-xs text-[var(--text-muted)] font-medium">
+                    {info.subtitle}
+                  </p>
+                </a>
+              );
+            })}
+          </div>
 
-          {/* Form Section */}
-          <section className="max-w-5xl mx-auto mb-32 grid lg:grid-cols-2 gap-12 items-start">
-            {/* Left Side: Terminal Info */}
-            <Motion.div 
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              className="space-y-12"
-            >
-              <div className="space-y-6">
-                <h2 className="text-4xl font-black text-[var(--text-primary)] uppercase tracking-tighter">
-                  Transmission <span className="text-gradient-crimson italic">Parameters</span>
+          {/* Contact & Coordination Form */}
+          <div className="grid lg:grid-cols-12 gap-5 sm:gap-6 items-start max-w-6xl mx-auto">
+            {/* Left Guidance Panel */}
+            <div className="lg:col-span-5 space-y-4">
+              <div>
+                <h2 className="text-xl sm:text-2xl font-black text-[var(--text-primary)] mb-2">
+                  Send a Direct Message
                 </h2>
-                <p className="text-lg text-[var(--text-secondary)] font-medium opacity-60 leading-relaxed italic">
-                  Complete the transmission manifest below. Our decryption array will process your request within a 2-hour window.
+                <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
+                  For non-urgent inquiries, hospital integrations, or feedback, submit your details. Our coordination desk will respond within 2 to 4 hours.
                 </p>
               </div>
 
-              <div className="ultra-glass rounded-3xl p-10 border border-white/10 space-y-8">
-                <div className="flex items-start gap-6">
-                  <div className="p-3 bg-blue-500/10 rounded-xl text-blue-500">
-                    <Clock size={24} />
+              <div className="bg-[var(--background-card)] border border-[var(--border-light)] rounded-2xl p-4 sm:p-5 space-y-4 shadow-sm">
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-lg bg-red-500/10 text-[var(--primary-red)] flex items-center justify-center shrink-0">
+                    <Clock size={18} />
                   </div>
                   <div>
-                    <h4 className="font-black text-[var(--text-primary)] uppercase tracking-wider text-sm">Response Frequency</h4>
-                    <p className="text-[var(--text-secondary)] font-medium italic opacity-60">Sub-2 hour synchronization</p>
+                    <h4 className="text-xs sm:text-sm font-bold text-[var(--text-primary)]">Emergency Dispatch</h4>
+                    <p className="text-[11px] text-[var(--text-muted)] mt-0.5">24 Hours / 7 Days a week</p>
                   </div>
                 </div>
-                <div className="flex items-start gap-6">
-                  <div className="p-3 bg-[var(--primary-red)]/10 rounded-xl text-[var(--primary-red)]">
-                    <Wifi size={24} />
+
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-lg bg-blue-500/10 text-blue-600 flex items-center justify-center shrink-0">
+                    <Building size={18} />
                   </div>
                   <div>
-                    <h4 className="font-black text-[var(--text-primary)] uppercase tracking-wider text-sm">Signal Range</h4>
-                    <p className="text-[var(--text-secondary)] font-medium italic opacity-60">Global Coverage (64 Districts)</p>
+                    <h4 className="text-xs sm:text-sm font-bold text-[var(--text-primary)]">Administrative Desk</h4>
+                    <p className="text-[11px] text-[var(--text-muted)] mt-0.5">Sunday - Thursday: 9:00 AM - 6:00 PM</p>
                   </div>
                 </div>
-                <div className="flex items-start gap-6">
-                  <div className="p-3 bg-emerald-500/10 rounded-xl text-emerald-500">
-                    <Terminal size={24} />
+
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-lg bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0">
+                    <ShieldCheck size={18} />
                   </div>
                   <div>
-                    <h4 className="font-black text-[var(--text-primary)] uppercase tracking-wider text-sm">System Status</h4>
-                    <p className="text-emerald-500 font-bold italic">All Nodes Operational</p>
+                    <h4 className="text-xs sm:text-sm font-bold text-[var(--text-primary)]">Confidential Communications</h4>
+                    <p className="text-[11px] text-[var(--text-muted)] mt-0.5">Your personal data is protected by strict privacy policies</p>
                   </div>
                 </div>
               </div>
-            </Motion.div>
+            </div>
 
-            {/* Right Side: Form */}
-            <Motion.div
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              className="relative"
-            >
-              <div className="absolute -inset-1 bg-gradient-to-r from-[var(--primary-red)] to-rose-600 rounded-[3rem] blur opacity-10 group-hover:opacity-20 transition duration-1000" />
-              <div className="relative ultra-glass rounded-[3rem] border border-white/10 p-10 md:p-12 shadow-3xl">
-                {isSubmitted ? (
-                  <Motion.div
-                    initial={{ scale: 0.9, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    className="py-20 text-center space-y-8"
+            {/* Right Form Card */}
+            <div className="lg:col-span-7 bg-[var(--background-card)] border border-[var(--border-light)] rounded-2xl p-5 sm:p-7 shadow-xl">
+              {isSubmitted ? (
+                <div className="py-10 text-center space-y-4">
+                  <div className="w-12 h-12 rounded-full bg-emerald-500/10 text-emerald-600 flex items-center justify-center mx-auto">
+                    <CheckCircle2 size={28} />
+                  </div>
+                  <h3 className="text-xl font-black text-[var(--text-primary)]">
+                    Message Successfully Delivered
+                  </h3>
+                  <p className="text-xs sm:text-sm text-[var(--text-secondary)] max-w-md mx-auto leading-relaxed">
+                    Thank you for reaching out. Our support coordinator will get in touch with you shortly.
+                  </p>
+                  <button
+                    onClick={() => setIsSubmitted(false)}
+                    className="px-5 py-2 rounded-lg bg-[var(--background-main)] border border-[var(--border-light)] text-xs font-bold uppercase tracking-wider text-[var(--text-primary)] hover:border-[var(--primary-red)] transition-all"
                   >
-                    <div className="relative inline-block">
-                       <CheckCircle className="w-24 h-24 text-emerald-500 mx-auto" />
-                       <Motion.div 
-                        initial={{ opacity: 0, scale: 2 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="absolute inset-0 bg-emerald-500/20 blur-3xl rounded-full" 
-                        />
+                    Send Another Message
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="grid sm:grid-cols-2 gap-3.5">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">
+                        Your Full Name
+                      </label>
+                      <input
+                        type="text"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        required
+                        placeholder="John Doe"
+                        className="w-full h-11 bg-[var(--background-main)] border border-[var(--border-light)] rounded-xl px-3.5 text-sm font-semibold text-[var(--text-primary)] focus:outline-none focus:border-[var(--primary-red)] transition-all"
+                      />
                     </div>
-                    <div>
-                      <h3 className="text-3xl font-black text-[var(--text-primary)] uppercase tracking-tight mb-4">
-                        Uplink Established
-                      </h3>
-                      <p className="text-lg text-[var(--text-secondary)] font-medium opacity-60 italic">
-                        Your data packet has been successfully encrypted and routed. A neural operative will contact you shortly.
-                      </p>
+
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">
+                        Phone Number
+                      </label>
+                      <input
+                        type="tel"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        required
+                        placeholder="+880 1712-000000"
+                        className="w-full h-11 bg-[var(--background-main)] border border-[var(--border-light)] rounded-xl px-3.5 text-sm font-semibold text-[var(--text-primary)] focus:outline-none focus:border-[var(--primary-red)] transition-all"
+                      />
                     </div>
-                    <Motion.button
-                      onClick={() => setIsSubmitted(false)}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="px-8 py-3 ultra-glass border border-white/10 rounded-xl text-xs font-black uppercase tracking-widest text-[var(--text-primary)]"
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">
+                      Email Address
+                    </label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      required
+                      placeholder="you@example.com"
+                      className="w-full h-11 bg-[var(--background-main)] border border-[var(--border-light)] rounded-xl px-3.5 text-sm font-semibold text-[var(--text-primary)] focus:outline-none focus:border-[var(--primary-red)] transition-all"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">
+                      Inquiry Category
+                    </label>
+                    <select
+                      name="subject"
+                      value={formData.subject}
+                      onChange={handleChange}
+                      required
+                      className="w-full h-11 bg-[var(--background-main)] border border-[var(--border-light)] rounded-xl px-3.5 text-sm font-semibold text-[var(--text-primary)] focus:outline-none focus:border-[var(--primary-red)] transition-all cursor-pointer"
                     >
-                      New Transmission
-                    </Motion.button>
-                  </Motion.div>
-                ) : (
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--text-muted)] ml-1">Operative Name</label>
-                        <div className="relative ultra-glass rounded-2xl border border-white/10 focus-within:border-[var(--primary-red)]/50 transition-all">
-                          <User size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-[var(--primary-red)] opacity-50" />
-                          <input
-                            type="text"
-                            name="name"
-                            value={formData.name}
-                            onChange={handleChange}
-                            required
-                            placeholder="IDENTIFY YOURSELF"
-                            className="bg-transparent w-full py-4 pl-14 pr-5 text-[var(--text-primary)] font-bold placeholder:text-[var(--text-muted)] placeholder:opacity-30 focus:outline-none"
-                          />
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--text-muted)] ml-1">Frequency Access</label>
-                        <div className="relative ultra-glass rounded-2xl border border-white/10 focus-within:border-[var(--primary-red)]/50 transition-all">
-                          <Phone size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-[var(--primary-red)] opacity-50" />
-                          <input
-                            type="tel"
-                            name="phone"
-                            value={formData.phone}
-                            onChange={handleChange}
-                            required
-                            placeholder="+880 GRID CODE"
-                            className="bg-transparent w-full py-4 pl-14 pr-5 text-[var(--text-primary)] font-bold placeholder:text-[var(--text-muted)] placeholder:opacity-30 focus:outline-none"
-                          />
-                        </div>
-                      </div>
-                    </div>
+                      <option value="">Select Topic</option>
+                      <option value="urgent">Emergency Blood Need Assistance</option>
+                      <option value="donor">Voluntary Donor Registration Query</option>
+                      <option value="hospital">Hospital Partnership Inquiry</option>
+                      <option value="technical">Platform Feedback or Bug Report</option>
+                      <option value="general">General Question</option>
+                    </select>
+                  </div>
 
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--text-muted)] ml-1">Digital Coordinates</label>
-                      <div className="relative ultra-glass rounded-2xl border border-white/10 focus-within:border-[var(--primary-red)]/50 transition-all">
-                        <Mail size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-[var(--primary-red)] opacity-50" />
-                        <input
-                          type="email"
-                          name="email"
-                          value={formData.email}
-                          onChange={handleChange}
-                          required
-                          placeholder="EMAIL@GRID.COM"
-                          className="bg-transparent w-full py-4 pl-14 pr-5 text-[var(--text-primary)] font-bold placeholder:text-[var(--text-muted)] placeholder:opacity-30 focus:outline-none"
-                        />
-                      </div>
-                    </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">
+                      Your Message
+                    </label>
+                    <textarea
+                      name="message"
+                      value={formData.message}
+                      onChange={handleChange}
+                      required
+                      rows={4}
+                      placeholder="Describe your inquiry in detail..."
+                      className="w-full p-3 bg-[var(--background-main)] border border-[var(--border-light)] rounded-xl text-sm font-semibold text-[var(--text-primary)] focus:outline-none focus:border-[var(--primary-red)] transition-all resize-none"
+                    />
+                  </div>
 
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--text-muted)] ml-1">Transmission Vector</label>
-                      <div className="relative ultra-glass rounded-2xl border border-white/10 focus-within:border-[var(--primary-red)]/50 transition-all">
-                         <Globe size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-[var(--primary-red)] opacity-50" />
-                          <select
-                            name="subject"
-                            value={formData.subject}
-                            onChange={handleChange}
-                            required
-                            className="bg-transparent w-full py-4 pl-14 pr-5 text-[var(--text-primary)] font-bold focus:outline-none appearance-none cursor-pointer"
-                          >
-                            <option value="" className="bg-[var(--background-main)]">SELECT VECTOR</option>
-                            <option value="general" className="bg-[var(--background-main)]">General Inquiry</option>
-                            <option value="urgent" className="bg-[var(--background-main)]">Urgent Deficit Signal</option>
-                            <option value="technical" className="bg-[var(--background-main)]">System Bug Reprt</option>
-                            <option value="feedback" className="bg-[var(--background-main)]">User Experience Data</option>
-                          </select>
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--text-muted)] ml-1">Encrypted Payload</label>
-                      <div className="relative ultra-glass rounded-3xl border border-white/10 focus-within:border-[var(--primary-red)]/50 transition-all">
-                        <MessageSquare size={18} className="absolute left-5 top-6 text-[var(--primary-red)] opacity-50" />
-                        <textarea
-                          name="message"
-                          value={formData.message}
-                          onChange={handleChange}
-                          required
-                          rows={5}
-                          placeholder="ENTER DATA BLOCK..."
-                          className="bg-transparent w-full py-6 pl-14 pr-5 text-[var(--text-primary)] font-bold placeholder:text-[var(--text-muted)] placeholder:opacity-30 focus:outline-none resize-none"
-                        />
-                      </div>
-                    </div>
-
-                    <Motion.button
-                      type="submit"
-                      disabled={isSubmitting}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="w-full relative group/btn overflow-hidden p-5 bg-[var(--primary-red)] rounded-2xl flex items-center justify-center gap-4 transition-all"
-                    >
-                       <div className="absolute inset-x-0 bottom-0 h-1 bg-white/20 scale-x-0 group-hover/btn:scale-x-100 transition-transform origin-left" />
-                      
-                      {isSubmitting ? (
-                        <div className="flex items-center gap-3">
-                          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                          <span className="font-black text-white uppercase tracking-[0.3em] text-xs">Syncing Signals...</span>
-                        </div>
-                      ) : (
-                        <>
-                          <Send size={20} className="text-white relative z-10" />
-                          <span className="font-black text-white uppercase tracking-[0.3em] text-xs relative z-10">Initialize Uplink</span>
-                        </>
-                      )}
-                    </Motion.button>
-                  </form>
-                )}
-              </div>
-            </Motion.div>
-          </section>
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="btn-premium w-full !h-12 !rounded-xl text-xs uppercase tracking-wider font-bold flex items-center justify-center gap-2 shadow-lg shadow-red-600/20 disabled:opacity-50"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Activity className="animate-spin" size={16} />
+                        <span>Sending Message...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Send size={16} />
+                        <span>Submit Inquiry</span>
+                      </>
+                    )}
+                  </button>
+                </form>
+              )}
+            </div>
+          </div>
         </div>
       </main>
     </div>
