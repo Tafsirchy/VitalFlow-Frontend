@@ -10,10 +10,12 @@ import {
   Calendar,
   Clock,
   Send,
-  Sparkles,
   HeartPulse,
+  CheckCircle,
+  AlertCircle,
+  ShieldCheck,
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion as Motion } from "framer-motion";
 import useAxiosSecure from "../../../Hooks/useAxiosSecure";
 
 const AddRequest = () => {
@@ -24,7 +26,7 @@ const AddRequest = () => {
   const [upazila, setUpazila] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const axiosSecure = useAxiosSecure()
+  const axiosSecure = useAxiosSecure();
 
   useEffect(() => {
     axios.get("/upazilas.json").then((res) => {
@@ -41,7 +43,6 @@ const AddRequest = () => {
       setDistricts(sortedDistricts);
     });
   }, []);
-
 
   const handleRequest = (e) => {
     e.preventDefault();
@@ -77,7 +78,7 @@ const AddRequest = () => {
 
     axiosSecure
       .post("/requests", reqFormData)
-      .then((res) => {
+      .then(() => {
         setIsSubmitting(false);
         document.getElementById("success_modal").showModal();
         form.reset();
@@ -85,415 +86,310 @@ const AddRequest = () => {
         setUpazila("");
       })
       .catch((err) => {
-        console.log(err);
+        console.error("Failed to submit request:", err);
         setIsSubmitting(false);
-        alert("Failed to submit request. Please try again.");
+        alert("Failed to submit blood request. Please check all required fields and try again.");
       });
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { type: "spring", stiffness: 100 },
-    },
-  };
-
   return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      className="relative"
-    >
-      {/* Header with Floating Animation */}
-      <motion.div variants={itemVariants} className="text-center p-8 relative ">
-        {/* Decorative Background */}
-        <div className="absolute inset-0 -z-10 overflow-hidden">
-          <motion.div
-            className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-gradient-to-r from-red-200 to-pink-200 rounded-full blur-3xl opacity-30"
-            animate={{
-              scale: [1, 1.2, 1],
-              rotate: [0, 180, 360],
-            }}
-            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          />
+    <div className="py-3 sm:py-5 lg:py-6">
+      <div className="max-w-4xl mx-auto px-3 sm:px-5">
+        {/* Symmetrical Section Header */}
+        <div className="text-center mb-4 sm:mb-6">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-red-600 to-red-700 text-white shadow-md shadow-red-500/20 mb-3">
+            <Droplet size={24} fill="currentColor" />
+          </div>
+          <span className="section-eyebrow block">EMERGENCY COORDINATION</span>
+          <h1 className="section-title">Create Donation Request</h1>
+          <p className="section-subtitle">
+            Initiate a verified emergency blood dispatch. Your request will immediately notify compatible, verified donors in the hospital district.
+          </p>
         </div>
 
-        <motion.div
-          className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-br from-red-500 to-red-600 mb-4 shadow-2xl shadow-red-500/50 relative"
-          whileHover={{ scale: 1.1, rotate: [0, -10, 10, -10, 0] }}
-          transition={{ type: "spring", stiffness: 300 }}
-        >
-          <Droplet size={40} className="text-white" fill="currentColor" />
-          <motion.div
-            className="absolute -top-2 -right-2 bg-yellow-400 rounded-full p-1.5 shadow-lg"
-            animate={{ rotate: [0, 360] }}
-            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-          >
-            <Sparkles size={16} className="text-yellow-700" />
-          </motion.div>
-        </motion.div>
-
-        <h2 className="text-4xl lg:text-5xl font-black mb-2">
-          <span className="bg-gradient-to-r from-red-600 via-pink-600 to-red-600 bg-clip-text text-transparent">
-            Create Donation Request
-          </span>
-        </h2>
-        <p className="text-gray-600 flex items-center justify-center gap-2">
-          <HeartPulse size={20} className="text-red-500 animate-pulse" />
-          Your request could save a precious life
-        </p>
-      </motion.div>
-
-      {/* Form Card */}
-      <motion.div variants={itemVariants}>
-        <div className="card bg-base-100 shadow-2xl border border-gray-100 mx-5 mb-5">
-          <form onSubmit={handleRequest} className="card-body p-6 lg:p-10">
-            <div className="space-y-8">
-              {/* Requester Info Section */}
-              <motion.div
-                variants={itemVariants}
-                className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-50 to-indigo-50 p-6 border border-blue-100"
-              >
-                <motion.div
-                  className="absolute top-0 right-0 w-40 h-40 bg-blue-200 rounded-full blur-3xl opacity-30"
-                  animate={{ scale: [1, 1.3, 1], x: [0, 20, 0] }}
-                  transition={{ duration: 5, repeat: Infinity }}
-                />
-
-                <div className="relative z-10">
-                  <div className="flex items-center gap-3 mb-5">
-                    <div className="badge badge-lg badge-info gap-2">
-                      <Users size={16} />
-                      Requester
-                    </div>
-                    <div className="h-px flex-1 bg-gradient-to-r from-blue-300 to-transparent"></div>
+        {/* Form Card */}
+        <div className="bg-[var(--background-card)] rounded-2xl border border-[var(--border-light)] shadow-sm p-4 sm:p-6 lg:p-8 transition-smooth">
+          <form onSubmit={handleRequest} className="space-y-5">
+            {/* Requester Information */}
+            <div className="bg-[var(--background-main)] rounded-xl p-4 border border-[var(--border-light)]">
+              <div className="flex items-center justify-between mb-3 pb-2 border-b border-[var(--border-light)]">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-red-500/10 flex items-center justify-center text-red-600">
+                    <ShieldCheck size={16} />
                   </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField label="Your Name" icon={<Users size={18} />}>
-                      <input
-                        name="requesterName"
-                        type="text"
-                        defaultValue={user?.displayName || ""}
-                        readOnly
-                        className="input input-bordered w-full bg-blue-100/50 backdrop-blur-sm"
-                      />
-                    </FormField>
-
-                    <FormField
-                      label="Your Email"
-                      icon={<MessageSquare size={18} />}
-                    >
-                      <input
-                        name="requesterEmail"
-                        type="email"
-                        defaultValue={user?.email || ""}
-                        readOnly
-                        className="input input-bordered w-full bg-blue-100/50 backdrop-blur-sm"
-                      />
-                    </FormField>
+                  <div>
+                    <h3 className="font-bold text-xs sm:text-sm text-[var(--text-primary)]">Requester Identity</h3>
+                    <p className="text-[11px] text-[var(--text-muted)]">Verified contact details from your session</p>
                   </div>
                 </div>
-              </motion.div>
+                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+                  <CheckCircle size={11} />
+                  Verified
+                </span>
+              </div>
 
-              {/* Recipient Info Section */}
-              <motion.div
-                variants={itemVariants}
-                className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-red-50 to-pink-50 p-6 border border-red-100"
-              >
-                <motion.div
-                  className="absolute top-0 right-0 w-40 h-40 bg-red-200 rounded-full blur-3xl opacity-30"
-                  animate={{ scale: [1.3, 1, 1.3], x: [20, 0, 20] }}
-                  transition={{ duration: 5, repeat: Infinity }}
-                />
-
-                <div className="relative z-10">
-                  <div className="flex items-center gap-3 mb-5">
-                    <div className="badge badge-lg badge-error gap-2">
-                      <Droplet size={16} fill="currentColor" />
-                      Blood Details
-                    </div>
-                    <div className="h-px flex-1 bg-gradient-to-r from-red-300 to-transparent"></div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField label="Recipient Name" required>
-                      <input
-                        name="recipientName"
-                        type="text"
-                        placeholder="Enter full name"
-                        className="input input-bordered input-error w-full bg-white/70 backdrop-blur-sm focus:scale-[1.02] transition-transform"
-                        required
-                      />
-                    </FormField>
-
-                    <FormField
-                      label="Blood Group"
-                      required
-                      icon={<Droplet size={18} />}
-                    >
-                      <select
-                        name="bloodGroup"
-                        className="select select-bordered select-error w-full bg-white/70 backdrop-blur-sm focus:scale-[1.02] transition-transform"
-                        required
-                      >
-                        <option value="">Select Type</option>
-                        <option value="A+">🅰️ A+</option>
-                        <option value="A-">🅰️ A-</option>
-                        <option value="B+">🅱️ B+</option>
-                        <option value="B-">🅱️ B-</option>
-                        <option value="AB+">🆎 AB+</option>
-                        <option value="AB-">🆎 AB-</option>
-                        <option value="O+">🅾️ O+</option>
-                        <option value="O-">🅾️ O-</option>
-                      </select>
-                    </FormField>
-                  </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                <div>
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-[var(--text-secondary)] mb-1">
+                    Requester Full Name
+                  </label>
+                  <input
+                    name="requesterName"
+                    type="text"
+                    defaultValue={user?.displayName || ""}
+                    readOnly
+                    className="w-full px-3 py-2 rounded-lg bg-[var(--background-card)] text-[var(--text-primary)] border border-[var(--border-light)] text-xs sm:text-sm font-medium opacity-90 cursor-not-allowed outline-none"
+                  />
                 </div>
-              </motion.div>
 
-              {/* Location Section */}
-              <motion.div
-                variants={itemVariants}
-                className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-green-50 to-emerald-50 p-6 border border-green-100"
-              >
-                <motion.div
-                  className="absolute top-0 right-0 w-40 h-40 bg-green-200 rounded-full blur-3xl opacity-30"
-                  animate={{ scale: [1, 1.3, 1], y: [0, 20, 0] }}
-                  transition={{ duration: 5, repeat: Infinity }}
-                />
-
-                <div className="relative z-10">
-                  <div className="flex items-center gap-3 mb-5">
-                    <div className="badge badge-lg badge-success gap-2">
-                      <MapPin size={16} />
-                      Location
-                    </div>
-                    <div className="h-px flex-1 bg-gradient-to-r from-green-300 to-transparent"></div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      label="District"
-                      required
-                      icon={<MapPin size={18} />}
-                    >
-                      <select
-                        name="district"
-                        value={district}
-                        onChange={(e) => setDistrict(e.target.value)}
-                        className="select select-bordered select-success w-full bg-white/90 backdrop-blur-sm"
-                        required
-                      >
-                        <option value="">Select District</option>
-                        {districts.map((d) => (
-                          <option key={d.name} value={d.name}>
-                            📍 {d.name}
-                          </option>
-                        ))}
-                      </select>
-                    </FormField>
-
-                    <FormField
-                      label="Upazila"
-                      required
-                      icon={<MapPin size={18} />}
-                    >
-                      <select
-                        name="upazila"
-                        value={upazila}
-                        onChange={(e) => setUpazila(e.target.value)}
-                        className="select select-bordered select-success w-full bg-white/90 backdrop-blur-sm"
-                        required
-                      >
-                        <option value="">Select Upazila</option>
-                        {upazilas.map((u) => (
-                          <option key={u.name} value={u.name}>
-                            📌 {u.name}
-                          </option>
-                        ))}
-                      </select>
-                    </FormField>
-
-                    <FormField
-                      label="Hospital Name"
-                      required
-                      icon={<Building2 size={18} />}
-                      className="md:col-span-2"
-                    >
-                      <input
-                        name="hospital"
-                        type="text"
-                        placeholder="e.g., Dhaka Medical College Hospital"
-                        className="input input-bordered input-success w-full bg-white/70 backdrop-blur-sm"
-                        required
-                      />
-                    </FormField>
-
-                    <FormField
-                      label="Full Address"
-                      required
-                      icon={<MapPin size={18} />}
-                      className="md:col-span-2"
-                    >
-                      <input
-                        name="address"
-                        type="text"
-                        placeholder="e.g., Zahir Raihan Rd, Dhaka"
-                        className="input input-bordered input-success w-full bg-white/70 backdrop-blur-sm"
-                        required
-                      />
-                    </FormField>
-                  </div>
+                <div>
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-[var(--text-secondary)] mb-1">
+                    Requester Email Address
+                  </label>
+                  <input
+                    name="requesterEmail"
+                    type="email"
+                    defaultValue={user?.email || ""}
+                    readOnly
+                    className="w-full px-3 py-2 rounded-lg bg-[var(--background-card)] text-[var(--text-primary)] border border-[var(--border-light)] text-xs sm:text-sm font-medium opacity-90 cursor-not-allowed outline-none"
+                  />
                 </div>
-              </motion.div>
+              </div>
+            </div>
 
-              {/* Schedule Section */}
-              <motion.div
-                variants={itemVariants}
-                className="grid grid-cols-1 md:grid-cols-2 gap-4"
-              >
-                <FormField
-                  label="Donation Date"
-                  required
-                  icon={<Calendar size={18} />}
-                >
+            {/* Patient & Blood Group */}
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <HeartPulse size={18} className="text-red-600" />
+                <h3 className="font-bold text-base text-[var(--text-primary)]">Patient & Blood Specification</h3>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] mb-2">
+                    Patient Full Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    name="recipientName"
+                    type="text"
+                    placeholder="e.g., Sarah Rahman"
+                    className="w-full px-4 py-3.5 rounded-xl bg-[var(--background-card)] text-[var(--text-primary)] border border-[var(--border-light)] text-sm focus:border-red-500 focus:ring-4 focus:ring-red-500/10 outline-none transition-all placeholder:text-[var(--text-muted)]"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] mb-2">
+                    Required Blood Group <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    name="bloodGroup"
+                    className="w-full px-4 py-3.5 rounded-xl bg-[var(--background-card)] text-[var(--text-primary)] border border-[var(--border-light)] text-sm font-semibold focus:border-red-500 focus:ring-4 focus:ring-red-500/10 outline-none transition-all"
+                    required
+                  >
+                    <option value="">Select Blood Group</option>
+                    <option value="A+">A+ (A Positive)</option>
+                    <option value="A-">A- (A Negative)</option>
+                    <option value="B+">B+ (B Positive)</option>
+                    <option value="B-">B- (B Negative)</option>
+                    <option value="AB+">AB+ (AB Positive)</option>
+                    <option value="AB-">AB- (AB Negative)</option>
+                    <option value="O+">O+ (O Positive)</option>
+                    <option value="O-">O- (O Negative)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Hospital & Location */}
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <Building2 size={18} className="text-red-600" />
+                <h3 className="font-bold text-base text-[var(--text-primary)]">Hospital & Location</h3>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] mb-2">
+                    District <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    name="district"
+                    value={district}
+                    onChange={(e) => setDistrict(e.target.value)}
+                    className="w-full px-4 py-3.5 rounded-xl bg-[var(--background-card)] text-[var(--text-primary)] border border-[var(--border-light)] text-sm focus:border-red-500 focus:ring-4 focus:ring-red-500/10 outline-none transition-all"
+                    required
+                  >
+                    <option value="">Select District</option>
+                    {districts.map((d) => (
+                      <option key={d.name} value={d.name}>
+                        {d.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] mb-2">
+                    Upazila / Area <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    name="upazila"
+                    value={upazila}
+                    onChange={(e) => setUpazila(e.target.value)}
+                    className="w-full px-4 py-3.5 rounded-xl bg-[var(--background-card)] text-[var(--text-primary)] border border-[var(--border-light)] text-sm focus:border-red-500 focus:ring-4 focus:ring-red-500/10 outline-none transition-all"
+                    required
+                  >
+                    <option value="">Select Upazila</option>
+                    {upazilas.map((u) => (
+                      <option key={u.name} value={u.name}>
+                        {u.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] mb-2">
+                    Hospital / Medical Center Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    name="hospital"
+                    type="text"
+                    placeholder="e.g., National Institute of Cardiovascular Diseases"
+                    className="w-full px-4 py-3.5 rounded-xl bg-[var(--background-card)] text-[var(--text-primary)] border border-[var(--border-light)] text-sm focus:border-red-500 focus:ring-4 focus:ring-red-500/10 outline-none transition-all placeholder:text-[var(--text-muted)]"
+                    required
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] mb-2">
+                    Hospital Ward, Bed or Full Address <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    name="address"
+                    type="text"
+                    placeholder="e.g., Sher-e-Bangla Nagar, Ward 4, Bed 12"
+                    className="w-full px-4 py-3.5 rounded-xl bg-[var(--background-card)] text-[var(--text-primary)] border border-[var(--border-light)] text-sm focus:border-red-500 focus:ring-4 focus:ring-red-500/10 outline-none transition-all placeholder:text-[var(--text-muted)]"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Schedule */}
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <Calendar size={18} className="text-red-600" />
+                <h3 className="font-bold text-base text-[var(--text-primary)]">Transfusion Schedule</h3>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] mb-2">
+                    Required Date <span className="text-red-500">*</span>
+                  </label>
                   <input
                     name="date"
                     type="date"
-                    className="input input-bordered input-primary w-full"
+                    className="w-full px-4 py-3.5 rounded-xl bg-[var(--background-card)] text-[var(--text-primary)] border border-[var(--border-light)] text-sm focus:border-red-500 focus:ring-4 focus:ring-red-500/10 outline-none transition-all"
                     required
                   />
-                </FormField>
+                </div>
 
-                <FormField
-                  label="Donation Time"
-                  required
-                  icon={<Clock size={18} />}
-                >
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] mb-2">
+                    Required Time <span className="text-red-500">*</span>
+                  </label>
                   <input
                     name="time"
                     type="time"
-                    className="input input-bordered input-primary w-full"
+                    className="w-full px-4 py-3.5 rounded-xl bg-[var(--background-card)] text-[var(--text-primary)] border border-[var(--border-light)] text-sm focus:border-red-500 focus:ring-4 focus:ring-red-500/10 outline-none transition-all"
                     required
                   />
-                </FormField>
-              </motion.div>
+                </div>
+              </div>
+            </div>
 
-              {/* Message Section */}
-              <motion.div variants={itemVariants}>
-                <FormField
-                  label="Request Message"
+            {/* Clinical Message */}
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <MessageSquare size={18} className="text-red-600" />
+                <h3 className="font-bold text-base text-[var(--text-primary)]">Clinical Note & Urgency Details</h3>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] mb-2">
+                  Emergency Details & Instructions <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  name="message"
+                  rows="4"
+                  className="w-full px-4 py-3.5 rounded-xl bg-[var(--background-card)] text-[var(--text-primary)] border border-[var(--border-light)] text-sm focus:border-red-500 focus:ring-4 focus:ring-red-500/10 outline-none transition-all placeholder:text-[var(--text-muted)] resize-none"
+                  placeholder="Provide clinical context (e.g., planned surgery, thalassemia transfusion, emergency trauma) and any specific donor criteria or directions..."
                   required
-                  icon={<MessageSquare size={18} />}
-                >
-                  <textarea
-                    name="message"
-                    rows="4"
-                    className="textarea textarea-bordered textarea-primary w-full resize-none"
-                    placeholder="Explain why blood is urgently needed..."
-                    required
-                  ></textarea>
-                </FormField>
-              </motion.div>
+                ></textarea>
+              </div>
+            </div>
 
-              {/* Submit Button */}
-              <motion.div
-                variants={itemVariants}
-                className="flex justify-center pt-6"
+            {/* Submit Action */}
+            <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-[var(--border-light)]">
+              <div className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
+                <AlertCircle size={15} className="text-amber-500 shrink-0" />
+                <span>All requests are broadcast to verified local donors immediately upon submission.</span>
+              </div>
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-xl bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold text-sm tracking-wide shadow-lg shadow-red-500/20 disabled:opacity-50 transition-smooth"
               >
-                <motion.button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="btn btn-error btn-lg gap-3 px-10 shadow-2xl shadow-red-500/50 hover:shadow-red-500/70"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  {isSubmitting ? (
-                    <>
-                      <span className="loading loading-spinner"></span>
-                      Submitting...
-                    </>
-                  ) : (
-                    <>
-                      <Send size={20} />
-                      <span className="font-bold">Submit Request</span>
-                      <motion.div
-                        animate={{ x: [0, 5, 0] }}
-                        transition={{ duration: 1, repeat: Infinity }}
-                      >
-                        →
-                      </motion.div>
-                    </>
-                  )}
-                </motion.button>
-              </motion.div>
+                {isSubmitting ? (
+                  <>
+                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Publishing Request...
+                  </>
+                ) : (
+                  <>
+                    <Send size={16} />
+                    Publish Emergency Request
+                  </>
+                )}
+              </button>
             </div>
           </form>
         </div>
-      </motion.div>
+      </div>
 
-      {/* Success Modal */}
-      <dialog id="success_modal" className="modal">
-        <div className="modal-box bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200">
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: "spring", stiffness: 200, damping: 15 }}
-            className="text-center"
-          >
-            <motion.div
-              className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center"
-              animate={{ rotate: [0, 360] }}
-              transition={{ duration: 1 }}
+      {/* Symmetrical Success Modal */}
+      <dialog id="success_modal" className="modal modal-bottom sm:modal-middle">
+        <div className="modal-box bg-[var(--background-card)] border border-[var(--border-light)] rounded-3xl p-8 sm:p-10 text-center max-w-md shadow-2xl">
+          <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center mx-auto mb-5 border border-emerald-500/20">
+            <CheckCircle size={36} />
+          </div>
+          <span className="section-eyebrow text-emerald-600">SUBMISSION CONFIRMED</span>
+          <h3 className="text-2xl font-black text-[var(--text-primary)] mt-1 mb-3">
+            Request Published
+          </h3>
+          <p className="text-sm text-[var(--text-secondary)] leading-relaxed mb-6">
+            Your emergency blood donation request has been verified and registered on the VitalFlow donor dispatch network. Compatible donors in your district will be notified immediately.
+          </p>
+          <div className="modal-action justify-center m-0">
+            <button
+              type="button"
+              className="w-full py-3.5 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm tracking-wide transition-smooth"
+              onClick={() => document.getElementById("success_modal").close()}
             >
-              <Droplet size={40} className="text-white" fill="currentColor" />
-            </motion.div>
-            <h3 className="font-bold text-2xl mb-2 text-green-800">Success!</h3>
-            <p className="py-4 text-gray-700">
-              Your blood donation request has been submitted successfully. We'll
-              notify you soon!
-            </p>
-            <div className="modal-action justify-center">
-              <button
-                className="btn btn-success"
-                onClick={() => document.getElementById("success_modal").close()}
-              >
-                Great!
-              </button>
-            </div>
-          </motion.div>
+              Done & Return
+            </button>
+          </div>
         </div>
+        <form method="dialog" className="modal-backdrop">
+          <button>close</button>
+        </form>
       </dialog>
-    </motion.div>
+    </div>
   );
 };
-
-// FormField Component
-const FormField = ({ label, icon, required, children, className = "" }) => (
-  <div className={className}>
-    <label className="label">
-      <span className="label-text font-bold flex items-center gap-2 text-gray-700">
-        {icon}
-        {label}
-        {required && <span className="text-error">*</span>}
-      </span>
-    </label>
-    {children}
-  </div>
-);
 
 export default AddRequest;
