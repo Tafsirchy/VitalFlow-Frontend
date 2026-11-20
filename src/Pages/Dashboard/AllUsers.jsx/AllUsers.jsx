@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
 import useAxiosSecure from "../../../Hooks/useAxiosSecure";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   MoreVertical,
-  UserCog,
   ShieldCheck,
   UserCheck,
   Ban,
@@ -12,9 +10,10 @@ import {
   Heart,
   Search,
   Filter,
-  Sparkles,
   Users,
+  ShieldAlert,
 } from "lucide-react";
+import { toast } from "react-toastify";
 
 const AllUsers = () => {
   const axiosSecure = useAxiosSecure();
@@ -25,7 +24,7 @@ const AllUsers = () => {
 
   useEffect(() => {
     axiosSecure.get("/donor").then((res) => {
-      setUsers(res.data);
+      setUsers(res.data || []);
     });
   }, [axiosSecure]);
 
@@ -39,9 +38,11 @@ const AllUsers = () => {
         setUsers((prev) =>
           prev.map((u) => (u.email === email ? { ...u, status } : u))
         );
+        toast.success(`User status updated to ${status}`);
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      toast.error("Failed to update user status");
     }
   };
 
@@ -55,13 +56,14 @@ const AllUsers = () => {
         setUsers((prev) =>
           prev.map((u) => (u.email === email ? { ...u, role } : u))
         );
+        toast.success(`User role updated to ${role}`);
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      toast.error("Failed to update user role");
     }
   };
 
-  // Filter users based on search and role filter
   const filteredUsers = users.filter((user) => {
     const matchesSearch =
       user?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -73,753 +75,306 @@ const AllUsers = () => {
     return matchesSearch && matchesRole;
   });
 
-  // Dropdown animation variants
-  const menuVariants = {
-    closed: {
-      scale: 0.85,
-      y: -10,
-      opacity: 0,
-      transition: { duration: 0.2, ease: "easeIn" },
-    },
-    open: {
-      scale: 1,
-      y: 0,
-      opacity: 1,
-      transition: {
-        duration: 0.25,
-        ease: "easeOut",
-        when: "beforeChildren",
-        staggerChildren: 0.05,
-      },
-    },
-  };
-
-  const itemVariants = {
-    closed: { opacity: 0, x: -20 },
-    open: { opacity: 1, x: 0 },
-  };
-
   const getRoleConfig = (role) => {
     const configs = {
       Admin: {
-        icon: <Crown size={16} className="text-yellow-500" />,
-        bgColor: "#FEF3C7",
-        textColor: "#92400E",
-        iconColor: "#F59E0B",
+        icon: <Crown size={15} />,
+        label: "Administrator",
+        border: "border-amber-500/30",
+        bg: "bg-amber-500/10",
+        text: "text-amber-600",
       },
       Volunteer: {
-        icon: (
-          <UserCheck size={16} style={{ color: "var(--secondary-blue)" }} />
-        ),
-        bgColor: "#DBEAFE",
-        textColor: "#1E40AF",
-        iconColor: "var(--secondary-blue)",
+        icon: <UserCheck size={15} />,
+        label: "Volunteer Coordinator",
+        border: "border-blue-500/30",
+        bg: "bg-blue-500/10",
+        text: "text-blue-600",
       },
       Donor: {
-        icon: <Heart size={16} className="text-red-500" />,
-        bgColor: "#FEE2E2",
-        textColor: "#991B1B",
-        iconColor: "#EF4444",
+        icon: <Heart size={15} />,
+        label: "Volunteer Donor",
+        border: "border-red-500/30",
+        bg: "bg-red-500/10",
+        text: "text-red-600",
       },
     };
     return configs[role] || configs.Donor;
   };
 
+  const stats = [
+    {
+      label: "Total Registered Members",
+      value: users.length,
+      icon: Users,
+      color: "text-red-600",
+      bg: "bg-red-500/10",
+    },
+    {
+      label: "System Administrators",
+      value: users.filter((u) => u.role === "Admin").length,
+      icon: Crown,
+      color: "text-amber-600",
+      bg: "bg-amber-500/10",
+    },
+    {
+      label: "Active Volunteers",
+      value: users.filter((u) => u.role === "Volunteer").length,
+      icon: UserCheck,
+      color: "text-blue-600",
+      bg: "bg-blue-500/10",
+    },
+    {
+      label: "Volunteer Donors",
+      value: users.filter((u) => !u.role || u.role === "Donor").length,
+      icon: Heart,
+      color: "text-emerald-600",
+      bg: "bg-emerald-500/10",
+    },
+  ];
+
   return (
-    <div
-      className="p-4 md:p-6 min-h-screen"
-      style={{ backgroundColor: "var(--background-main)" }}
-    >
-      <div className="max-w-7xl mx-auto pt-7">
-        {/* Animated Header - FIXED FOR MOBILE */}
-        <motion.div
-          initial={{ opacity: 0, y: -30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          className="mb-8 text-center relative px-5 md:px-0"
-        >
-          {/* Floating sparkles animation - CENTERED FOR MOBILE */}
-          <motion.div
-            className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-6 md:-translate-y-8"
-            animate={{
-              y: [-5, 5, -5],
-              rotate: [0, 180, 360],
-            }}
-            transition={{
-              duration: 4,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          >
-            <Sparkles
-              size={20}
-              style={{ color: "var(--primary-red)" }}
-              className="opacity-70 md:w-6 md:h-6"
-            />
-          </motion.div>
+    <div className="py-3 sm:py-5 lg:py-6">
+      <div className="max-w-7xl mx-auto px-3 sm:px-5 lg:px-6">
+        {/* Symmetrical Header */}
+        <div className="text-center mb-4 sm:mb-6">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-red-600 to-red-700 text-white shadow-md shadow-red-500/20 mb-3">
+            <Users size={24} />
+          </div>
+          <span className="section-eyebrow block">USER GOVERNANCE & ACCESS</span>
+          <h1 className="section-title">Community Members Directory</h1>
+          <p className="section-subtitle">
+            Manage member accounts, assign volunteer and administrative permissions, and safeguard community standards.
+          </p>
+        </div>
 
-          <motion.div
-            initial={{ scale: 0.8 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="pt-2 md:pt-0"
-          >
-            <div className="flex items-center justify-center gap-2 md:gap-3 mb-2 md:mb-3">
-              <motion.div
-                animate={{
-                  rotate: [0, 10, -10, 0],
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  repeatDelay: 3,
-                }}
-              >
-                <Users
-                  size={32}
-                  style={{ color: "var(--primary-red)" }}
-                  strokeWidth={2.5}
-                  className="md:w-10 md:h-10"
-                />
-              </motion.div>
-              <h1
-                className="text-3xl md:text-5xl font-extrabold tracking-tight"
-                style={{ color: "var(--text-primary)" }}
-              >
-                User Management
-              </h1>
-            </div>
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.4 }}
-              className="text-sm md:text-lg font-medium px-2"
-              style={{ color: "var(--text-secondary)" }}
-            >
-              Empower your community • Manage roles • Build the future of
-              VitalFlow
-            </motion.p>
-          </motion.div>
-
-          {/* Decorative line - RESPONSIVE WIDTH */}
-          <motion.div
-            className="mt-3 md:mt-4 h-1 mx-auto rounded-full"
-            style={{
-              background:
-                "linear-gradient(90deg, transparent, var(--primary-red), transparent)",
-              width: "150px",
-            }}
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ duration: 0.8, delay: 0.5 }}
-          />
-        </motion.div>
-
-        {/* Search and Filter Bar - FIXED FOR MOBILE */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="mb-6 flex flex-col gap-4"
-        >
-          {/* Search Input */}
-          <motion.div
-            className="relative w-full"
-            whileHover={{ scale: 1.02 }}
-            transition={{ duration: 0.2 }}
-          >
-            <motion.div
-              animate={{ x: [0, 5, 0] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            >
-              <Search
-                size={20}
-                className="absolute left-4 top-1/2 transform -translate-y-1/2"
-                style={{ color: "var(--text-muted)" }}
-              />
-            </motion.div>
-            <input
-              type="text"
-              placeholder="Search by name or email..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2"
-              style={{
-                backgroundColor: "var(--background-card)",
-                borderColor: "var(--border-light)",
-                color: "var(--text-primary)",
-              }}
-            />
-          </motion.div>
-
-          {/* Role Filter - FULL WIDTH ON MOBILE */}
-          <motion.div
-            className="relative w-full"
-            whileHover={{ scale: 1.02 }}
-            transition={{ duration: 0.2 }}
-          >
-            <Filter
-              size={20}
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 pointer-events-none"
-              style={{ color: "var(--text-muted)" }}
-            />
-            <select
-              value={filterRole}
-              onChange={(e) => setFilterRole(e.target.value)}
-              className="w-full pl-12 pr-8 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 appearance-none cursor-pointer"
-              style={{
-                backgroundColor: "var(--background-card)",
-                borderColor: "var(--border-light)",
-                color: "var(--text-primary)",
-              }}
-            >
-              <option value="All">All Roles</option>
-              <option value="Admin">Admin</option>
-              <option value="Volunteer">Volunteer</option>
-              <option value="Donor">Donor</option>
-            </select>
-          </motion.div>
-        </motion.div>
-
-        {/* Animated Stats Cards */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6"
-        >
-          {[
-            {
-              label: "Total Users",
-              value: users.length,
-              color: "#6366F1",
-              icon: Users,
-            },
-            {
-              label: "Admins",
-              value: users.filter((u) => u.role === "Admin").length,
-              color: "#F59E0B",
-              icon: Crown,
-            },
-            {
-              label: "Volunteers",
-              value: users.filter((u) => u.role === "Volunteer").length,
-              color: "#3B82F6",
-              icon: UserCheck,
-            },
-            {
-              label: "Donors",
-              value: users.filter((u) => !u.role || u.role === "Donor").length,
-              color: "#EF4444",
-              icon: Heart,
-            },
-          ].map((stat, index) => (
-            <motion.div
+        {/* 4 Stats Cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+          {stats.map((stat) => (
+            <div
               key={stat.label}
-              initial={{ opacity: 0, scale: 0.8, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={{
-                delay: 0.4 + index * 0.1,
-                type: "spring",
-                stiffness: 100,
-              }}
-              whileHover={{
-                scale: 1.05,
-                y: -5,
-                transition: { duration: 0.2 },
-              }}
-              className="p-4 md:p-5 rounded-xl border-2 cursor-pointer"
-              style={{
-                backgroundColor: "var(--background-card)",
-                borderColor: "var(--border-light)",
-              }}
+              className="bg-[var(--background-card)] rounded-xl p-3.5 border border-[var(--border-light)] shadow-sm"
             >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p
-                    className="text-xs md:text-sm font-medium mb-1"
-                    style={{ color: "var(--text-secondary)" }}
-                  >
-                    {stat.label}
-                  </p>
-                  <motion.p
-                    className="text-2xl md:text-3xl font-bold"
-                    style={{ color: stat.color }}
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.6 + index * 0.1, type: "spring" }}
-                  >
-                    {stat.value}
-                  </motion.p>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
+                  {stat.label}
+                </span>
+                <div className={`p-1.5 rounded-lg ${stat.bg} ${stat.color}`}>
+                  <stat.icon size={14} />
                 </div>
-                <motion.div
-                  className="w-10 h-10 md:w-14 md:h-14 rounded-full flex items-center justify-center"
-                  style={{ backgroundColor: `${stat.color}20` }}
-                  animate={{
-                    rotate: [0, 360],
-                  }}
-                  transition={{
-                    duration: 20,
-                    repeat: Infinity,
-                    ease: "linear",
-                  }}
-                >
-                  <stat.icon
-                    size={20}
-                    style={{ color: stat.color }}
-                    className="md:w-6 md:h-6"
-                  />
-                </motion.div>
               </div>
-            </motion.div>
+              <div className="text-xl sm:text-2xl font-black text-[var(--text-primary)]">
+                {stat.value}
+              </div>
+            </div>
           ))}
-        </motion.div>
+        </div>
 
-        {/* Table Container */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.5 }}
-          className="overflow-hidden rounded-2xl shadow-2xl border-2"
-          style={{ borderColor: "var(--border-light)" }}
-        >
+        {/* Search & Filter Bar */}
+        <div className="bg-[var(--background-card)] rounded-2xl border border-[var(--border-light)] p-3.5 sm:p-4 mb-4 shadow-sm">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
+            <div className="md:col-span-8 relative">
+              <Search
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)]"
+                size={16}
+              />
+              <input
+                type="text"
+                placeholder="Search member by full name or email address..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-3.5 py-2.5 bg-[var(--background-main)] border border-[var(--border-light)] rounded-xl text-xs sm:text-sm font-medium text-[var(--text-primary)] focus:border-red-500 focus:ring-2 focus:ring-red-500/10 outline-none transition-all placeholder:text-[var(--text-muted)]"
+              />
+            </div>
+
+            <div className="md:col-span-4 relative">
+              <Filter
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-blue-500"
+                size={15}
+              />
+              <select
+                value={filterRole}
+                onChange={(e) => setFilterRole(e.target.value)}
+                className="w-full pl-10 pr-6 py-2.5 bg-[var(--background-main)] border border-[var(--border-light)] rounded-xl text-xs font-bold uppercase tracking-wider text-[var(--text-primary)] cursor-pointer outline-none focus:border-blue-500 transition-all"
+              >
+                <option value="All">All Member Roles</option>
+                <option value="Admin">Administrators</option>
+                <option value="Volunteer">Volunteer Coordinators</option>
+                <option value="Donor">Volunteer Donors</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {/* Directory Table */}
+        <div className="bg-[var(--background-card)] rounded-2xl border border-[var(--border-light)] shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="table w-full">
-              <thead style={{ backgroundColor: "var(--background-card)" }}>
-                <motion.tr
-                  className="border-b-2"
-                  style={{ borderColor: "var(--border-light)" }}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.6 }}
-                >
-                  <th
-                    className="text-left py-4 px-6 font-bold text-sm uppercase tracking-wider"
-                    style={{ color: "var(--text-primary)" }}
-                  >
-                    User Information
-                  </th>
-                  <th
-                    className="text-left py-4 px-6 font-bold text-sm uppercase tracking-wider"
-                    style={{ color: "var(--text-primary)" }}
-                  >
-                    Role
-                  </th>
-                  <th
-                    className="text-left py-4 px-6 font-bold text-sm uppercase tracking-wider"
-                    style={{ color: "var(--text-primary)" }}
-                  >
-                    Status
-                  </th>
-                  <th
-                    className="text-right py-4 px-6 font-bold text-sm uppercase tracking-wider"
-                    style={{ color: "var(--text-primary)" }}
-                  >
-                    Actions
-                  </th>
-                </motion.tr>
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-[var(--background-main)] border-b border-[var(--border-light)] text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
+                  <th className="py-2.5 px-3.5">Member Details</th>
+                  <th className="py-2.5 px-3.5">Account Status</th>
+                  <th className="py-2.5 px-3.5">Role Classification</th>
+                  <th className="py-2.5 px-3.5 text-right">Actions</th>
+                </tr>
               </thead>
-              <tbody>
-                <AnimatePresence mode="popLayout">
-                  {filteredUsers?.map((user, index) => {
-                    const roleConfig = getRoleConfig(user?.role || "Donor");
-                    return (
-                      <motion.tr
-                        key={user.email}
-                        initial={{ opacity: 0, x: -50 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: 50, height: 0 }}
-                        transition={{
-                          delay: index * 0.05,
-                          type: "spring",
-                          stiffness: 80,
-                        }}
-                        className="border-b transition-all duration-300 group"
-                        style={{
-                          backgroundColor: "var(--background-card)",
-                          borderColor: "var(--border-light)",
-                        }}
-                        whileHover={{
-                          backgroundColor: "rgba(239, 68, 68, 0.03)",
-                          transition: { duration: 0.2 },
-                        }}
-                      >
-                        {/* User Info */}
-                        <td className="py-5 px-6">
-                          <div className="flex items-center gap-4">
-                            <motion.div
-                              className="relative"
-                              whileHover={{ scale: 1.15 }}
-                              transition={{ type: "spring", stiffness: 300 }}
-                            >
-                              <div
-                                className="mask mask-squircle w-14 h-14 ring-2 ring-offset-2 ring-offset-transparent"
-                                style={{ ringColor: roleConfig.iconColor }}
-                              >
-                                <img
-                                  src={
-                                    user?.mainPhotoUrl || "/default-avatar.png"
-                                  }
-                                  alt={user?.name}
-                                  className="object-cover"
-                                />
-                              </div>
-                              <motion.div
-                                className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center border-2"
-                                style={{
-                                  backgroundColor: roleConfig.bgColor,
-                                  borderColor: "var(--background-card)",
-                                }}
-                                initial={{ scale: 0 }}
-                                animate={{ scale: 1 }}
-                                transition={{ delay: 0.7 + index * 0.05 }}
-                                whileHover={{ scale: 1.3, rotate: 360 }}
-                              >
-                                {roleConfig.icon}
-                              </motion.div>
-                            </motion.div>
-                            <div>
-                              <div
-                                className="font-bold text-base mb-1"
-                                style={{ color: "var(--text-primary)" }}
-                              >
-                                {user?.name}
-                              </div>
-                              <div
-                                className="text-sm flex items-center gap-1"
-                                style={{ color: "var(--text-muted)" }}
-                              >
-                                {user?.email}
-                              </div>
+              <tbody className="divide-y divide-[var(--border-light)] text-xs sm:text-sm">
+                {filteredUsers.map((u) => {
+                  const roleConfig = getRoleConfig(u.role || "Donor");
+                  const isActive = (u.status || "Active") === "Active";
+
+                  return (
+                    <tr
+                      key={u.email}
+                      className="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors"
+                    >
+                      <td className="py-2.5 px-3.5">
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={u.mainPhotoUrl || "/default-avatar.png"}
+                            alt={u.name}
+                            className="w-9 h-9 rounded-lg object-cover border border-[var(--border-light)] shadow-sm"
+                            onError={(e) => {
+                              e.currentTarget.src =
+                                "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=120";
+                            }}
+                          />
+                          <div>
+                            <div className="font-bold text-[var(--text-primary)] text-xs sm:text-sm">
+                              {u.name}
+                            </div>
+                            <div className="text-[11px] text-[var(--text-muted)]">
+                              {u.email}
                             </div>
                           </div>
-                        </td>
+                        </div>
+                      </td>
 
-                        {/* Role Badge */}
-                        <td className="py-5 px-6">
-                          <motion.div
-                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full border-2"
-                            whileHover={{ scale: 1.1, rotate: 2 }}
-                            transition={{ type: "spring", stiffness: 400 }}
-                          >
-                            <motion.div
-                              animate={{ rotate: 360 }}
-                              transition={{
-                                duration: 3,
-                                repeat: Infinity,
-                                ease: "linear",
-                              }}
-                            >
-                              {roleConfig.icon}
-                            </motion.div>
-                            <span
-                              className="text-sm font-bold capitalize"
-                              style={{ color: roleConfig.textColor }}
-                            >
-                              {user?.role || "Donor"}
-                            </span>
-                          </motion.div>
-                        </td>
+                      <td className="py-2.5 px-3.5">
+                        <span
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border ${
+                            isActive
+                              ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+                              : "bg-rose-500/10 text-rose-600 border-rose-500/20"
+                          }`}
+                        >
+                          <span
+                            className={`w-1.5 h-1.5 rounded-full ${
+                              isActive ? "bg-emerald-500" : "bg-rose-500"
+                            }`}
+                          />
+                          {u.status || "Active"}
+                        </span>
+                      </td>
 
-                        {/* Status Indicator */}
-                        <td className="py-5 px-6">
-                          <motion.div
-                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full border-2"
-                            style={{
-                              borderColor:
-                                user?.status === "Active"
-                                  ? "var(--success-green)"
-                                  : "var(--primary-red)",
-                              backgroundColor:
-                                user?.status === "Active"
-                                  ? "#10B98120"
-                                  : "#EF444420",
-                            }}
-                            whileHover={{ scale: 1.05 }}
-                          >
-                            <motion.div
-                              animate={{
-                                scale:
-                                  user?.status === "Active" ? [1, 1.4, 1] : 1,
-                                opacity:
-                                  user?.status === "Active" ? [1, 0.5, 1] : 1,
-                              }}
-                              transition={{ repeat: Infinity, duration: 2 }}
-                            >
-                              <div
-                                className="w-2.5 h-2.5 rounded-full"
-                                style={{
-                                  backgroundColor:
-                                    user?.status === "Active"
-                                      ? "var(--success-green)"
-                                      : "var(--primary-red)",
-                                }}
-                              />
-                            </motion.div>
-                            <span
-                              className="font-bold text-sm"
-                              style={{
-                                color:
-                                  user?.status === "Active"
-                                    ? "var(--success-green)"
-                                    : "var(--primary-red)",
-                              }}
-                            >
-                              {user?.status || "Active"}
-                            </span>
-                          </motion.div>
-                        </td>
+                      <td className="py-2.5 px-3.5">
+                        <span
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold border ${roleConfig.bg} ${roleConfig.border} ${roleConfig.text}`}
+                        >
+                          {roleConfig.icon}
+                          {roleConfig.label}
+                        </span>
+                      </td>
 
-                        {/* Actions Dropdown */}
-                        <td className="py-5 px-6 text-right relative">
-                          <motion.div
-                            whileHover={{ scale: 1.2, rotate: 90 }}
-                            whileTap={{ scale: 0.9 }}
-                            transition={{ type: "spring", stiffness: 300 }}
-                            role="button"
-                            tabIndex={0}
-                            onClick={(e) => {
-                              e.stopPropagation();
+                      <td className="py-2.5 px-3.5 text-right relative">
+                        <div className="inline-block text-left">
+                          <button
+                            type="button"
+                            onClick={() =>
                               setOpenDropdown(
-                                openDropdown === user.email ? null : user.email
-                              );
-                            }}
-                            onKeyDown={(e) =>
-                              e.key === "Enter" &&
-                              setOpenDropdown(
-                                openDropdown === user.email ? null : user.email
+                                openDropdown === u.email ? null : u.email
                               )
                             }
-                            className="btn btn-ghost btn-circle hover:bg-red-50 transition-all inline-flex items-center justify-center"
-                            style={{ color: "var(--text-secondary)" }}
+                            className="p-2 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
                           >
-                            <MoreVertical size={20} />
-                          </motion.div>
+                            <MoreVertical size={16} />
+                          </button>
 
-                          <AnimatePresence>
-                            {openDropdown === user.email && (
-                              <motion.ul
-                                variants={menuVariants}
-                                initial="closed"
-                                animate="open"
-                                exit="closed"
-                                className="absolute right-0 mt-2 p-3 shadow-2xl rounded-xl w-64 border-2 backdrop-blur-md z-50"
-                                style={{
-                                  backgroundColor: "var(--background-card)",
-                                  borderColor: "var(--border-light)",
-                                }}
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                {/* Change Role Section */}
-                                <motion.li
-                                  variants={itemVariants}
-                                  className="text-xs font-bold uppercase tracking-wide mb-2 px-3"
-                                  style={{ color: "var(--text-muted)" }}
-                                >
-                                  Change Role
-                                </motion.li>
+                          {openDropdown === u.email && (
+                            <>
+                              <div
+                                className="fixed inset-0 z-30"
+                                onClick={() => setOpenDropdown(null)}
+                              />
+                              <div className="absolute right-0 mt-1 w-52 bg-[var(--background-card)] rounded-2xl shadow-xl border border-[var(--border-light)] py-2 z-40 text-left text-xs font-medium">
+                                <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)] border-b border-[var(--border-light)] mb-1">
+                                  Role Assignment
+                                </div>
 
-                                {user?.role !== "Donor" && (
-                                  <motion.li variants={itemVariants}>
-                                    <motion.button
-                                      onClick={() => {
-                                        handleRoleChange(user?.email, "Donor");
-                                        setOpenDropdown(null);
-                                      }}
-                                      className="flex items-center gap-3 hover:bg-red-50 rounded-lg w-full text-left py-2.5 px-3 transition-all duration-200"
-                                      whileHover={{ x: 5 }}
-                                    >
-                                      <Heart
-                                        size={16}
-                                        className="text-red-500"
-                                      />
-                                      <span className="font-medium">
-                                        Make Donor
-                                      </span>
-                                    </motion.button>
-                                  </motion.li>
-                                )}
-
-                                {user?.role !== "Volunteer" && (
-                                  <motion.li variants={itemVariants}>
-                                    <motion.button
-                                      onClick={() => {
-                                        handleRoleChange(
-                                          user?.email,
-                                          "Volunteer"
-                                        );
-                                        setOpenDropdown(null);
-                                      }}
-                                      className="flex items-center gap-3 hover:bg-blue-50 rounded-lg w-full text-left py-2.5 px-3 transition-all duration-200"
-                                      whileHover={{ x: 5 }}
-                                    >
-                                      <UserCheck
-                                        size={16}
-                                        style={{
-                                          color: "var(--secondary-blue)",
+                                {[
+                                  { label: "Volunteer Donor", role: "Donor", icon: Heart },
+                                  { label: "Volunteer Coordinator", role: "Volunteer", icon: UserCheck },
+                                  { label: "Administrator", role: "Admin", icon: Crown },
+                                ].map(
+                                  (opt) =>
+                                    u.role !== opt.role && (
+                                      <button
+                                        key={opt.role}
+                                        onClick={() => {
+                                          handleRoleChange(u.email, opt.role);
+                                          setOpenDropdown(null);
                                         }}
-                                      />
-                                      <span className="font-medium">
-                                        Make Volunteer
-                                      </span>
-                                    </motion.button>
-                                  </motion.li>
+                                        className="w-full px-4 py-2 hover:bg-black/5 dark:hover:bg-white/5 flex items-center gap-2.5 text-[var(--text-secondary)]"
+                                      >
+                                        <opt.icon size={14} />
+                                        Make {opt.label}
+                                      </button>
+                                    )
                                 )}
 
-                                {user?.role !== "Admin" && (
-                                  <motion.li variants={itemVariants}>
-                                    <motion.button
-                                      onClick={() => {
-                                        handleRoleChange(user?.email, "Admin");
-                                        setOpenDropdown(null);
-                                      }}
-                                      className="flex items-center gap-3 hover:bg-yellow-50 rounded-lg w-full text-left py-2.5 px-3 font-semibold transition-all duration-200"
-                                      style={{ color: "#F59E0B" }}
-                                      whileHover={{ x: 5 }}
-                                    >
-                                      <Crown size={16} />
-                                      <span>Make Admin</span>
-                                    </motion.button>
-                                  </motion.li>
-                                )}
+                                <div className="my-1 border-t border-[var(--border-light)]" />
 
-                                {/* Status Section - Hidden for Admins */}
-                                {user?.role !== "Admin" && (
-                                  <>
-                                    <motion.div
-                                      variants={itemVariants}
-                                      className="divider my-2"
-                                    ></motion.div>
-                                    <motion.li
-                                      variants={itemVariants}
-                                      className="text-xs font-bold uppercase tracking-wide mb-2 px-3"
-                                      style={{ color: "var(--text-muted)" }}
-                                    >
-                                      Account Status
-                                    </motion.li>
-                                    <motion.li variants={itemVariants}>
-                                      {user?.status === "Active" ? (
-                                        <motion.button
-                                          onClick={() => {
-                                            handleStatusChange(
-                                              user?.email,
-                                              "Blocked"
-                                            );
-                                            setOpenDropdown(null);
-                                          }}
-                                          className="flex items-center gap-3 text-error hover:bg-red-50 rounded-lg w-full text-left py-2.5 px-3 transition-all duration-200 font-medium"
-                                          whileHover={{ x: 5 }}
-                                        >
-                                          <Ban size={16} />
-                                          <span>Block User</span>
-                                        </motion.button>
-                                      ) : (
-                                        <motion.button
-                                          onClick={() => {
-                                            handleStatusChange(
-                                              user?.email,
-                                              "Active"
-                                            );
-                                            setOpenDropdown(null);
-                                          }}
-                                          className="flex items-center gap-3 hover:bg-green-50 rounded-lg w-full text-left py-2.5 px-3 transition-all duration-200 font-medium"
-                                          style={{
-                                            color: "var(--success-green)",
-                                          }}
-                                          whileHover={{ x: 5 }}
-                                        >
-                                          <CheckCircle size={16} />
-                                          <span>Activate User</span>
-                                        </motion.button>
-                                      )}
-                                    </motion.li>
-                                  </>
-                                )}
-                              </motion.ul>
-                            )}
-                          </AnimatePresence>
-                        </td>
-                      </motion.tr>
-                    );
-                  })}
-                </AnimatePresence>
+                                <button
+                                  onClick={() => {
+                                    handleStatusChange(
+                                      u.email,
+                                      isActive ? "Blocked" : "Active"
+                                    );
+                                    setOpenDropdown(null);
+                                  }}
+                                  className={`w-full px-4 py-2 hover:bg-black/5 dark:hover:bg-white/5 flex items-center gap-2.5 ${
+                                    isActive ? "text-rose-600" : "text-emerald-600"
+                                  }`}
+                                >
+                                  {isActive ? (
+                                    <>
+                                      <Ban size={14} />
+                                      Suspend Account
+                                    </>
+                                  ) : (
+                                    <>
+                                      <CheckCircle size={14} />
+                                      Activate Account
+                                    </>
+                                  )}
+                                </button>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
 
-          {/* Empty State */}
           {filteredUsers.length === 0 && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5 }}
-              className="text-center py-16"
-            >
-              <motion.div
-                animate={{
-                  y: [0, -10, 0],
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-              >
-                <Search
-                  size={64}
-                  style={{ color: "var(--text-muted)" }}
-                  className="mx-auto mb-4 opacity-50"
-                />
-              </motion.div>
-              <p
-                className="text-lg font-medium"
-                style={{ color: "var(--text-muted)" }}
-              >
-                No users found matching your criteria
+            <div className="py-10 text-center">
+              <ShieldAlert
+                size={36}
+                className="text-[var(--text-muted)] mx-auto mb-2"
+              />
+              <p className="text-sm font-bold text-[var(--text-primary)]">
+                No matching members found
               </p>
-              <p
-                className="text-sm mt-2"
-                style={{ color: "var(--text-muted)" }}
-              >
-                Try adjusting your search or filter settings
+              <p className="text-xs text-[var(--text-muted)] mt-0.5">
+                Try searching with a different name, email, or role filter.
               </p>
-            </motion.div>
+            </div>
           )}
-        </motion.div>
-
-        {/* Results Count */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7 }}
-          className="mt-6 text-center"
-        >
-          <motion.p
-            className="text-sm inline-block px-4 py-2 rounded-full"
-            style={{
-              color: "var(--text-secondary)",
-              backgroundColor: "var(--background-card)",
-              border: "2px solid var(--border-light)",
-            }}
-            whileHover={{ scale: 1.05 }}
-          >
-            Showing{" "}
-            <span
-              className="font-bold text-lg"
-              style={{ color: "var(--primary-red)" }}
-            >
-              {filteredUsers.length}
-            </span>{" "}
-            of{" "}
-            <span
-              className="font-bold text-lg"
-              style={{ color: "var(--primary-red)" }}
-            >
-              {users.length}
-            </span>{" "}
-            users
-          </motion.p>
-        </motion.div>
+        </div>
       </div>
     </div>
   );
