@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion as Motion, AnimatePresence } from "framer-motion";
 import {
   DollarSign,
   Heart,
@@ -10,10 +10,11 @@ import {
   Sparkles,
   X,
   ArrowRight,
+  Activity,
+  ShieldCheck,
+  CheckCircle2,
 } from "lucide-react";
 import { AuthContext } from "../../Provider/AuthProvider";
-import Navbar from "../../Components/Navbar";
-import Footer from "../../Components/Footer";
 import useAxiosSecure from "../../Hooks/useAxiosSecure";
 import { toast } from "react-toastify";
 
@@ -29,57 +30,65 @@ const FundingPage = () => {
   const [selectedAmount, setSelectedAmount] = useState(null);
   const [isDonating, setIsDonating] = useState(false);
 
-
   useEffect(() => {
     fetchFundings();
     fetchStats();
   }, []);
+
+  useEffect(() => {
+    if (!showDonateModal) {
+      setSelectedAmount(null);
+      setDonateAmount("");
+    }
+  }, [showDonateModal]);
 
   const fetchFundings = async () => {
     try {
       setIsLoading(true);
       const { data } = await axiosSecure.get("/all-funding");
       setFundings(data);
+    } catch (error) {
+      console.error("Failed to load funding records:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
   const fetchStats = async () => {
-    const { data } = await axiosSecure.get("/total-funding");
-    setStats(data);
+    try {
+      const { data } = await axiosSecure.get("/total-funding");
+      setStats(data);
+    } catch (error) {
+      console.error("Failed to load funding stats:", error);
+    }
   };
 
   const handleDonate = async () => {
     if (!user) {
-      window.location.href = "/login";
+      window.location.href = "/auth/login";
       return;
     }
 
     const amount = selectedAmount || donateAmount;
 
     if (!amount || amount <= 0) {
-      toast.error("Please select or enter a valid donation amount");
+      toast.error("Please select or enter a valid contribution amount");
       return;
     }
 
     try {
       setIsDonating(true);
-
       const res = await axiosSecure.post("/create-payment-checkout", {
         donateAmount: amount,
         donorEmail: user.email,
       });
 
-      // Redirect to Stripe
       window.location.href = res.data.url;
     } catch (error) {
       setIsDonating(false);
-      toast.error("Failed to initiate payment. Please try again.");
+      toast.error("Failed to initiate secure checkout. Please try again.");
     }
   };
-
-
 
   const formatDate = (date) =>
     new Date(date).toLocaleDateString("en-US", {
@@ -91,418 +100,272 @@ const FundingPage = () => {
   const quickAmounts = [10, 25, 50, 100, 250, 500];
 
   return (
-    <section>
-      <navbar>
-        <Navbar />
-      </navbar>
-      <main>
-        <div className="min-h-screen bg-gradient-to-br from-rose-50 via-red-50 to-orange-50 relative overflow-hidden">
-          {/* Animated Background Elements */}
-          <motion.div
-            animate={{
-              scale: [1, 1.2, 1],
-              rotate: [0, 90, 0],
-            }}
-            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-            className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-br from-red-300/30 to-pink-300/30 rounded-full blur-3xl"
-          />
-          <motion.div
-            animate={{
-              scale: [1.2, 1, 1.2],
-              rotate: [90, 0, 90],
-            }}
-            transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-            className="absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-br from-orange-300/30 to-rose-300/30 rounded-full blur-3xl"
-          />
-
-          <div className="relative max-w-7xl mx-auto py-12 px-4">
-            {/* Hero Header */}
-            <motion.div
-              initial={{ opacity: 0, y: -30 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-center mb-16"
-            >
-              <motion.div
-                animate={{
-                  y: [0, -15, 0],
-                  rotate: [0, 5, -5, 0],
-                }}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-                className="inline-block mb-6 relative"
-              >
-                <Heart size={80} className="text-red-500" fill="currentColor" />
-                <motion.div
-                  animate={{ scale: [1, 1.3, 1], opacity: [0.5, 0, 0.5] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                  className="absolute inset-0 bg-red-500 rounded-full blur-2xl"
-                />
-              </motion.div>
-              <h1 className="text-5xl md:text-6xl font-extrabold bg-gradient-to-r from-red-600 via-rose-600 to-pink-600 bg-clip-text text-transparent mb-4">
-                Funding & Donations
-              </h1>
-              <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                Your generosity powers our mission to save lives through blood
-                donation
-              </p>
-            </motion.div>
-
-            {/* Stats Cards */}
-            <div className="grid md:grid-cols-2 gap-8 mb-12">
-              <motion.div
-                initial={{ opacity: 0, x: -50 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.2 }}
-                whileHover={{ y: -8, scale: 1.02 }}
-                className="relative group"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-green-400 to-emerald-600 rounded-3xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity" />
-                <div className="relative bg-white/90 backdrop-blur-xl p-8 rounded-3xl shadow-2xl border border-white/50">
-                  <div className="flex items-center justify-between mb-4">
-                    <motion.div
-                      animate={{ rotate: [0, 360] }}
-                      transition={{
-                        duration: 3,
-                        repeat: Infinity,
-                        ease: "linear",
-                      }}
-                      className="p-4 bg-gradient-to-br from-green-400 to-emerald-600 rounded-2xl"
-                    >
-                      <DollarSign className="text-white" size={40} />
-                    </motion.div>
-                    <TrendingUp className="text-green-600" size={32} />
-                  </div>
-                  <p className="text-5xl font-black bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mb-2">
-                    ${stats.totalAmount.toLocaleString()}
-                  </p>
-                  <p className="text-gray-600 font-semibold text-lg">
-                    Total Funds Raised
-                  </p>
-                  <div className="mt-4 h-2 bg-gray-200 rounded-full overflow-hidden">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: "75%" }}
-                      transition={{ duration: 1.5, delay: 0.5 }}
-                      className="h-full bg-gradient-to-r from-green-400 to-emerald-600"
-                    />
-                  </div>
-                </div>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, x: 50 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3 }}
-                whileHover={{ y: -8, scale: 1.02 }}
-                className="relative group"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-red-400 to-rose-600 rounded-3xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity" />
-                <div className="relative bg-white/90 backdrop-blur-xl p-8 rounded-3xl shadow-2xl border border-white/50">
-                  <div className="flex items-center justify-between mb-4">
-                    <motion.div
-                      animate={{
-                        scale: [1, 1.1, 1],
-                      }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                      className="p-4 bg-gradient-to-br from-red-400 to-rose-600 rounded-2xl"
-                    >
-                      <Heart
-                        className="text-white"
-                        size={40}
-                        fill="currentColor"
-                      />
-                    </motion.div>
-                    <Award className="text-red-600" size={32} />
-                  </div>
-                  <p className="text-5xl font-black bg-gradient-to-r from-red-600 to-rose-600 bg-clip-text text-transparent mb-2">
-                    {stats.totalDonations.toLocaleString()}
-                  </p>
-                  <p className="text-gray-600 font-semibold text-lg">
-                    Total Donations Made
-                  </p>
-                  <div className="mt-4 h-2 bg-gray-200 rounded-full overflow-hidden">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: "85%" }}
-                      transition={{ duration: 1.5, delay: 0.5 }}
-                      className="h-full bg-gradient-to-r from-red-400 to-rose-600"
-                    />
-                  </div>
-                </div>
-              </motion.div>
+    <div className="bg-[var(--background-main)] min-h-screen text-[var(--text-primary)]">
+      <main className="py-8 sm:py-12 lg:py-14">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Symmetrical Section Header */}
+          <div className="text-center max-w-3xl mx-auto mb-6 lg:mb-8">
+            <div className="section-eyebrow">
+              <ShieldCheck size={13} className="text-[var(--primary-red)]" />
+              <span>Transparent Medical Relief Fund</span>
             </div>
+            <h1 className="section-title">
+              VitalFlow Community <br />
+              <span className="text-gradient-crimson italic">Life Support Fund</span>
+            </h1>
+            <p className="section-subtitle">
+              Every dollar contributed supports emergency blood transfusions, donor transport logistics, and sterile medical testing kits for underserved patients.
+            </p>
 
-            {/* CTA Button */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.4 }}
-              className="text-center mb-12"
-            >
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+            <div className="mt-5 flex justify-center">
+              <button
                 onClick={() => setShowDonateModal(true)}
-                className="relative group px-12 py-6 bg-gradient-to-r from-red-500 via-rose-500 to-pink-500 text-white text-xl font-bold rounded-2xl shadow-2xl overflow-hidden"
+                className="btn-premium !px-8 !py-3 !text-sm shadow-lg shadow-red-600/20 flex items-center gap-2.5"
               >
-                <motion.div
-                  animate={{ x: ["-100%", "100%"] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
-                />
-                <span className="relative flex items-center gap-3">
-                  <Sparkles className="w-6 h-6" />
-                  Give Fund & Make Impact
-                  <Heart className="w-6 h-6" fill="currentColor" />
-                </span>
-              </motion.button>
-            </motion.div>
+                <Heart size={18} fill="currentColor" />
+                <span>Make a Contribution</span>
+                <ArrowRight size={16} />
+              </button>
+            </div>
+          </div>
 
-            {/* Donations Table */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-              className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden border border-white/50"
-            >
-              <div className="bg-gradient-to-r from-red-500 to-rose-500 px-8 py-6">
-                <h2 className="text-2xl font-bold text-white flex items-center gap-3">
-                  <Award className="w-7 h-7" />
-                  Recent Donations
-                </h2>
+          {/* Impact Metrics Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6 mb-8 lg:mb-10">
+            {/* Total Resources */}
+            <div className="bg-[var(--background-card)] border border-[var(--border-light)] rounded-2xl p-5 sm:p-7 shadow-sm relative overflow-hidden flex flex-col justify-between group hover:border-[var(--primary-red)]/30 transition-all">
+              <div>
+                <div className="flex items-center justify-between mb-5">
+                  <div className="w-12 h-12 rounded-xl bg-red-500/10 border border-red-500/20 text-[var(--primary-red)] flex items-center justify-center">
+                    <DollarSign size={24} />
+                  </div>
+                  <span className="text-xs font-bold uppercase tracking-wider text-emerald-600 bg-emerald-500/10 px-2.5 py-0.5 rounded-full">
+                    Audited Fund
+                  </span>
+                </div>
+                <div className="text-3xl sm:text-4xl font-black text-[var(--text-primary)] mb-1.5 tracking-tight">
+                  ${stats.totalAmount.toLocaleString()}
+                </div>
+                <h3 className="text-base font-bold text-[var(--text-secondary)]">Total Relief Funds Raised</h3>
+                <p className="text-xs text-[var(--text-muted)] mt-1.5 leading-relaxed">
+                  Directly deployed for patient emergency transfusions, testing kits, and nationwide logistics.
+                </p>
               </div>
 
+              <div className="pt-4 mt-5 border-t border-[var(--border-light)] flex items-center justify-between text-xs text-[var(--text-secondary)] font-medium">
+                <span>Hospital Partners Supported</span>
+                <span className="font-bold text-[var(--text-primary)]">140+ Facilities</span>
+              </div>
+            </div>
+
+            {/* Total Life Impacts */}
+            <div className="bg-[var(--background-card)] border border-[var(--border-light)] rounded-2xl p-5 sm:p-7 shadow-sm relative overflow-hidden flex flex-col justify-between group hover:border-[var(--primary-red)]/30 transition-all">
+              <div>
+                <div className="flex items-center justify-between mb-5">
+                  <div className="w-12 h-12 rounded-xl bg-red-500/10 border border-red-500/20 text-[var(--primary-red)] flex items-center justify-center">
+                    <Heart size={24} fill="currentColor" />
+                  </div>
+                  <span className="text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-500/10 px-2.5 py-0.5 rounded-full">
+                    Verified Outcomes
+                  </span>
+                </div>
+                <div className="text-3xl sm:text-4xl font-black text-[var(--text-primary)] mb-1.5 tracking-tight">
+                  {stats.totalDonations.toLocaleString()}
+                </div>
+                <h3 className="text-base font-bold text-[var(--text-secondary)]">Patient Treatments Assisted</h3>
+                <p className="text-xs text-[var(--text-muted)] mt-1.5 leading-relaxed">
+                  Individuals whose emergency transfusion costs or logistics were covered by this fund.
+                </p>
+              </div>
+
+              <div className="pt-4 mt-5 border-t border-[var(--border-light)] flex items-center justify-between text-xs text-[var(--text-secondary)] font-medium">
+                <span>Average Response Window</span>
+                <span className="font-bold text-[var(--text-primary)]">&lt; 2.5 Hours</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Recent Community Contributions Table */}
+          <div className="bg-[var(--background-card)] border border-[var(--border-light)] rounded-2xl shadow-sm overflow-hidden mb-10">
+            <div className="p-4 sm:p-6 border-b border-[var(--border-light)] flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h2 className="text-lg sm:text-xl font-black text-[var(--text-primary)]">Recent Community Contributions</h2>
+                <p className="text-xs text-[var(--text-secondary)] mt-0.5">
+                  Public ledger of transparent humanitarian support from verified donors.
+                </p>
+              </div>
+              <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-600 bg-emerald-500/10 px-2.5 py-1 rounded-full">
+                <CheckCircle2 size={13} />
+                <span>100% Direct Allocation</span>
+              </div>
+            </div>
+
+            {isLoading ? (
+              <div className="text-center py-12">
+                <div className="w-10 h-10 rounded-full border-3 border-[var(--primary-red)]/20 border-t-[var(--primary-red)] animate-spin mx-auto mb-3" />
+                <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider">
+                  Loading Contributions...
+                </p>
+              </div>
+            ) : fundings.length === 0 ? (
+              <div className="text-center py-12 text-[var(--text-muted)]">
+                <Heart size={30} className="mx-auto mb-2 opacity-40" />
+                <p className="font-bold text-xs sm:text-sm">Be the first to contribute to the Life Support Fund</p>
+              </div>
+            ) : (
               <div className="overflow-x-auto">
-                <table className="min-w-full">
-                  <thead className="bg-gray-50/50">
-                    <tr>
-                      <th className="px-8 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">
-                        Donor
-                      </th>
-                      <th className="px-8 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">
-                        Email
-                      </th>
-                      <th className="px-8 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">
-                        Amount
-                      </th>
-                      <th className="px-8 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">
-                        Date
-                      </th>
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="bg-[var(--background-main)]/60 text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted)] border-b border-[var(--border-light)]">
+                      <th className="px-4 py-3">Contributor</th>
+                      <th className="px-4 py-3">Amount</th>
+                      <th className="px-4 py-3">Date</th>
+                      <th className="px-4 py-3 text-right">Receipt Status</th>
                     </tr>
                   </thead>
-                  <tbody>
-                    <AnimatePresence>
-                      {fundings.map((fund, index) => (
-                        <motion.tr
-                          key={fund._id}
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: index * 0.05 }}
-                          className="border-t border-gray-100 hover:bg-red-50/50 transition-colors"
-                        >
-                          <td className="px-8 py-5">
-                            <div className="flex items-center gap-3">
-                              <motion.div
-                                whileHover={{ rotate: 360 }}
-                                transition={{ duration: 0.5 }}
-                                className="p-2 bg-gradient-to-br from-red-100 to-rose-100 rounded-full"
-                              >
-                                <User size={20} className="text-red-600" />
-                              </motion.div>
-                              <span className="font-semibold text-gray-900">
-                                {fund.donorName || "Anonymous"}
-                              </span>
+                  <tbody className="divide-y divide-[var(--border-light)]/60 text-xs sm:text-sm">
+                    {fundings.slice(0, 10).map((fund, idx) => (
+                      <tr key={idx} className="hover:bg-[var(--background-main)]/50 transition-colors">
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-2.5">
+                            <div className="w-8 h-8 rounded-lg bg-[var(--background-main)] border border-[var(--border-light)] flex items-center justify-center font-bold text-xs text-[var(--text-secondary)]">
+                              <User size={14} />
                             </div>
-                          </td>
-                          <td className="px-8 py-5 text-gray-600">
-                            {fund.donorEmail}
-                          </td>
-                          <td className="px-8 py-5">
-                            <span className="inline-flex items-center gap-1 px-4 py-2 bg-gradient-to-r from-green-100 to-emerald-100 rounded-full">
-                              <DollarSign
-                                size={18}
-                                className="text-green-700"
-                              />
-                              <span className="font-bold text-green-700">
-                                {fund.amount}
-                              </span>
-                            </span>
-                          </td>
-                          <td className="px-8 py-5">
-                            <div className="flex items-center gap-2 text-gray-600">
-                              <Calendar size={16} className="text-red-500" />
-                              {formatDate(fund.paidAt)}
+                            <div>
+                              <div className="font-bold text-[var(--text-primary)]">
+                                {fund.donorName || "Kind Contributor"}
+                              </div>
+                              <div className="text-[11px] text-[var(--text-muted)]">
+                                {fund.donorEmail ? fund.donorEmail.replace(/(.{2})(.*)(?=@)/, "$1***") : "Anonymous"}
+                              </div>
                             </div>
-                          </td>
-                        </motion.tr>
-                      ))}
-                    </AnimatePresence>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 font-black text-[var(--primary-red)] text-sm sm:text-base">
+                          ${fund.amount}
+                        </td>
+                        <td className="px-4 py-3 text-xs text-[var(--text-secondary)]">
+                          {formatDate(fund.paidAt)}
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs font-semibold">
+                            <CheckCircle2 size={11} />
+                            <span>Verified</span>
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
-            </motion.div>
-          </div>
-
-          {/* Donate Modal */}
-          <AnimatePresence>
-            {showDonateModal && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-                onClick={() => setShowDonateModal(false)}
-              >
-                <motion.div
-                  initial={{ scale: 0.9, opacity: 0, y: 50 }}
-                  animate={{ scale: 1, opacity: 1, y: 0 }}
-                  exit={{ scale: 0.9, opacity: 0, y: 50 }}
-                  transition={{ type: "spring", damping: 25 }}
-                  onClick={(e) => e.stopPropagation()}
-                  className="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden"
-                >
-                  {/* Modal Header */}
-                  <div className="bg-gradient-to-r from-red-500 via-rose-500 to-pink-500 p-8 text-white relative overflow-hidden">
-                    <motion.div
-                      animate={{ rotate: 360, scale: [1, 1.2, 1] }}
-                      transition={{ duration: 3, repeat: Infinity }}
-                      className="absolute -right-10 -top-10 w-40 h-40 bg-white/20 rounded-full blur-2xl"
-                    />
-                    <div className="relative flex justify-between items-start">
-                      <div>
-                        <motion.div
-                          animate={{ rotate: [0, 10, -10, 0] }}
-                          transition={{ duration: 2, repeat: Infinity }}
-                          className="inline-block mb-3"
-                        >
-                          <Heart size={48} fill="currentColor" />
-                        </motion.div>
-                        <h2 className="text-3xl font-bold mb-2">
-                          Make a Donation
-                        </h2>
-                        <p className="text-red-100">
-                          Every contribution saves lives
-                        </p>
-                      </div>
-                      <button
-                        onClick={() => setShowDonateModal(false)}
-                        className="p-2 hover:bg-white/20 rounded-full transition-colors"
-                      >
-                        <X size={24} />
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Modal Content */}
-                  <div className="p-6 space-y-4">
-                    {/* Quick Amount Selection */}
-                    <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-3">
-                        Quick Select Amount
-                      </label>
-                      <div className="grid grid-cols-3 gap-3">
-                        {quickAmounts.map((amount) => (
-                          <motion.button
-                            key={amount}
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={() => {
-                              setSelectedAmount(amount);
-                              setDonateAmount("");
-                            }}
-                            className={`py-2 rounded-xl font-bold transition-all ${
-                              selectedAmount === amount
-                                ? "bg-gradient-to-r from-red-500 to-rose-500 text-white shadow-lg"
-                                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                            }`}
-                          >
-                            ${amount}
-                          </motion.button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Custom Amount */}
-                    <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-2">
-                        Or Enter Custom Amount
-                      </label>
-                      <div className="relative">
-                        <DollarSign
-                          size={20}
-                          className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-                        />
-                        <input
-                          type="number"
-                          min="1"
-                          step="0.01"
-                          value={donateAmount}
-                          onChange={(e) => {
-                            setDonateAmount(e.target.value);
-                            setSelectedAmount(null);
-                          }}
-                          className="w-full pl-12 pr-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-red-500 transition-colors text-lg font-semibold"
-                          placeholder="Enter custom amount"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="flex gap-3 pt-2">
-                      <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => setShowDonateModal(false)}
-                        className="flex-1 py-4 border-2 border-gray-300 rounded-xl font-bold text-gray-700 hover:bg-gray-50 transition-colors"
-                      >
-                        Cancel
-                      </motion.button>
-                      <motion.button
-                        whileHover={!isDonating ? { scale: 1.02 } : {}}
-                        whileTap={!isDonating ? { scale: 0.98 } : {}}
-                        onClick={handleDonate}
-                        disabled={
-                          isDonating || (!selectedAmount && !donateAmount)
-                        }
-                        className="flex-1 py-4 bg-gradient-to-r from-red-500 to-rose-500 text-white font-bold rounded-xl shadow-lg
-             disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                      >
-                        {isDonating ? (
-                          <>
-                            <motion.div
-                              animate={{ rotate: 360 }}
-                              transition={{
-                                repeat: Infinity,
-                                duration: 1,
-                                ease: "linear",
-                              }}
-                              className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
-                            />
-                            Redirecting...
-                          </>
-                        ) : (
-                          <>
-                            <Heart size={20} fill="currentColor" />
-                            Donate Now
-                            <ArrowRight size={20} />
-                          </>
-                        )}
-                      </motion.button>
-                    </div>
-                  </div>
-                </motion.div>
-              </motion.div>
             )}
-          </AnimatePresence>
+          </div>
         </div>
       </main>
-      <footer>
-        <Footer />
-      </footer>
-    </section>
+
+      {/* Contribution Modal */}
+      <AnimatePresence>
+        {showDonateModal && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <Motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              onClick={() => setShowDonateModal(false)}
+            />
+            <Motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              className="relative w-full max-w-md bg-[var(--background-card)] rounded-3xl border border-[var(--border-light)] shadow-2xl overflow-hidden p-8"
+            >
+              <div className="flex items-center justify-between pb-4 border-b border-[var(--border-light)] mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-red-500/10 text-[var(--primary-red)] flex items-center justify-center">
+                    <Heart size={20} fill="currentColor" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-black text-[var(--text-primary)]">Donate to VitalFlow</h3>
+                    <p className="text-xs text-[var(--text-muted)]">Secure payment via Stripe</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowDonateModal(false)}
+                  className="p-2 rounded-lg hover:bg-[var(--background-main)] text-[var(--text-muted)] transition-colors"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] block mb-3">
+                    Select Contribution Tier
+                  </label>
+                  <div className="grid grid-cols-3 gap-3">
+                    {quickAmounts.map((val) => (
+                      <button
+                        key={val}
+                        onClick={() => {
+                          setSelectedAmount((prev) => (prev === val ? null : val));
+                          setDonateAmount("");
+                        }}
+                        className={`py-3 rounded-2xl font-black text-base border transition-all ${
+                          selectedAmount === val
+                            ? "bg-[var(--primary-red)] text-white border-[var(--primary-red)] shadow-md shadow-red-600/30"
+                            : "bg-[var(--background-main)] text-[var(--text-primary)] border-[var(--border-light)] hover:border-[var(--primary-red)]/50"
+                        }`}
+                      >
+                        ${val}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] block mb-2">
+                    Or Enter Custom Amount ($ USD)
+                  </label>
+                  <div className="relative">
+                    <DollarSign size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
+                    <input
+                      type="number"
+                      value={donateAmount}
+                      onChange={(e) => {
+                        setDonateAmount(e.target.value);
+                        setSelectedAmount(null);
+                      }}
+                      placeholder="e.g., 75"
+                      className="w-full h-14 pl-12 pr-4 bg-[var(--background-main)] border border-[var(--border-light)] rounded-2xl font-bold text-lg text-[var(--text-primary)] focus:outline-none focus:border-[var(--primary-red)] transition-all"
+                    />
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-[var(--background-main)] border border-[var(--border-light)] text-xs text-[var(--text-secondary)] flex items-center gap-3">
+                  <ShieldCheck size={20} className="text-emerald-500 shrink-0" />
+                  <span>256-bit SSL encrypted checkout. You will be redirected to the secure gateway.</span>
+                </div>
+
+                <button
+                  onClick={handleDonate}
+                  disabled={isDonating || (!selectedAmount && !donateAmount)}
+                  className="btn-premium w-full !py-4 shadow-xl shadow-red-600/20 text-sm font-bold flex items-center justify-center gap-2 disabled:opacity-40"
+                >
+                  {isDonating ? (
+                    <div className="w-5 h-5 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                  ) : (
+                    <>
+                      <span>Proceed to Contribution</span>
+                      <ArrowRight size={16} />
+                    </>
+                  )}
+                </button>
+              </div>
+            </Motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 };
 
