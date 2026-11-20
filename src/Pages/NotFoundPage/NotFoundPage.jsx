@@ -1,140 +1,62 @@
 import React from "react";
-import { motion } from "framer-motion";
 import { Link } from "react-router";
-import { Droplet, Heart, Home, Search } from "lucide-react";
+import { Droplet, Heart, Home, Search, ArrowRight } from "lucide-react";
+import Navbar from "../../Components/Navbar";
+import Footer from "../../Components/Footer";
 
 const NotFoundPage = () => {
-  const droplets = [...Array(12)];
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 to-blue-50 flex items-center justify-center px-4 py-5 overflow-hidden relative">
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {droplets.map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute text-red-300 opacity-30"
-            initial={{
-              x: Math.random() * window.innerWidth,
-              y: -150,
-              rotate: 0,
-            }}
-            animate={{
-              y: window.innerHeight + 150,
-              x: Math.random() * window.innerWidth,
-              rotate: 360,
-            }}
-            transition={{
-              duration: 20 + Math.random() * 15,
-              repeat: Infinity,
-              ease: "linear",
-              delay: i * 1.5,
-            }}
-          >
-            <Droplet
-              size={40 + Math.random() * 60}
-              fill="currentColor"
-              className="drop-shadow-xl"
-            />
-          </motion.div>
-        ))}
-      </div>
+    <div className="bg-[var(--background-main)] min-h-screen text-[var(--text-primary)] flex flex-col">
+      <Navbar />
 
-      <div className="relative z-10 text-center max-w-2xl">
-        {/* Creative 404 with Morphing Drop + Heart Fusion */}
-        <motion.div
-          initial={{ scale: 0, rotateY: 180 }}
-          animate={{ scale: 1, rotateY: 0 }}
-          transition={{ type: "spring", stiffness: 80, damping: 12 }}
-          className="mb-4"
-        >
-          <div className="relative inline-block">
-            {/* Pulsing Heart inside Droplet */}
-            <motion.div
-              animate={{ scale: [1, 1.3, 1] }}
-              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute inset-0 flex items-center justify-center"
-            >
-              <Heart size={90} className="text-red-600" fill="currentColor" />
-            </motion.div>
-
-            {/* Outer Droplet Shape */}
-            <motion.div
-              animate={{ y: [0, -12, 0] }}
-              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-            >
-              <Droplet
-                size={180}
-                className="text-red-500"
-                fill="currentColor"
-              />
-            </motion.div>
-
-            {/* 404 Text Overlaid */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <h1 className="text-6xl md:text-8xl font-black text-white drop-shadow-2xl">
-                404
-              </h1>
+      <main className="flex-1 flex items-center justify-center py-10 sm:py-14 lg:py-16 px-4">
+        <div className="max-w-xl mx-auto text-center space-y-5">
+          {/* Symmetrical 404 Icon & Badge */}
+          <div className="relative inline-block mx-auto">
+            <div className="w-24 h-24 rounded-2xl bg-red-500/10 border border-red-500/20 text-[var(--primary-red)] flex items-center justify-center mx-auto shadow-lg shadow-red-500/10">
+              <Droplet size={48} fill="currentColor" />
+            </div>
+            <div className="absolute -bottom-2 -right-2 px-2.5 py-0.5 rounded-full bg-[var(--primary-red)] text-white text-[10px] font-black shadow-md">
+              404
             </div>
           </div>
-        </motion.div>
 
-        {/* Title & Message - Tighter spacing */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="mb-4"
-        >
-          <h2 className="text-2xl md:text-4xl font-bold text-gray-800 mb-2">
-            Lost in the Bloodstream?
-          </h2>
-          <p className="text-base md:text-lg text-gray-600">
-            This page took a detour while trying to save a life. Don't worry —
-            we'll get you back on track! 💉
+          {/* Headings */}
+          <div className="space-y-2">
+            <h1 className="text-3xl sm:text-4xl font-black text-[var(--text-primary)] tracking-tight">
+              Page Not Found
+            </h1>
+            <p className="text-xs sm:text-sm text-[var(--text-secondary)] max-w-md mx-auto leading-relaxed">
+              The page you are looking for does not exist or may have been relocated. Every second counts in saving lives — let's guide you back to the network.
+            </p>
+          </div>
+
+          {/* Symmetrical Navigation Buttons */}
+          <div className="flex flex-wrap items-center justify-center gap-3 pt-1">
+            <Link
+              to="/"
+              className="btn-premium !px-6 !py-2.5 text-xs font-bold flex items-center gap-2 shadow-md shadow-red-600/20"
+            >
+              <Home size={16} />
+              <span>Return to Home</span>
+            </Link>
+
+            <Link
+              to="/search"
+              className="px-8 py-4 rounded-2xl bg-[var(--background-card)] border border-[var(--border-light)] hover:border-[var(--primary-red)] text-sm font-bold text-[var(--text-primary)] transition-all flex items-center gap-2 shadow-sm"
+            >
+              <Search size={18} className="text-[var(--primary-red)]" />
+              <span>Search Donors</span>
+            </Link>
+          </div>
+
+          <p className="text-xs text-[var(--text-muted)] font-medium">
+            VitalFlow — Bangladesh's 24/7 Voluntary Blood Donation Network
           </p>
-        </motion.div>
+        </div>
+      </main>
 
-        {/* Searching Icon Animation (like it's looking for the page) */}
-        <motion.div
-          className="my-5"
-          animate={{
-            rotate: [0, 15, -15, 15, 0],
-            scale: [1, 1.1, 1],
-          }}
-          transition={{
-            duration: 3,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        >
-          <Search size={60} className="text-blue-600 mx-auto drop-shadow-md" />
-        </motion.div>
-
-        {/* Back to Home Button - Prominent & Animated */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8 }}
-        >
-          <Link
-            to="/"
-            className="inline-flex items-center gap-3 bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-700 hover:to-blue-700 text-white font-bold text-lg px-10 py-4 rounded-full shadow-2xl transition-all duration-300 transform hover:scale-110 hover:shadow-3xl"
-          >
-            <Home size={26} />
-            Return Home & Save Lives
-          </Link>
-        </motion.div>
-
-        {/* Fun Closing Line */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.2 }}
-          className="mt-5 text-sm text-gray-500"
-        >
-          Every lost page helps us find better ways to connect donors ❤️
-        </motion.p>
-      </div>
+      <Footer />
     </div>
   );
 };
