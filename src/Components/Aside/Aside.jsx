@@ -10,13 +10,11 @@ import {
   Menu,
   X,
   Droplet,
-  Activity,
-  Sparkles,
   Home,
+  ShieldCheck,
 } from "lucide-react";
 import { AuthContext } from "../../Provider/AuthProvider";
 import { motion as Motion, AnimatePresence } from "framer-motion";
-import logo from "../../assets/image.png";
 import { toast } from "react-toastify";
 
 const Aside = () => {
@@ -28,11 +26,10 @@ const Aside = () => {
   const handleLogOut = () => {
     logOut()
       .then(() => {
-        toast.success("Logout Successfully");
+        toast.success("Signed out successfully");
         navigate("/");
       })
-      .catch((error) => 
-        toast.error(error));
+      .catch((error) => toast.error(error));
   };
 
   useEffect(() => {
@@ -50,37 +47,13 @@ const Aside = () => {
 
   return (
     <>
-      {/* Mobile Menu Button */}
-      <Motion.button
+      {/* Mobile Toggle Button */}
+      <button
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 btn btn-circle btn-error shadow-2xl"
-        whileHover={{ scale: 1.1, rotate: 180 }}
-        whileTap={{ scale: 0.9 }}
+        className="lg:hidden fixed bottom-6 right-6 z-[80] w-14 h-14 flex items-center justify-center bg-[var(--primary-red)] text-white rounded-full shadow-2xl"
       >
-        <AnimatePresence mode="wait">
-          {isSidebarOpen ? (
-            <Motion.div
-              key="close"
-              initial={{ rotate: -90, opacity: 0 }}
-              animate={{ rotate: 0, opacity: 1 }}
-              exit={{ rotate: 90, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-            >
-              <X size={24} />
-            </Motion.div>
-          ) : (
-            <Motion.div
-              key="menu"
-              initial={{ rotate: 90, opacity: 0 }}
-              animate={{ rotate: 0, opacity: 1 }}
-              exit={{ rotate: -90, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-            >
-              <Menu size={24} />
-            </Motion.div>
-          )}
-        </AnimatePresence>
-      </Motion.button>
+        {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
+      </button>
 
       {/* Overlay for mobile */}
       <AnimatePresence>
@@ -89,88 +62,37 @@ const Aside = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-30 lg:hidden"
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 lg:hidden"
             onClick={() => setIsSidebarOpen(false)}
           />
         )}
       </AnimatePresence>
 
-      {/* Sidebar */}
-      <Motion.aside
-        initial={isMobile ? { x: -320 } : { x: 0 }}
-        animate={{
-          x: isMobile ? (isSidebarOpen ? 0 : -320) : 0,
-        }}
-        transition={{ type: "spring", damping: 25, stiffness: 200 }}
+      {/* Sidebar Container */}
+      <aside
         className={`
-          fixed lg:static inset-y-0 left-0 z-40
-          w-80
-          h-screen
-          flex flex-col
-          bg-gradient-to-br from-white via-red-50/30 to-blue-50/30 backdrop-blur-xl
-          border-r border-gray-200/50 shadow-2xl
+          fixed top-16 left-0 z-40 w-80 h-[calc(100vh-64px)]
+          flex flex-col bg-[var(--background-card)] border-r border-[var(--border-light)]
+          transition-transform duration-300 lg:translate-x-0
+          ${isMobile ? (isSidebarOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full") : ""}
         `}
       >
-        {/* Logo Section with Animation */}
-        <div className="px-6 py-6 border-b border-gray-200/50 relative overflow-hidden">
-          <Motion.div
-            className="absolute inset-0 bg-gradient-to-r from-red-500/10 to-blue-500/10"
-            animate={{
-              backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
-            }}
-            transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
-            style={{ backgroundSize: "200% 200%" }}
-          />
-
-          <Link to={"/"} className="flex items-center gap-3 relative z-10">
-            <Motion.div
-              className="relative"
-              whileHover={{ scale: 1.1, rotate: 360 }}
-              transition={{ type: "spring", stiffness: 260, damping: 20 }}
-            >
-              <div className="w-12 h-12 rounded-2xl bg-white shadow-lg overflow-hidden flex items-center justify-center p-1">
-                <img
-                  src={logo}
-                  alt="VitalFlow Logo"
-                  className="w-full h-full object-contain"
-                />
-              </div>
-              <Motion.div
-                className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white"
-                animate={{
-                  scale: [1, 1.2, 1],
-                  opacity: [1, 0.8, 1],
-                }}
-                transition={{ duration: 2, repeat: Infinity }}
-              />
-            </Motion.div>
-            <div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">
-                VitalFlow
-              </h1>
-              <p className="text-xs text-gray-500 flex items-center gap-1">
-                <Activity size={12} />
-                Admin Panel
-              </p>
-            </div>
-          </Link>
-        </div>
-
-        {/* Navigation */}
-        <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto scrollbar-thin scrollbar-thumb-red-300 scrollbar-track-transparent">
+        {/* Navigation Links */}
+        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
           <NavItem
             to="/dashboard"
             icon={LayoutDashboard}
-            label="Dashboard"
+            label="Overview"
             isMobile={isMobile}
             closeSidebar={setIsSidebarOpen}
+            end={true}
           />
 
           <NavItem
             to="/dashboard/profile"
             icon={Settings}
-            label="Profile"
+            label="My Profile"
             isMobile={isMobile}
             closeSidebar={setIsSidebarOpen}
           />
@@ -180,7 +102,7 @@ const Aside = () => {
               <NavItem
                 to="/dashboard/add-request"
                 icon={Plus}
-                label="Add Request"
+                label="Create Request"
                 isMobile={isMobile}
                 closeSidebar={setIsSidebarOpen}
               />
@@ -216,139 +138,75 @@ const Aside = () => {
           )}
         </nav>
 
-        {/* User Info & Footer */}
-        <div className="p-4 border-t border-gray-200/50 space-y-3 bg-gradient-to-t from-white/80 to-transparent backdrop-blur-sm">
-          {/* User Info Card */}
-          <Motion.div
-            className="card bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-xl"
-            whileHover={{ scale: 1.02, y: -2 }}
-            transition={{ type: "spring", stiffness: 300 }}
-          >
-            <div className="card-body p-4">
-              <div className="flex items-center gap-3">
-                <div className="avatar">
-                  <div className="w-10 h-10 rounded-full overflow-hidden ring ring-white/30 ring-offset-2 ring-offset-blue-500">
-                    {user?.photoURL ? (
-                      <img
-                        src={user.photoURL}
-                        alt={user?.displayName || "User"}
-                        className="object-cover"
-                        onError={(e) => {
-                          e.target.style.display = "none";
-                          e.target.parentElement.classList.add("placeholder");
-                          e.target.parentElement.innerHTML = `<div class="bg-white/20 text-white rounded-full w-10 h-10 flex items-center justify-center backdrop-blur-sm"><span class="text-lg font-bold">${
-                            user?.displayName?.charAt(0) || "G"
-                          }</span></div>`;
-                        }}
-                      />
-                    ) : (
-                      <div className="bg-white/20 text-white rounded-full w-10 h-10 flex items-center justify-center backdrop-blur-sm">
-                        <span className="text-lg font-bold">
-                          {user?.displayName?.charAt(0) || "G"}
-                        </span>
-                      </div>
-                    )}
-                  </div>
+        {/* Footer User Info & Actions */}
+        <div className="p-4 border-t border-[var(--border-light)] bg-[var(--background-main)]/50 space-y-4">
+          {/* Member Card */}
+          <div className="p-4 rounded-2xl bg-[var(--background-card)] border border-[var(--border-light)] shadow-sm flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full overflow-hidden border border-red-500/20 shrink-0">
+              {user?.photoURL ? (
+                <img
+                  src={user.photoURL}
+                  alt={user?.displayName || "Member"}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="bg-[var(--primary-red)] text-white w-full h-full flex items-center justify-center font-bold">
+                  {user?.displayName?.charAt(0) || "M"}
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold truncate">
-                    {user?.displayName || "Guest User"}
-                  </p>
-                  <p className="text-xs opacity-90 truncate">
-                    {user?.email || "guest@example.com"}
-                  </p>
-                </div>
+              )}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-bold text-[var(--text-primary)] truncate">
+                {user?.displayName || "Member"}
+              </p>
+              <div className="flex items-center gap-1 text-[10px] text-emerald-600 font-semibold mt-0.5">
+                <ShieldCheck size={12} />
+                <span>{role || "Verified Donor"}</span>
               </div>
             </div>
-          </Motion.div>
+          </div>
 
-          {/* Action Buttons */}
+          {/* Quick Action Links */}
           <div className="grid grid-cols-2 gap-2">
-            {/* Back to Home Button */}
-            <Link to="/">
-              <Motion.button
-                className="btn btn-outline btn-primary w-full gap-2 hover:btn-primary group"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <Home size={18} className="group-hover:animate-bounce" />
-                <span className="font-semibold">Home</span>
-              </Motion.button>
+            <Link
+              to="/"
+              className="flex items-center justify-center gap-2 h-10 rounded-xl bg-[var(--background-card)] border border-[var(--border-light)] hover:border-[var(--primary-red)] text-xs font-bold text-[var(--text-secondary)] hover:text-[var(--primary-red)] transition-all"
+            >
+              <Home size={14} />
+              <span>Home</span>
             </Link>
 
-            {/* Logout Button */}
-            <Motion.button
+            <button
               onClick={handleLogOut}
-              className="btn btn-outline btn-error w-full gap-2 hover:btn-error group"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              className="flex items-center justify-center gap-2 h-10 rounded-xl bg-[var(--background-card)] border border-[var(--border-light)] hover:border-red-500 text-xs font-bold text-[var(--text-secondary)] hover:text-red-600 transition-all"
             >
-              <LogOut size={18} className="group-hover:animate-bounce" />
-              <span className="font-semibold">Logout</span>
-            </Motion.button>
+              <LogOut size={14} />
+              <span>Sign Out</span>
+            </button>
           </div>
         </div>
-      </Motion.aside>
+      </aside>
     </>
   );
 };
 
 export default Aside;
 
-const NavItem = ({ to, icon: Icon, label, isMobile, closeSidebar }) => (
+const NavItem = ({ to, icon: Icon, label, isMobile, closeSidebar, end = false }) => (
   <NavLink
     to={to}
+    end={end}
     onClick={() => isMobile && closeSidebar(false)}
-    className="block"
+    className={({ isActive }) => `
+      flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all
+      ${
+        isActive
+          ? "bg-[var(--primary-red)] text-white shadow-md shadow-red-600/20"
+          : "text-[var(--text-secondary)] hover:bg-[var(--background-main)] hover:text-[var(--text-primary)]"
+      }
+    `}
   >
-    {({ isActive }) => (
-      <Motion.div
-        whileHover={{ scale: 1.03, x: 5 }}
-        whileTap={{ scale: 0.98 }}
-        className={`
-          flex items-center gap-3 px-4 py-3.5 rounded-2xl
-          transition-all duration-300 relative overflow-hidden
-          ${
-            isActive
-              ? "bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg shadow-red-500/30"
-              : "text-gray-700 hover:bg-white/60 backdrop-blur-sm"
-          }
-        `}
-      >
-        {isActive && (
-          <Motion.div
-            className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent"
-            animate={{
-              x: ["-100%", "100%"],
-            }}
-            transition={{
-              duration: 1.5,
-              repeat: Infinity,
-              ease: "linear",
-            }}
-          />
-        )}
-
-        <div className={`relative z-10 ${isActive ? "animate-pulse" : ""}`}>
-          <Icon size={20} />
-        </div>
-        <span className="font-semibold relative z-10">{label}</span>
-
-        {isActive && (
-          <Motion.div
-            className="ml-auto"
-            initial={{ scale: 0, rotate: -180 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{
-              type: "spring",
-              stiffness: 200,
-              damping: 15,
-            }}
-          >
-            <Sparkles size={16} />
-          </Motion.div>
-        )}
-      </Motion.div>
-    )}
+    <Icon size={16} />
+    <span>{label}</span>
   </NavLink>
 );
