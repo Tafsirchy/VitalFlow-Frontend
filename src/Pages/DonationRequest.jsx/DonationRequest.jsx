@@ -1,82 +1,23 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Droplet,
   MapPin,
   Calendar,
   Clock,
   Eye,
-  Zap,
-  Users,
-  AlertCircle,
-  Target,
   Hospital,
+  Activity,
+  Heart,
+  AlertCircle,
+  Users,
+  ShieldCheck,
+  ArrowRight
 } from "lucide-react";
-import { motion as Motion, AnimatePresence } from "framer-motion";
-import Navbar from "../../Components/Navbar";
-import Footer from "../../Components/Footer";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import useAxios from "../../hooks/useAxios";
 
-// --- Sub-component: Neural Background ---
-const NeuralBackground = () => {
-  const circles = useMemo(() => 
-    [...Array(20)].map(() => ({
-      cx: Math.random() * 1000,
-      cy: Math.random() * 1000,
-      r: Math.random() * 2 + 1,
-      duration: Math.random() * 3 + 2,
-      delay: Math.random() * 5
-    })), []);
-
-  const paths = useMemo(() => [
-    { d: "M0,500 Q250,200 500,500 T1000,500", duration: 5, delay: 0 },
-    { d: "M0,300 Q300,600 600,300 T1000,300", duration: 7, delay: 1 }
-  ], []);
-
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-[0.3] dark:opacity-[0.1]">
-      <svg className="w-full h-full" viewBox="0 0 1000 1000">
-        <defs>
-          <linearGradient id="neural-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="var(--primary-red)" stopOpacity="0.2" />
-            <stop offset="100%" stopColor="transparent" />
-          </linearGradient>
-        </defs>
-        {paths.map((p, i) => (
-          <Motion.path
-            key={i}
-            d={p.d}
-            fill="none"
-            stroke="url(#neural-grad)"
-            strokeWidth="1"
-            initial={{ pathLength: 0, opacity: 0 }}
-            animate={{ pathLength: 1, opacity: 1 }}
-            transition={{ duration: p.duration, repeat: Infinity, ease: "linear", delay: p.delay }}
-          />
-        ))}
-        {circles.map((c, i) => (
-          <Motion.circle
-            key={i}
-            cx={c.cx}
-            cy={c.cy}
-            r={c.r}
-            fill="var(--primary-red)"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: [0, 0.5, 0] }}
-            transition={{ 
-              duration: c.duration, 
-              repeat: Infinity, 
-              delay: c.delay 
-            }}
-          />
-        ))}
-      </svg>
-    </div>
-  );
-};
-
-const PendingDonationRequests = () => {
+const DonationRequest = () => {
   const [requests, setRequests] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState("all");
@@ -103,7 +44,7 @@ const PendingDonationRequests = () => {
     navigate(`/donation-details/${id}`);
   };
 
-  const bloodGroups = ["all", ...new Set(requests.map((r) => r.bloodGroup))];
+  const bloodGroups = ["all", "A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"];
 
   const filteredRequests =
     filter === "all"
@@ -111,242 +52,149 @@ const PendingDonationRequests = () => {
       : requests.filter((r) => r.bloodGroup === filter);
 
   return (
-    <section className="bg-[var(--background-main)] min-h-screen">
-      <navbar>
-        <Navbar />
-      </navbar>
-      <main className="relative pt-20 overflow-hidden">
-        <NeuralBackground />
-        
-        <div className="container mx-auto px-6 lg:px-12 relative z-10">
-          {/* Hero Header */}
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-20">
-            <div className="space-y-6 max-w-2xl">
-              <Motion.div
-                initial={{ opacity: 0, x: -30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                className="inline-flex items-center gap-3 px-5 py-2 rounded-full ultra-glass border border-red-500/20 shadow-sm"
-              >
-                <AlertCircle size={14} className="text-red-500 animate-pulse" />
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--text-primary)]">
-                  Active Emergency Protocol
-                </span>
-              </Motion.div>
-              <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-[var(--text-primary)] leading-tight tracking-tighter uppercase">
-                Urgent <br />
-                <span className="text-gradient-crimson italic">Blood Requests</span>
-              </h1>
-              <p className="text-lg text-[var(--text-secondary)] font-medium opacity-70 leading-relaxed max-w-xl">
-                Every circuit connects a生命 (life). Every donation bridges the void. Synchronize with the network to identify critical requests in your sector.
-              </p>
+    <div className="bg-[var(--background-main)] min-h-screen select-none">
+      <main className="py-8 sm:py-12 lg:py-14">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          {/* Symmetrical Section Header */}
+          <div className="text-center max-w-3xl mx-auto mb-6 sm:mb-8 space-y-2">
+            <div className="section-eyebrow mx-auto">
+              <Activity size={13} className="text-red-600 animate-pulse" />
+              <span>Emergency Dispatch Registry</span>
             </div>
 
-            {/* Stats Banner */}
-            <Motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              className="flex items-center gap-6 md:gap-8 bg-black/5 dark:bg-white/5 backdrop-blur-xl rounded-[2.5rem] px-10 py-6 border border-white/10 shadow-xl"
-            >
-              <div className="flex items-center gap-4">
-                <div className="p-3 bg-red-600/10 rounded-2xl">
-                  <Droplet className="text-red-600" size={28} />
-                </div>
-                <div>
-                  <p className="text-3xl font-black text-[var(--text-primary)] leading-none">{requests.length}</p>
-                  <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest mt-1">Pending</p>
-                </div>
-              </div>
-              <div className="w-px h-10 bg-white/10" />
-              <div className="flex items-center gap-4">
-                <div className="p-3 bg-red-600/10 rounded-2xl">
-                  <Users className="text-red-600" size={28} />
-                </div>
-                <div>
-                  <p className="text-3xl font-black text-[var(--text-primary)] leading-none">{new Set(requests.map((r) => r.bloodGroup)).size}</p>
-                  <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest mt-1">Sectors</p>
-                </div>
-              </div>
-            </Motion.div>
+            <h1 className="section-title">
+              All Blood <span className="text-gradient-crimson italic">Donation Requests</span>
+            </h1>
+
+            <p className="section-subtitle">
+              Browse authenticated emergency transfusion requests from verified hospitals. Filter by your blood group to connect immediately with coordinators.
+            </p>
+
+            {/* Quick Summary Badges */}
+            <div className="flex flex-wrap items-center justify-center gap-4 pt-2 text-xs font-semibold text-[var(--text-muted)]">
+              <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/10 text-red-600 dark:text-red-400">
+                <Droplet size={13} className="fill-current" />
+                {requests.length} Pending Transfusions
+              </span>
+              <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                <ShieldCheck size={13} />
+                100% Medical Staff Authenticated
+              </span>
+            </div>
           </div>
 
-          {/* Blood Group Filter */}
-          <Motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex flex-wrap gap-4 mb-20 p-4 ultra-glass rounded-[2rem] border border-white/5"
-          >
-            {bloodGroups.map((group) => (
-              <Motion.button
-                key={group}
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setFilter(group)}
-                className={`px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
-                  filter === group
-                    ? "bg-[var(--primary-red)] text-white shadow-[0_10px_20px_rgba(100,13,20,0.3)]"
-                    : "bg-white/5 text-[var(--text-secondary)] border border-white/10 hover:bg-white/10"
-                }`}
-              >
-                {group === "all" ? "All Sectors" : group}
-              </Motion.button>
-            ))}
-          </Motion.div>
+          {/* Blood Group Filter Pills */}
+          <div className="flex justify-center mb-6">
+            <div className="inline-flex flex-wrap justify-center gap-1.5 p-1 rounded-xl bg-white dark:bg-zinc-900 border border-[var(--border-light)] dark:border-zinc-800 shadow-sm">
+              {bloodGroups.map((group) => (
+                <button
+                  key={group}
+                  onClick={() => setFilter(group)}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
+                    filter === group
+                      ? "bg-[var(--primary-red)] text-white shadow-sm"
+                      : "text-[var(--text-secondary)] hover:text-red-600 hover:bg-black/5 dark:hover:bg-white/5"
+                  }`}
+                >
+                  {group === "all" ? "All Groups" : group}
+                </button>
+              ))}
+            </div>
+          </div>
 
           {/* Request Grid */}
-          <div className="min-h-[400px] pb-24">
+          <div className="min-h-[400px]">
             {isLoading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
                 {[...Array(6)].map((_, i) => (
-                  <div key={i} className="h-[420px] rounded-[2.5rem] ultra-glass animate-pulse border border-white/5" />
+                  <div key={i} className="h-56 rounded-2xl bg-white dark:bg-zinc-900 border border-[var(--border-light)] dark:border-zinc-800 animate-pulse p-5" />
                 ))}
               </div>
             ) : filteredRequests.length > 0 ? (
-              <Motion.div
-                layout
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-              >
-                <AnimatePresence mode='popLayout'>
-                  {filteredRequests.map((request, index) => (
-                    <Motion.div
-                      key={request._id}
-                      layout
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, scale: 0.9 }}
-                      transition={{ delay: index * 0.05 }}
-                      whileHover={{ y: -8 }}
-                      className="group relative"
-                    >
-                      <div className="relative ultra-glass rounded-[2.5rem] border border-white/10 overflow-hidden hover:border-red-500/30 transition-all duration-500 shadow-2xl flex flex-col h-full">
-                        {/* Status Bar */}
-                        <div className="absolute top-6 right-6 z-10 flex gap-2">
-                          <div className="bg-[var(--primary-red)] text-white px-3 py-1 rounded-full text-[9px] font-black tracking-widest uppercase flex items-center gap-1 shadow-lg">
-                            <Zap size={10} fill="currentColor" />
-                            CRITICAL
-                          </div>
-                        </div>
-
-                        <div className="p-8 flex-grow">
-                          {/* Header: Blood Group & Name */}
-                          <div className="flex items-center gap-5 mb-8">
-                            <Motion.div 
-                              whileHover={{ scale: 1.05 }}
-                              className="w-16 h-16 rounded-3xl bg-white dark:bg-white shadow-[0_8px_20px_rgba(0,0,0,0.15)] flex items-center justify-center border border-white/20 shrink-0"
-                            >
-                              <span className="text-xl font-black text-[var(--primary-red)] tracking-tighter">
-                                {request.bloodGroup}
-                              </span>
-                            </Motion.div>
-                            <div className="min-w-0">
-                              <h3 className="text-lg font-black text-[var(--text-primary)] uppercase tracking-tight leading-none mb-2 truncate">
-                                {request.recipient_name}
-                              </h3>
-                              <div className="flex items-center gap-2 text-[var(--primary-red)] font-bold">
-                                <Hospital size={14} />
-                                <span className="text-[10px] uppercase tracking-widest truncate">
-                                  {request.hospital || "Central Medical Cluster"}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Info Matrix */}
-                          <div className="grid grid-cols-2 gap-6 mb-8">
-                            <div className="space-y-4">
-                              <div className="space-y-1">
-                                <p className="text-[9px] font-black text-[var(--text-muted)] tracking-[0.2em] uppercase">Coordinate</p>
-                                <div className="flex items-center gap-2 text-[var(--text-primary)]">
-                                  <MapPin size={14} className="text-[var(--primary-red)]" />
-                                  <span className="text-xs font-black uppercase truncate">{request.recipient_district}</span>
-                                </div>
-                              </div>
-                              <div className="space-y-1">
-                                <p className="text-[9px] font-black text-[var(--text-muted)] tracking-[0.2em] uppercase">Temporal Window</p>
-                                <div className="flex items-center gap-2 text-[var(--text-primary)]">
-                                  <Calendar size={14} className="text-[var(--primary-red)]" />
-                                  <span className="text-xs font-black uppercase">{request.date}</span>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="space-y-4">
-                              <div className="space-y-1">
-                                <p className="text-[9px] font-black text-[var(--text-muted)] tracking-[0.2em] uppercase">Sub-Sector</p>
-                                <div className="flex items-center gap-2 text-[var(--text-primary)]">
-                                  <Target size={14} className="text-[var(--primary-red)]" />
-                                  <span className="text-xs font-black uppercase truncate">{request.recipient_upazila}</span>
-                                </div>
-                              </div>
-                              <div className="space-y-1">
-                                <p className="text-[9px] font-black text-[var(--text-muted)] tracking-[0.2em] uppercase">Sync Time</p>
-                                <div className="flex items-center gap-2 text-[var(--text-primary)]">
-                                  <Clock size={14} className="text-[var(--primary-red)]" />
-                                  <span className="text-xs font-black uppercase">{request.time}</span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Action Button */}
-                          <Motion.button
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            onClick={() => handleViewDetails(request._id)}
-                            className="w-full bg-[var(--primary-red)] text-white font-black py-4 rounded-2xl shadow-[0_10px_20px_rgba(100,13,20,0.2)] hover:shadow-[0_15px_30px_rgba(100,13,20,0.4)] transition-all flex items-center justify-center gap-3 group/btn relative overflow-hidden"
-                          >
-                            <Eye size={18} />
-                            <span className="text-xs uppercase tracking-widest">Connect</span>
-                            <div className="absolute inset-0 bg-white/20 translate-y-full group-hover/btn:translate-y-0 transition-transform" />
-                          </Motion.button>
-                        </div>
-
-                        {/* Card Footer/Accent */}
-                        <div className="h-2 bg-gradient-to-r from-transparent via-[var(--primary-red)]/50 to-transparent opacity-30" />
-                      </div>
-                    </Motion.div>
-                  ))}
-                </AnimatePresence>
-              </Motion.div>
-            ) : (
-              /* Empty State */
-              <Motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="text-center py-32 ultra-glass rounded-[4rem] border border-white/10 shadow-3xl overflow-hidden relative"
-              >
-                <div className="absolute inset-0 -z-10 bg-red-600/5 blur-[120px]" />
-                <Motion.div
-                  animate={{ y: [0, -20, 0] }}
-                  transition={{ duration: 4, repeat: Infinity }}
-                  className="mb-10 inline-block p-10 rounded-full bg-red-600/5 border border-red-500/10 shadow-inner"
-                >
-                  <Droplet size={80} className="text-[var(--primary-red)]/30" strokeWidth={1} />
-                </Motion.div>
-                <h3 className="text-3xl font-black text-[var(--text-primary)] uppercase tracking-tight mb-4">
-                  All Systems Clear
-                </h3>
-                <p className="text-lg text-[var(--text-secondary)] font-medium max-w-lg mx-auto opacity-60 leading-relaxed mb-10">
-                  {filter === "all"
-                    ? "Initial sweep suggests all critical requests have been synchronized. The network is stable."
-                    : `No active signals detected for the ${filter} sector. Monitoring continues...`}
-                </p>
-                {filter !== "all" && (
-                  <button
-                    onClick={() => setFilter("all")}
-                    className="px-10 py-4 bg-[var(--primary-red)] text-white font-black rounded-xl shadow-xl hover:scale-105 transition-transform uppercase text-xs tracking-widest"
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+                {filteredRequests.map((request) => (
+                  <div
+                    key={request._id}
+                    className="bg-white dark:bg-zinc-900/90 rounded-2xl border border-[var(--border-light)] dark:border-zinc-800 p-4 sm:p-5 flex flex-col justify-between transition-all hover:border-red-500/30 hover:shadow-xl hover:shadow-red-950/5 group"
                   >
-                    Reset Grid Scan
-                  </button>
-                )}
-              </Motion.div>
+                    <div>
+                      {/* Card Header: Blood Type + Status */}
+                      <div className="flex items-center justify-between pb-3.5 border-b border-[var(--border-light)] dark:border-zinc-800/80">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 rounded-xl bg-red-500/10 dark:bg-red-500/15 border border-red-500/20 flex items-center justify-center">
+                            <span className="text-xl font-black text-red-600 dark:text-red-400">
+                              {request.bloodGroup}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider block">
+                              Required Blood
+                            </span>
+                            <span className="text-sm font-bold text-[var(--text-primary)]">
+                              {request.units || 1} {request.units > 1 ? "Units" : "Unit"}
+                            </span>
+                          </div>
+                        </div>
+
+                        <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest bg-red-500/10 text-red-600 border border-red-500/20">
+                          {request.donation_status || "Urgent"}
+                        </span>
+                      </div>
+
+                      {/* Recipient & Location Info */}
+                      <div className="py-3.5 space-y-2">
+                        <h3 className="text-base sm:text-lg font-bold text-[var(--text-primary)] group-hover:text-red-600 transition-colors line-clamp-1">
+                          {request.recipient_name}
+                        </h3>
+
+                        <div className="space-y-1.5 text-xs text-[var(--text-secondary)]">
+                          <div className="flex items-center gap-2">
+                            <Hospital size={14} className="text-[var(--primary-red)] shrink-0" />
+                            <span className="truncate">{request.hospital}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <MapPin size={14} className="text-[var(--primary-red)] shrink-0" />
+                            <span className="truncate">{request.recipient_district}{request.recipient_upazila ? `, ${request.recipient_upazila}` : ''}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Calendar size={14} className="text-[var(--primary-red)] shrink-0" />
+                            <span>Required: {request.date} ({request.time || "Immediate"})</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Action Button */}
+                    <div className="pt-3 border-t border-[var(--border-light)] dark:border-zinc-800/80">
+                      <button
+                        onClick={() => handleViewDetails(request._id)}
+                        className="w-full py-2.5 px-4 rounded-xl bg-[var(--primary-red)] hover:bg-[var(--primary-red-hover)] text-white font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 active:scale-[0.99] shadow-sm"
+                      >
+                        <Heart size={14} className="fill-white" />
+                        <span>View Details & Donate</span>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="max-w-md mx-auto text-center py-10 px-6 bg-white dark:bg-zinc-900 rounded-2xl border border-[var(--border-light)] dark:border-zinc-800 space-y-3">
+                <div className="w-12 h-12 mx-auto rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-600">
+                  <ShieldCheck size={24} />
+                </div>
+                <h3 className="font-bold text-lg text-[var(--text-primary)]">No Active Requests</h3>
+                <p className="text-xs sm:text-sm text-[var(--text-muted)] leading-relaxed">
+                  There are currently no pending requests for blood group <span className="font-bold text-[var(--primary-red)]">{filter.toUpperCase()}</span>. Thank you for staying ready.
+                </p>
+              </div>
             )}
           </div>
+
         </div>
       </main>
-      <footer>
-        <Footer />
-      </footer>
-    </section>
+    </div>
   );
 };
 
-export default PendingDonationRequests;
+export default DonationRequest;
