@@ -1,352 +1,227 @@
-import React, { useMemo, useState, useEffect } from "react";
-import { motion as Motion, AnimatePresence } from "framer-motion";
-import { 
-  Users, 
-  Target, 
-  Heart, 
-  Award, 
-  TrendingUp, 
-  Shield, 
-  Activity, 
+import React from "react";
+import { motion as Motion } from "framer-motion";
+import {
+  Users,
+  Target,
+  Heart,
+  Award,
+  TrendingUp,
+  Shield,
+  Activity,
   Droplet,
-  Zap,
   Globe,
   Clock,
-  CheckCircle2
+  CheckCircle2,
+  HeartHandshake,
+  ShieldCheck,
 } from "lucide-react";
-import Navbar from "../../Components/Navbar";
-import Footer from "../../Components/Footer";
-
-// --- Sub-component: Neural Background ---
-const NeuralBackground = () => {
-  const circles = useMemo(() => 
-    [...Array(20)].map(() => ({
-      cx: Math.random() * 1000,
-      cy: Math.random() * 1000,
-      r: Math.random() * 2 + 1,
-      duration: Math.random() * 3 + 2,
-      delay: Math.random() * 5
-    })), []);
-
-  const paths = useMemo(() => [
-    { d: "M0,500 Q250,200 500,500 T1000,500", duration: 5, delay: 0 },
-    { d: "M0,300 Q300,600 600,300 T1000,300", duration: 7, delay: 1 }
-  ], []);
-
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-[0.4] dark:opacity-[0.15]">
-      <svg className="w-full h-full" viewBox="0 0 1000 1000">
-        <defs>
-          <linearGradient id="neural-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="var(--primary-red)" stopOpacity="0.2" />
-            <stop offset="100%" stopColor="transparent" />
-          </linearGradient>
-        </defs>
-        {paths.map((p, i) => (
-          <Motion.path
-            key={i}
-            d={p.d}
-            fill="none"
-            stroke="url(#neural-grad)"
-            strokeWidth="1"
-            initial={{ pathLength: 0, opacity: 0 }}
-            animate={{ pathLength: 1, opacity: 1 }}
-            transition={{ duration: p.duration, repeat: Infinity, ease: "linear", delay: p.delay }}
-          />
-        ))}
-        {circles.map((c, i) => (
-          <Motion.circle
-            key={i}
-            cx={c.cx}
-            cy={c.cy}
-            r={c.r}
-            fill="var(--primary-red)"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: [0, 0.5, 0] }}
-            transition={{ 
-              duration: c.duration, 
-              repeat: Infinity, 
-              delay: c.delay 
-            }}
-          />
-        ))}
-      </svg>
-    </div>
-  );
-};
-
-// --- Sub-component: Text Scramble (Simulated) ---
-const ScrambleText = ({ text }) => {
-  const [displayText, setDisplayText] = useState(text);
-  const chars = "!<>-_\\/[]{}—=+*^?#________";
-
-  useEffect(() => {
-    let iteration = 0;
-    const interval = setInterval(() => {
-      setDisplayText(prev => 
-        text.split("").map((char, index) => {
-          if (index < iteration) return text[index];
-          return chars[Math.floor(Math.random() * chars.length)];
-        }).join("")
-      );
-      if (iteration >= text.length) clearInterval(interval);
-      iteration += 1 / 3;
-    }, 30);
-    return () => clearInterval(interval);
-  }, [text]);
-
-  return <span>{displayText}</span>;
-};
 
 const About = () => {
   const stats = [
-    { icon: Users, value: "15,000+", label: "Active Carriers" },
-    { icon: Heart, value: "3,200+", label: "Restored Lives" },
-    { icon: TrendingUp, value: "98%", label: "Sync Accuracy" },
-    { icon: Shield, value: "24/7", label: "Neural Support" },
+    { icon: Users, value: "15,800+", label: "Active Donors" },
+    { icon: Heart, value: "4,290+", label: "Lives Assisted" },
+    { icon: Globe, value: "64", label: "Districts Covered" },
+    { icon: Shield, value: "24/7", label: "Emergency Support" },
   ];
 
   const team = [
     {
       name: "Dr. Sarah Ahmed",
-      role: "Strategic Executive",
-      image: "https://i.pravatar.cc/300?img=45",
-      bio: "Medical visionary architecting the next generation of circulatory networks.",
+      role: "Chief Medical Officer",
+      image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&h=400&fit=crop&q=80",
+      bio: "Hematologist and transfusion specialist leading our clinical protocols and safety verification standards.",
     },
     {
       name: "Michael Chen",
-      role: "Medical Director",
-      image: "https://i.pravatar.cc/300?img=12",
-      bio: "Master of transfusion protocols and biological synchronization systems.",
+      role: "Director of Operations",
+      image: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=400&h=400&fit=crop&q=80",
+      bio: "Logistics strategist coordinating nationwide emergency hospital integrations and volunteer networks.",
     },
     {
       name: "Priya Patel",
-      role: "Community Liaison",
-      image: "https://i.pravatar.cc/300?img=32",
-      bio: "Orchestrating the human-circuit connections for maximum life-flow.",
+      role: "Head of Community Outreach",
+      image: "https://images.unsplash.com/photo-1594824813583-009148d4e9d0?w=400&h=400&fit=crop&q=80",
+      bio: "Advocate dedicated to donor mobilization, university campaigns, and community awareness drives.",
     },
   ];
 
   const coreValues = [
-    { icon: Shield, title: "Verified Nodes", desc: "Every carrier undergoes a rigorous biological authentication process." },
-    { icon: Clock, title: "Temporal Priority", desc: "Emergency protocols active 24/7 for instantaneous signal matching." },
-    { icon: Zap, title: "Neural Linkage", desc: "Advanced algorithm ensures the closest matches in the circulatory grid." },
-    { icon: Globe, title: "Global Sync", desc: "A world without boundaries where life-flow is accessible to all biotypes." },
-    { icon: Activity, title: "Carrier Centric", desc: "Empowering donors through a community-driven technological ecosystem." },
-    { icon: CheckCircle2, title: "Zero Latency", desc: "Completely free platform ensuring every drop connects without delay." },
+    {
+      icon: ShieldCheck,
+      title: "Verified Donors",
+      desc: "Every voluntary donor profile is verified with active contact points and eligibility confirmation before matching.",
+    },
+    {
+      icon: Clock,
+      title: "Emergency Response",
+      desc: "Our automated dispatch notifies nearby voluntary donors immediately when critical blood units are needed.",
+    },
+    {
+      icon: Globe,
+      title: "Nationwide Reach",
+      desc: "Comprehensive active network spanning all 64 districts and 495 upazilas across Bangladesh.",
+    },
+    {
+      icon: HeartHandshake,
+      title: "100% Free & Altruistic",
+      desc: "VitalFlow operates strictly as a humanitarian service. No charges or fees are ever levied on patients or donors.",
+    },
+    {
+      icon: Activity,
+      title: "Clinical Safety First",
+      desc: "All donations are conducted exclusively at registered medical hospitals and blood transfusion centers.",
+    },
+    {
+      icon: CheckCircle2,
+      title: "Community Trust",
+      desc: "Transparent coordination with verified hospital personnel, patient families, and civic volunteers.",
+    },
   ];
 
   return (
-    <div className="bg-[var(--background-main)] font-sans selection:bg-red-500/30">      
-      <main className="relative pt-10 overflow-hidden">
-        <NeuralBackground />
-        
-        <div className="container mx-auto px-6 lg:px-12 relative z-10">
-          {/* Header Section */}
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-24 mt-16 px-4">
-            <div className="space-y-6 text-left max-w-2xl">
-              <Motion.div
-                initial={{ opacity: 0, x: -30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                className="inline-flex items-center gap-3 px-5 py-2 rounded-full ultra-glass border border-[var(--primary-red)]/20"
-              >
-                <Activity size={14} className="text-[var(--primary-red)] animate-pulse" />
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--text-primary)]">
-                  Strategic Protocol v.0.1
-                </span>
-              </Motion.div>
-              <h1 className="text-4xl md:text-5xl lg:text-7xl font-black text-[var(--text-primary)] leading-tight tracking-tighter uppercase">
-                <ScrambleText text="The Vision" /> <br />
-                <span className="text-gradient-crimson italic">Beyond Circulations</span>
-              </h1>
-              <p className="text-lg text-[var(--text-secondary)] font-medium opacity-60 leading-relaxed max-w-xl">
-                VitalFlow is not just a platform; it's a synthetic heartbeat designed to synchronize the global circulatory grid. We identify the silence between heartbeats and bridge it with life.
-              </p>
+    <div className="bg-[var(--background-main)] min-h-screen text-[var(--text-primary)]">
+      <main className="py-8 sm:py-12 lg:py-14">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Symmetrical Section Header */}
+          <div className="text-center max-w-3xl mx-auto mb-6 lg:mb-8">
+            <div className="section-eyebrow">
+              <Heart size={13} className="text-[var(--primary-red)] fill-current" />
+              <span>Our Mission & Vision</span>
             </div>
-            
-            <Motion.div 
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              className="flex justify-center gap-6 flex-wrap lg:mb-4"
-            >
-              <div className="p-8 ultra-glass rounded-[2rem] border border-white/10 shadow-2xl relative overflow-hidden group">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-[var(--primary-red)]/5 rounded-full blur-2xl -mr-12 -mt-12 transition-all group-hover:bg-[var(--primary-red)]/10" />
-                <div className="relative text-center">
-                  <Droplet className="text-[var(--primary-red)] mx-auto mb-4 animate-bounce" size={40} />
-                  <p className="text-4xl font-black text-[var(--text-primary)] leading-none mb-1">100%</p>
-                  <p className="text-[10px] font-black text-[var(--text-muted)] tracking-widest uppercase">Pure Altruism</p>
-                </div>
-              </div>
-            </Motion.div>
+            <h1 className="section-title">
+              Bridging the Distance Between <br />
+              <span className="text-gradient-crimson italic">Every Drop & Every Life</span>
+            </h1>
+            <p className="section-subtitle">
+              VitalFlow was founded on a simple premise: no patient in Bangladesh should lose their life waiting for compatible blood. We unite voluntary donors, hospitals, and families into one seamless humanitarian network.
+            </p>
           </div>
 
-          {/* Tactical Objectives Section */}
-          <div className="grid md:grid-cols-2 gap-12 mb-24">
-            {[
-              { 
-                title: "Tactical Mission", 
-                icon: Target, 
-                desc: "To engineer a seamless circulatory bridge where technology meets biological necessity, ensuring zero latency in life-flow restoration.",
-                glow: "from-[var(--primary-red)]/20" 
-              },
-              { 
-                title: "Global Vision", 
-                icon: Award, 
-                desc: "A globally synchronized grid where every person in need of biological carriers has immediate uplink to verified, compatible donors.",
-                glow: "from-blue-500/10" 
-              }
-            ].map((obj, i) => (
-              <Motion.div
-                key={i}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.2 }}
-                className="relative group h-full"
-              >
-                <div className="relative ultra-glass rounded-[3rem] p-10 border border-white/10 dark:border-white/5 h-full flex flex-col items-start hover:border-[var(--primary-red)]/30 transition-all duration-500 shadow-3xl overflow-hidden">
-                  <div className={`absolute -bottom-24 -right-24 w-64 h-64 bg-gradient-to-br ${obj.glow} rounded-full blur-[80px] pointer-events-none group-hover:scale-125 transition-transform duration-700`} />
-                  
-                  <div className="w-16 h-16 bg-white dark:bg-white shadow-[0_8px_20px_rgba(0,0,0,0.1)] rounded-2xl flex items-center justify-center mb-8 shrink-0">
-                    <obj.icon className="text-[var(--primary-red)]" size={32} />
-                  </div>
-                  <h2 className="text-3xl font-black text-[var(--text-primary)] uppercase tracking-tight mb-6">{obj.title}</h2>
-                  <p className="text-lg text-[var(--text-secondary)] font-medium opacity-70 leading-relaxed italic">
-                    {obj.desc}
-                  </p>
+          {/* Mission & Vision Cards */}
+          <div className="grid md:grid-cols-2 gap-4 lg:gap-6 mb-8 lg:mb-10">
+            <div className="bg-[var(--background-card)] border border-[var(--border-light)] rounded-2xl p-5 sm:p-7 shadow-sm relative overflow-hidden flex flex-col justify-between group hover:border-[var(--primary-red)]/30 transition-all">
+              <div>
+                <div className="w-12 h-12 rounded-xl bg-red-500/10 border border-red-500/20 text-[var(--primary-red)] flex items-center justify-center mb-4">
+                  <Target size={24} />
                 </div>
-              </Motion.div>
+                <h2 className="text-xl sm:text-2xl font-black text-[var(--text-primary)] mb-2">
+                  Our Mission
+                </h2>
+                <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
+                  To eliminate preventable fatalities resulting from blood scarcity by providing a dependable, real-time, and 100% voluntary blood matching platform accessible to every citizen regardless of geographical barriers.
+                </p>
+              </div>
+              <div className="pt-4 mt-5 border-t border-[var(--border-light)] flex items-center gap-2 text-xs font-bold text-[var(--primary-red)]">
+                <CheckCircle2 size={15} />
+                <span>Zero Latency Emergency Matching</span>
+              </div>
+            </div>
+
+            <div className="bg-[var(--background-card)] border border-[var(--border-light)] rounded-2xl p-5 sm:p-7 shadow-sm relative overflow-hidden flex flex-col justify-between group hover:border-[var(--primary-red)]/30 transition-all">
+              <div>
+                <div className="w-12 h-12 rounded-xl bg-red-500/10 border border-red-500/20 text-[var(--primary-red)] flex items-center justify-center mb-4">
+                  <Award size={24} />
+                </div>
+                <h2 className="text-xl sm:text-2xl font-black text-[var(--text-primary)] mb-2">
+                  Our Vision
+                </h2>
+                <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
+                  A society where voluntary blood donation is a celebrated civic culture, where every medical facility maintains immediate access to verified donors, and where technology serves humanitarian dignity.
+                </p>
+              </div>
+              <div className="pt-4 mt-5 border-t border-[var(--border-light)] flex items-center gap-2 text-xs font-bold text-emerald-600">
+                <CheckCircle2 size={15} />
+                <span>Universal Blood Security</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Stats Bar */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 mb-8 lg:mb-10">
+            {stats.map((stat, idx) => (
+              <div
+                key={idx}
+                className="bg-[var(--background-card)] border border-[var(--border-light)] rounded-2xl p-4 sm:p-5 text-center shadow-sm"
+              >
+                <stat.icon className="text-[var(--primary-red)] mx-auto mb-2" size={22} />
+                <div className="text-2xl sm:text-3xl font-black text-[var(--text-primary)] tracking-tight mb-0.5">
+                  {stat.value}
+                </div>
+                <div className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-wider">
+                  {stat.label}
+                </div>
+              </div>
             ))}
           </div>
 
-          {/* Neural Links / Stats */}
-          <div className="mb-20">
-            <Motion.div 
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              className="grid grid-cols-2 md:grid-cols-4 gap-8"
-            >
-              {stats.map((stat, index) => {
-                const Icon = stat.icon;
-                return (
-                  <Motion.div
-                    key={index}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.1 }}
-                    whileHover={{ y: -5, scale: 1.02 }}
-                    className="text-center p-8 ultra-glass rounded-3xl border border-white/10 group"
-                  >
-                    <div className="w-14 h-14 bg-[var(--primary-red)]/5 dark:bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-white/10 group-hover:border-[var(--primary-red)]/30 transition-all">
-                      <Icon className="text-[var(--primary-red)]" size={28} />
-                    </div>
-                    <div className="text-4xl font-black text-[var(--text-primary)] mb-2 tracking-tighter">
-                      {stat.value}
-                    </div>
-                    <div className="text-[10px] font-black text-[var(--text-muted)] tracking-widest uppercase">
-                      {stat.label}
-                    </div>
-                  </Motion.div>
-                );
-              })}
-            </Motion.div>
+          {/* Core Values / Pillars */}
+          <div className="mb-8 lg:mb-10">
+            <div className="text-center max-w-2xl mx-auto mb-6">
+              <h2 className="text-2xl sm:text-3xl font-black text-[var(--text-primary)] mb-2">
+                Our Core Pillars
+              </h2>
+              <p className="text-xs sm:text-sm text-[var(--text-secondary)]">
+                The standards and values that guide our operations every day.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+              {coreValues.map((val, idx) => (
+                <div
+                  key={idx}
+                  className="bg-[var(--background-card)] border border-[var(--border-light)] rounded-2xl p-4 sm:p-5 hover:border-[var(--primary-red)]/30 transition-all shadow-sm group"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-red-500/10 text-[var(--primary-red)] flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
+                    <val.icon size={20} />
+                  </div>
+                  <h3 className="text-base font-black text-[var(--text-primary)] mb-1.5">
+                    {val.title}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
+                    {val.desc}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
 
-          {/* Core Operatives / Team */}
-          <section className="mb-32">
-            <Motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-center mb-20"
-            >
-              <h2 className="text-4xl md:text-5xl font-black text-[var(--text-primary)] uppercase tracking-tighter mb-4">
-                Core <span className="text-gradient-crimson italic">Operatives</span>
+          {/* Leadership Team */}
+          <div>
+            <div className="text-center max-w-2xl mx-auto mb-6">
+              <h2 className="text-2xl sm:text-3xl font-black text-[var(--text-primary)] mb-2">
+                Clinical & Advisory Leadership
               </h2>
-              <div className="h-1.5 w-24 bg-gradient-to-r from-transparent via-[var(--primary-red)] to-transparent mx-auto rounded-full" />
-            </Motion.div>
+              <p className="text-xs sm:text-sm text-[var(--text-secondary)]">
+                Experienced medical professionals and operations leaders overseeing the VitalFlow network.
+              </p>
+            </div>
 
-            <div className="grid md:grid-cols-3 gap-10">
-              {team.map((member, index) => (
-                <Motion.div
-                  key={index}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.2 }}
-                  whileHover={{ y: -10 }}
-                  className="group relative h-full flex flex-col"
+            <div className="grid md:grid-cols-3 gap-4 sm:gap-5">
+              {team.map((member, idx) => (
+                <div
+                  key={idx}
+                  className="bg-[var(--background-card)] border border-[var(--border-light)] rounded-2xl p-4 sm:p-5 text-center shadow-sm flex flex-col items-center hover:border-[var(--primary-red)]/30 transition-all"
                 >
-                  <div className="relative h-full ultra-glass rounded-[3rem] p-10 border border-white/10 hover:border-[var(--primary-red)]/40 transition-all duration-500 shadow-2xl flex flex-col items-center">
-                    <div className="relative mb-8 pt-4">
-                      <div className="w-32 h-32 rounded-[2.5rem] overflow-hidden ring-4 ring-[var(--primary-red)]/20 ring-offset-8 ring-offset-[var(--background-main)] shadow-2xl transition-all group-hover:ring-[var(--primary-red)]/50 group-hover:-translate-y-2">
-                        <img
-                          src={member.image}
-                          alt={member.name}
-                          className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
-                        />
-                      </div>
-                      <div className="absolute -bottom-2 -right-2 p-2 bg-emerald-500 rounded-xl shadow-lg border-2 border-white">
-                        <Zap size={14} className="text-white fill-white" />
-                      </div>
-                    </div>
-                    
-                    <h3 className="text-2xl font-black text-[var(--text-primary)] uppercase tracking-tight text-center mb-2">
-                      {member.name}
-                    </h3>
-                    <p className="text-[10px] bg-[var(--primary-red)]/10 text-[var(--primary-red)] font-black uppercase tracking-[0.2em] px-4 py-1.5 rounded-full mb-6">
-                      {member.role}
-                    </p>
-                    <p className="text-sm text-[var(--text-secondary)] text-center leading-relaxed font-semibold line-clamp-3">
-                      {member.bio}
-                    </p>
+                  <div className="w-20 h-20 rounded-full overflow-hidden border-3 border-red-500/20 mb-3.5 shadow-md">
+                    <img
+                      src={member.image}
+                      alt={member.name}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
-                </Motion.div>
+                  <h3 className="text-base sm:text-lg font-black text-[var(--text-primary)] mb-0.5">
+                    {member.name}
+                  </h3>
+                  <span className="text-[11px] font-bold text-[var(--primary-red)] uppercase tracking-wider mb-2.5 block">
+                    {member.role}
+                  </span>
+                  <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
+                    {member.bio}
+                  </p>
+                </div>
               ))}
             </div>
-          </section>
-
-          {/* Grid Advantages */}
-          <section className="pb-32">
-            <Motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-center mb-20"
-            >
-              <h2 className="text-4xl font-black text-[var(--text-primary)] uppercase tracking-tight">
-                Circulatory <span className="italic text-gradient-crimson">Advantage</span>
-              </h2>
-            </Motion.div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {coreValues.map((feature, index) => (
-                <Motion.div
-                  key={index}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.05 }}
-                  className="bg-black/5 dark:bg-white/5 border border-white/10 rounded-[2rem] p-8 hover:bg-[var(--primary-red)]/[0.03] hover:border-[var(--primary-red)]/20 transition-all group"
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="p-3 bg-white dark:bg-white/10 rounded-xl shadow-sm group-hover:scale-110 transition-transform">
-                      <feature.icon className="text-[var(--primary-red)]" size={24} />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-black text-[var(--text-primary)] uppercase tracking-tight mb-2">
-                        {feature.title}
-                      </h3>
-                      <p className="text-sm text-[var(--text-secondary)] opacity-70 leading-relaxed font-semibold">
-                        {feature.desc}
-                      </p>
-                    </div>
-                  </div>
-                </Motion.div>
-              ))}
-            </div>
-          </section>
+          </div>
         </div>
       </main>
     </div>
