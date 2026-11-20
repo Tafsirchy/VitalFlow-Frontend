@@ -117,6 +117,38 @@ const router = createBrowserRouter([
           </SuspenseWrapper>
         )
       },
+      {
+        path: "/search",
+        element: (
+          <SuspenseWrapper>
+            <SearchPage />
+          </SuspenseWrapper>
+        ),
+      },
+      {
+        path: "/donation-requests",
+        element: (
+          <SuspenseWrapper>
+            <DonationRequest />
+          </SuspenseWrapper>
+        ),
+      },
+      {
+        path: "/funding",
+        element: (
+          <SuspenseWrapper>
+            <Funding />
+          </SuspenseWrapper>
+        ),
+      },
+      {
+        path: "/payment-success",
+        element: <PaymentSuccess />,
+      },
+      {
+        path: "/payment-cancelled",
+        element: <PaymentCancelled />,
+      },
     ],
   },
   {
@@ -127,7 +159,7 @@ const router = createBrowserRouter([
       </PrivateRoute>
     ),
     children: [
-      { path: "/dashboard", element: <MainDashboard /> },
+      { index: true, element: <MainDashboard /> },
       { path: "add-request", element: <AddRequest /> },
       { path: "all-users", element: <AllUsers /> },
       { path: "my-requests", element: <MyRequest /> },
@@ -137,39 +169,6 @@ const router = createBrowserRouter([
       },
       { path: "profile", element: <Profile /> },
     ],
-  },
-
-  {
-    path: "/search",
-    element: (
-      <SuspenseWrapper>
-        <SearchPage />
-      </SuspenseWrapper>
-    ),
-  },
-  {
-    path: "/donation-requests",
-    element: (
-      <SuspenseWrapper>
-        <DonationRequest />
-      </SuspenseWrapper>
-    ),
-  },
-  {
-    path: "/funding",
-    element: (
-      <SuspenseWrapper>
-        <Funding />
-      </SuspenseWrapper>
-    ),
-  },
-  {
-    path: "/payment-success",
-    element: <PaymentSuccess />,
-  },
-  {
-    path: "/payment-cancelled",
-    element: <PaymentCancelled />,
   },
   {
     path: "*",
