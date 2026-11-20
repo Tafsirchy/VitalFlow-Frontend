@@ -8,23 +8,7 @@ const AccessDenied = () => {
   const [glitchActive, setGlitchActive] = useState(false);
   const [particles, setParticles] = useState([]);
 
- useEffect(() => {
-   const newParticles = Array.from({ length: 20 }, (_, i) => ({
-     id: i,
-     x: Math.random() * 100,
-     y: Math.random() * 100,
-     size: Math.random() * 4 + 2,
-     duration: Math.random() * 3 + 2,
-    }));
-    setParticles(newParticles);
-    
-   const glitchInterval = setInterval(() => {
-     setGlitchActive(true);
-     setTimeout(() => setGlitchActive(false), 200);
-   }, 3000);
-
-   return () => clearInterval(glitchInterval);
- }, []);
+ 
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -61,52 +45,16 @@ const AccessDenied = () => {
 
   const pulseVariants = {
     animate: {
-      scale: [1, 1.2, 1],
-      opacity: [0.5, 0.2, 0.5],
-      transition: {
-        duration: 2,
-        repeat: Infinity,
-        ease: "easeInOut",
-      },
+      
     },
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-red-900 to-slate-900 flex items-center justify-center p-4 overflow-hidden relative">
-      {/* Animated background particles */}
-      {particles.map((particle) => (
-        <motion.div
-          key={particle.id}
-          className="absolute rounded-full bg-red-500/20"
-          style={{
-            left: `${particle.x}%`,
-            top: `${particle.y}%`,
-            width: particle.size,
-            height: particle.size,
-          }}
-          animate={{
-            y: [0, -30, 0],
-            opacity: [0.2, 0.6, 0.2],
-          }}
-          transition={{
-            duration: particle.duration,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
-      ))}
-
       {/* Scan line effect */}
       <motion.div
         className="absolute inset-0 bg-gradient-to-b from-transparent via-red-500/10 to-transparent"
-        animate={{
-          y: ["-100%", "200%"],
-        }}
-        transition={{
-          duration: 3,
-          repeat: Infinity,
-          ease: "linear",
-        }}
+        
       />
 
       <motion.div
@@ -117,7 +65,7 @@ const AccessDenied = () => {
       >
         {/* Main content card */}
         <motion.div
-          className={`bg-slate-800/50 backdrop-blur-xl rounded-2xl p-8 md:p-12 shadow-2xl border border-red-500/20 ${
+          className={`bg-slate-800/50 backdrop- rounded-2xl p-8 md:p-12 shadow-2xl border border-red-500/20 ${
             glitchActive ? "animate-pulse" : ""
           }`}
           whileHover={{ scale: 1.02 }}
@@ -128,7 +76,7 @@ const AccessDenied = () => {
             <motion.div
               variants={pulseVariants}
               animate="animate"
-              className="absolute w-32 h-32 rounded-full bg-red-500/30 blur-xl"
+              className="absolute w-32 h-32 rounded-full bg-red-500/30 "
             />
             <motion.div
               variants={shieldVariants}
@@ -147,7 +95,7 @@ const AccessDenied = () => {
           <motion.h1
             variants={itemVariants}
             className={`text-5xl md:text-6xl font-bold text-center mb-4 ${
-              glitchActive ? "text-red-400 blur-sm" : "text-red-500"
+              "text-red-500"
             } transition-all duration-200`}
           >
             ACCESS DENIED
@@ -200,34 +148,10 @@ const AccessDenied = () => {
 
         {/* Floating locks decoration */}
         <div className="absolute -top-10 -left-10 opacity-20">
-          <motion.div
-            animate={{
-              rotate: [0, 360],
-              scale: [1, 1.2, 1],
-            }}
-            transition={{
-              duration: 8,
-              repeat: Infinity,
-              ease: "linear",
-            }}
-          >
-            <Lock className="w-16 h-16 text-red-500" />
-          </motion.div>
+          <div className="w-16 h-16 flex items-center justify-center"><Lock className="w-16 h-16 text-red-500" /></div>
         </div>
         <div className="absolute -bottom-10 -right-10 opacity-20">
-          <motion.div
-            animate={{
-              rotate: [360, 0],
-              scale: [1, 1.2, 1],
-            }}
-            transition={{
-              duration: 8,
-              repeat: Infinity,
-              ease: "linear",
-            }}
-          >
-            <X className="w-16 h-16 text-red-500" />
-          </motion.div>
+          <div className="w-16 h-16 flex items-center justify-center"><X className="w-16 h-16 text-red-500" /></div>
         </div>
       </motion.div>
     </div>
