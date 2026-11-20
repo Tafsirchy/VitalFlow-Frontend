@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState, useCallback } from "react";
 import { Link, useNavigate } from "react-router";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion as Motion, AnimatePresence } from "framer-motion";
 import {
   Activity,
   Calendar,
@@ -9,7 +9,6 @@ import {
   User,
   ArrowRight,
   Heart,
-  AlertCircle,
   Droplet,
   MoreVertical,
   Edit,
@@ -19,9 +18,10 @@ import {
   XCircle,
   Mail,
   UserCheck,
+  ShieldCheck,
+  Plus,
 } from "lucide-react";
 import { toast } from "react-toastify";
-import gsap from "gsap";
 import { AuthContext } from "../../../Provider/AuthProvider";
 import useAxiosSecure from "../../../Hooks/useAxiosSecure";
 import AdminDashboardFeature from "../AdminDashboardFeature/AdminDashboardFeature";
@@ -53,7 +53,6 @@ const MainDashboard = () => {
       setMyRecentRequests(response.data);
     } catch (error) {
       console.error("Error fetching recent requests:", error);
-      toast.error("Failed to load recent requests");
     } finally {
       setLoading(false);
     }
@@ -78,7 +77,6 @@ const MainDashboard = () => {
 
   const fetchDashboardStats = useCallback(async () => {
     try {
-      // Parallel API calls for better performance
       const [allRequestsRes, allDonorsRes, totalFundingRes] = await Promise.all([
         axiosSecure.get("/all-requests?size=1000&page=0"),
         axiosSecure.get("/donor"),
@@ -89,7 +87,6 @@ const MainDashboard = () => {
       const allDonors = allDonorsRes.data || [];
       const funding = totalFundingRes.data || {};
 
-      // Calculate blood type distribution from donors
       const bloodTypes = {};
       allDonors.forEach((donor) => {
         const bloodType = donor.blood || donor.bloodGroup;
@@ -98,12 +95,11 @@ const MainDashboard = () => {
         }
       });
 
-      // Calculate request status breakdown  
       const statusCount = {
-        pending: allRequests.filter(r => r.donation_status === "pending").length,
-        inprogress: allRequests.filter(r => r.donation_status === "inprogress").length,
-        done: allRequests.filter(r => r.donation_status === "done").length,
-        canceled: allRequests.filter(r => r.donation_status === "canceled").length,
+        pending: allRequests.filter((r) => r.donation_status === "pending").length,
+        inprogress: allRequests.filter((r) => r.donation_status === "inprogress").length,
+        done: allRequests.filter((r) => r.donation_status === "done").length,
+        canceled: allRequests.filter((r) => r.donation_status === "canceled").length,
       };
 
       setDashboardStats({
@@ -116,7 +112,6 @@ const MainDashboard = () => {
       });
     } catch (error) {
       console.error("Error fetching dashboard stats:", error);
-      toast.error("Failed to load dashboard statistics");
     }
   }, [axiosSecure]);
 
@@ -131,18 +126,6 @@ const MainDashboard = () => {
     }
   }, [userRole, fetchDashboardStats]);
 
-  useEffect(() => {
-    if (!loading && !roleLoading) {
-      gsap.from(".dashboard-card", {
-        y: 40,
-        opacity: 0,
-        duration: 0.8,
-        stagger: 0.1,
-        ease: "power3.out",
-      });
-    }
-  }, [loading, roleLoading]);
-
   const handleStatusUpdate = async (id, status) => {
     try {
       await axiosSecure.patch(`/update-donation-status/${id}`, { status });
@@ -156,10 +139,10 @@ const MainDashboard = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this request?")) {
+    if (window.confirm("Are you sure you want to delete this donation request?")) {
       try {
         await axiosSecure.delete(`/delete-request/${id}`);
-        toast.success("Request deleted successfully");
+        toast.success("Request removed successfully");
         fetchRecentRequests();
         setActiveDropdown(null);
       } catch (error) {
@@ -169,561 +152,233 @@ const MainDashboard = () => {
     }
   };
 
-  const handleEdit = (id) => {
-    navigate(`/dashboard/edit-request/${id}`);
-  };
-
-  const handleView = (id) => {
-    navigate(`/donation-details/${id}`);
-  };
-
   const getStatusColor = (status) => {
     switch (status) {
       case "pending":
-        return "bg-yellow-100 text-yellow-700 border-yellow-200";
+        return "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20";
       case "inprogress":
-        return "bg-blue-100 text-blue-700 border-blue-200";
+        return "bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20";
       case "done":
-        return "bg-green-100 text-green-700 border-green-200";
+        return "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20";
       case "canceled":
-        return "bg-red-100 text-red-700 border-red-200";
+        return "bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-500/20";
       default:
-        return "bg-gray-100 text-gray-700 border-gray-200";
+        return "bg-zinc-100 text-zinc-700 border-zinc-200";
     }
   };
 
   return (
-    <div className="bg-background-main min-h-screen py-5 transition-smooth">
-      <div className="py-8 px-5 max-w-7xl mx-auto">
-        {/* Welcome Section */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="relative bg-premium-gradient rounded-[2rem] p-8 mb-8 text-white overflow-hidden shadow-premium"
-        >
-          {/* Animated Background Particles (Floating Blood Drops) */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            {[...Array(6)].map((_, i) => (
-              <motion.div
-                key={i}
-                className="absolute text-white/10"
-                initial={{ y: "100%", x: `${i * 20}%` }}
-                animate={{ y: "-100%" }}
-                transition={{
-                  duration: 12 + i * 2,
-                  repeat: Infinity,
-                  ease: "linear",
-                  delay: i * 1.5,
-                }}
-              >
-                <Droplet
-                  size={80 + i * 20}
-                  fill="currentColor"
-                  className="drop-shadow-2xl"
-                />
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Glowing Heart Pulse */}
-          <div className="absolute top-4 right-8">
-            <motion.div
-              animate={{ scale: [1, 1.4, 1], opacity: [0.6, 1, 0.6] }}
-              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-              className="w-32 h-32 bg-white/20 rounded-full blur-3xl"
-            />
-            <motion.div
-              animate={{ scale: [1, 1.3, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
-              className="absolute inset-0 flex items-center justify-center"
-            >
-              <Heart
-                size={60}
-                className="text-white drop-shadow-2xl"
-                fill="currentColor"
+    <div className="space-y-5">
+      {/* Symmetrical Member Welcome Hero */}
+      <div className="bg-[var(--background-card)] border border-[var(--border-light)] rounded-2xl p-4 sm:p-6 shadow-sm relative overflow-hidden">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative z-10">
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-xl overflow-hidden border-2 border-[var(--primary-red)]/30 shrink-0">
+              <img
+                src={user?.photoURL || "https://ui-avatars.com/api/?name=User&size=100&background=C62828&color=fff"}
+                alt={user?.displayName || "Member"}
+                className="w-full h-full object-cover"
               />
-            </motion.div>
-          </div>
-
-          <div className="relative z-10">
-            <div className="flex flex-col md:flex-row items-start md:items-center gap-6 mb-6">
-              {/* Avatar + Greeting */}
-              <motion.div
-                initial={{ x: -50, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: 0.3 }}
-                className="flex items-center gap-5"
-              >
-                <div className="relative">
-                  <div className="w-20 h-20 bg-white/30 rounded-full flex items-center justify-center backdrop-blur-md border-4 border-white/40">
-                    <Heart size={40} fill="white" />
-                  </div>
-                  {/* Online Indicator */}
-                  <motion.div
-                    animate={{ scale: [1, 1.2, 1] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                    className="absolute bottom-0 right-0 w-6 h-6 bg-green-400 rounded-full border-4 border-white shadow-lg"
-                  >
-                    <Activity
-                      size={14}
-                      className="text-white absolute inset-1"
-                    />
-                  </motion.div>
-                </div>
-
-                <div>
-                  <motion.h1
-                    initial={{ y: 20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.5 }}
-                    className="text-4xl lg:text-5xl font-black tracking-tight"
-                  >
-                    Welcome back,
-                    <span className="block text-white/90 text-3xl lg:text-4xl mt-1">
-                      {user?.displayName || "Lifesaver"}! ❤️
-                    </span>
-                  </motion.h1>
-                  <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.8 }}
-                    className="text-white/90 text-lg mt-2 font-medium"
-                  >
-                    You're making the world healthier — one drop at a time.
-                  </motion.p>
-                </div>
-              </motion.div>
             </div>
-
-            {/* Dynamic Stats Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mt-8">
-              {/* Total Requests Card */}
-              <motion.div
-                whileHover={{ scale: 1.02, y: -2 }}
-                className="glass-morphism dashboard-card rounded-2xl p-6 border border-white/20"
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-white/70 text-sm font-medium uppercase tracking-wider">
-                      Your Requests
-                    </p>
-                    <p className="text-4xl font-black mt-2 text-white">
-                      {myRecentRequests.length}
-                    </p>
-                  </div>
-                  <motion.div
-                    animate={{ scale: [1, 1.1, 1] }}
-                    transition={{ duration: 4, repeat: Infinity }}
-                  >
-                    <Droplet
-                      size={44}
-                      className="text-white/60"
-                      fill="currentColor"
-                    />
-                  </motion.div>
-                </div>
-              </motion.div>
-
-              {/* Online Status Card */}
-              <motion.div
-                whileHover={{ scale: 1.02, y: -2 }}
-                className="glass-morphism dashboard-card rounded-2xl p-6 border border-white/20"
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-white/70 text-sm font-medium uppercase tracking-wider">Status</p>
-                    <div className="flex items-center gap-3 mt-3">
-                      <div className="relative w-4 h-4">
-                        <motion.div
-                          animate={{ scale: [1, 1.8, 1], opacity: [1, 0, 1] }}
-                          transition={{ duration: 2, repeat: Infinity }}
-                          className="absolute inset-0 bg-green-400 rounded-full"
-                        />
-                        <div className="absolute inset-0.5 bg-green-500 rounded-full border border-white/40" />
-                      </div>
-                      <p className="text-2xl font-bold text-white">Active & Ready</p>
-                    </div>
-                  </div>
-                  <Activity size={44} className="text-green-400/80" />
-                </div>
-              </motion.div>
+            <div>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-500/10 text-[var(--primary-red)] text-[11px] font-bold uppercase tracking-wider mb-0.5">
+                <ShieldCheck size={12} />
+                <span>{userRole || "Voluntary Donor"}</span>
+              </div>
+              <h1 className="text-xl sm:text-2xl font-black text-[var(--text-primary)]">
+                Welcome back, {user?.displayName || "Member"}
+              </h1>
+              <p className="text-xs text-[var(--text-secondary)] mt-0.5">
+                Connected to Bangladesh's 24/7 voluntary emergency blood network.
+              </p>
             </div>
           </div>
 
-          {/* Bottom Glow Effect */}
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-white/50 to-transparent" />
-        </motion.div>
+          {userRole === "Donor" && (
+            <Link
+              to="/dashboard/add-request"
+              className="btn-premium !px-4 !py-2.5 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-md shadow-red-600/20 shrink-0"
+            >
+              <Plus size={15} />
+              <span>Create Blood Request</span>
+            </Link>
+          )}
+        </div>
+      </div>
 
-        {/* Loading role */}
-        {roleLoading && (
-          <div className="flex items-center justify-center py-20">
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-              className="w-12 h-12 border-4 border-red-600 border-t-transparent rounded-full"
-            />
+      {/* Role Loading */}
+      {roleLoading && (
+        <div className="py-12 text-center">
+          <div className="w-10 h-10 rounded-full border-4 border-[var(--primary-red)]/20 border-t-[var(--primary-red)] animate-spin mx-auto mb-3" />
+          <p className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">
+            Loading Dashboard...
+          </p>
+        </div>
+      )}
+
+      {/* Admin / Volunteer View */}
+      {!roleLoading && (userRole === "Admin" || userRole === "Volunteer") && (
+        <div className="space-y-5">
+          <AdminDashboardFeature />
+          <CreativeDashboardStats
+            requests={dashboardStats.allRequests}
+            bloodStats={dashboardStats.bloodTypeDistribution}
+          />
+          <DataAnalysis
+            requests={dashboardStats.allRequests}
+            totalUsers={dashboardStats.totalUsers}
+          />
+        </div>
+      )}
+
+      {/* Donor Recent Requests View */}
+      {!roleLoading && userRole === "Donor" && (
+        <div className="bg-[var(--background-card)] border border-[var(--border-light)] rounded-2xl p-4 sm:p-5 shadow-sm">
+          <div className="flex items-center justify-between pb-3 mb-4 border-b border-[var(--border-light)]">
+            <div>
+              <h2 className="text-base sm:text-lg font-black text-[var(--text-primary)]">
+                My Recent Blood Requests
+              </h2>
+              <p className="text-xs text-[var(--text-muted)] mt-0.5">
+                Active donation directives requested from your account.
+              </p>
+            </div>
+            <Link
+              to="/dashboard/my-requests"
+              className="text-xs font-bold text-[var(--primary-red)] hover:underline flex items-center gap-1"
+            >
+              <span>View All</span>
+              <ArrowRight size={13} />
+            </Link>
           </div>
-        )}
 
-        {/* Admin / Volunteer Dashboard Feature */}
-        {!roleLoading && (userRole === "Admin" || userRole === "Volunteer") && (
-          <>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="mb-8"
-            >
-              <AdminDashboardFeature />
-            </motion.div>
-
-            {/* Creative Analytics Section for Admin/Volunteer */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="mb-8"
-            >
-              <CreativeDashboardStats 
-                requests={dashboardStats.allRequests} 
-                bloodStats={dashboardStats.bloodTypeDistribution}
-              />
-            </motion.div>
-
-            {/* Data Analysis Section */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-              className="mb-8"
-            >
-              <DataAnalysis 
-                requests={dashboardStats.allRequests} 
-                totalUsers={dashboardStats.totalUsers}
-              />
-            </motion.div>
-          </>
-        )}
-
-        {/* Regular Donor Dashboard - Recent Requests */}
-        {!roleLoading && userRole === "Donor" && (
-          <>
-            {/* Recent Requests Section */}
-            {myRecentRequests.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden mb-6"
+          {loading ? (
+            <div className="py-16 text-center">
+              <div className="w-10 h-10 rounded-full border-4 border-[var(--primary-red)]/20 border-t-[var(--primary-red)] animate-spin mx-auto mb-3" />
+              <p className="text-xs font-semibold text-[var(--text-muted)]">Loading recent requests...</p>
+            </div>
+          ) : myRecentRequests.length === 0 ? (
+            <div className="py-16 text-center text-[var(--text-muted)]">
+              <Droplet size={36} className="mx-auto mb-3 opacity-30 text-[var(--primary-red)]" fill="currentColor" />
+              <h3 className="text-base font-bold text-[var(--text-primary)] mb-1">No Active Blood Requests</h3>
+              <p className="text-xs max-w-sm mx-auto mb-6">
+                When you or your relatives need blood, create a verified request here.
+              </p>
+              <Link
+                to="/dashboard/add-request"
+                className="btn-premium !px-6 !py-3 text-xs font-bold inline-flex items-center gap-2"
               >
-                <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-red-600 to-blue-600 rounded-lg flex items-center justify-center">
-                        <Droplet
-                          className="text-white"
-                          size={20}
-                          fill="currentColor"
-                        />
-                      </div>
-                      <div>
-                        <h2 className="text-2xl font-bold text-gray-900">
-                          Recent Donation Requests
-                        </h2>
-                        <p className="text-sm text-gray-600">
-                          Your latest 3 requests
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {loading ? (
-                  <div className="flex items-center justify-center py-20">
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{
-                        duration: 1,
-                        repeat: Infinity,
-                        ease: "linear",
-                      }}
-                      className="w-12 h-12 border-4 border-red-600 border-t-transparent rounded-full"
-                    />
-                  </div>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <table className="table w-full">
-                      <thead className="bg-gray-50">
-                        <tr className="border-b border-gray-200">
-                          <th className="text-gray-700 font-semibold">#</th>
-                          <th className="text-gray-700 font-semibold">
-                            Recipient Name
-                          </th>
-                          <th className="text-gray-700 font-semibold">
-                            Recipient Location
-                          </th>
-                          <th className="text-gray-700 font-semibold">
-                            Donation Date
-                          </th>
-                          <th className="text-gray-700 font-semibold">
-                            Donation Time
-                          </th>
-                          <th className="text-gray-700 font-semibold">
-                            Blood Group
-                          </th>
-                          <th className="text-gray-700 font-semibold">
-                            Donation Status
-                          </th>
-                          <th className="text-gray-700 font-semibold">
-                            Donor Information
-                          </th>
-                          <th className="text-gray-700 font-semibold">
-                            Actions
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {myRecentRequests.map((request, index) => (
-                          <tr
-                            key={request._id}
-                            className="hover:bg-gray-50 transition-colors border-b border-gray-100"
+                <Plus size={16} />
+                <span>Create Blood Request</span>
+              </Link>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs sm:text-sm">
+                <thead>
+                  <tr className="bg-[var(--background-main)]/60 text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted)] border-b border-[var(--border-light)]">
+                    <th className="px-3.5 py-2.5">Patient</th>
+                    <th className="px-3.5 py-2.5">Blood Group</th>
+                    <th className="px-3.5 py-2.5">Hospital & Location</th>
+                    <th className="px-3.5 py-2.5">Schedule</th>
+                    <th className="px-3.5 py-2.5">Status</th>
+                    <th className="px-3.5 py-2.5 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[var(--border-light)]">
+                  {myRecentRequests.map((req) => (
+                    <tr key={req._id} className="hover:bg-[var(--background-main)]/40 transition-colors">
+                      <td className="px-3.5 py-2.5 font-bold text-[var(--text-primary)]">
+                        {req.recipient_name}
+                      </td>
+                      <td className="px-3.5 py-2.5">
+                        <span className="px-2 py-0.5 rounded-md bg-red-600 text-white font-black text-xs">
+                          {req.bloodGroup}
+                        </span>
+                      </td>
+                      <td className="px-3.5 py-2.5 text-xs">
+                        <div className="font-semibold text-[var(--text-primary)]">{req.hospital}</div>
+                        <div className="text-[var(--text-muted)]">{req.recipient_district}, {req.recipient_upazila}</div>
+                      </td>
+                      <td className="px-3.5 py-2.5 text-xs font-medium text-[var(--text-secondary)]">
+                        {req.date} ({req.time})
+                      </td>
+                      <td className="px-3.5 py-2.5">
+                        <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border ${getStatusColor(req.donation_status)}`}>
+                          {req.donation_status === "inprogress" ? "In Progress" : req.donation_status}
+                        </span>
+                      </td>
+                      <td className="px-3.5 py-2.5 text-right">
+                        <div className="relative inline-block">
+                          <button
+                            onClick={() => setActiveDropdown(activeDropdown === req._id ? null : req._id)}
+                            className="p-2 rounded-lg hover:bg-[var(--background-main)] text-[var(--text-muted)] transition-colors"
                           >
-                            <td className="font-semibold text-gray-700">
-                              {index + 1}
-                            </td>
-                            <td>
-                              <div className="flex items-center gap-2">
-                                <User className="text-gray-400" size={16} />
-                                <span className="font-medium text-gray-900">
-                                  {request.recipient_name}
-                                </span>
-                              </div>
-                            </td>
-                            <td>
-                              <div className="flex items-center gap-2">
-                                <MapPin className="text-gray-400" size={16} />
-                                <span className="text-sm text-gray-700">
-                                  {request.recipient_district},{" "}
-                                  {request.recipient_upazila}
-                                </span>
-                              </div>
-                            </td>
-                            <td>
-                              <div className="flex items-center gap-2 text-sm">
-                                <Calendar className="text-gray-400" size={14} />
-                                <span className="text-gray-700">
-                                  {request.date}
-                                </span>
-                              </div>
-                            </td>
-                            <td>
-                              <div className="flex items-center gap-2 text-sm">
-                                <Clock className="text-gray-400" size={14} />
-                                <span className="text-gray-700">
-                                  {request.time}
-                                </span>
-                              </div>
-                            </td>
-                            <td>
-                              <span className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-bold border border-red-200">
-                                {request.bloodGroup}
-                              </span>
-                            </td>
-                            <td>
-                              <span
-                                className={`px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(
-                                  request.donation_status
-                                )}`}
-                              >
-                                {request.donation_status}
-                              </span>
-                            </td>
-                            <td>
-                              {request.donation_status === "inprogress" ? (
-                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-2 min-w-[200px]">
-                                  <div className="flex items-center gap-2 mb-1">
-                                    <UserCheck
-                                      className="text-blue-600"
-                                      size={14}
-                                    />
-                                    <span className="font-semibold text-blue-900 text-sm">
-                                      {request.requester_name}
-                                    </span>
-                                  </div>
-                                  <div className="flex items-center gap-2">
-                                    <Mail className="text-blue-500" size={12} />
-                                    <span className="text-xs text-blue-700">
-                                      {request.requester_email}
-                                    </span>
-                                  </div>
-                                </div>
-                              ) : (
-                                <span className="text-gray-400 text-sm">—</span>
-                              )}
-                            </td>
-                            <td>
-                              <div className="relative">
-                                <button
-                                  onClick={() =>
-                                    setActiveDropdown(
-                                      activeDropdown === request._id
-                                        ? null
-                                        : request._id
-                                    )
-                                  }
-                                  className="btn btn-ghost btn-sm btn-circle"
+                            <MoreVertical size={16} />
+                          </button>
+
+                          <AnimatePresence>
+                            {activeDropdown === req._id && (
+                              <>
+                                <div
+                                  className="fixed inset-0 z-40"
+                                  onClick={() => setActiveDropdown(null)}
+                                />
+                                <Motion.div
+                                  initial={{ opacity: 0, scale: 0.95 }}
+                                  animate={{ opacity: 1, scale: 1 }}
+                                  exit={{ opacity: 0, scale: 0.95 }}
+                                  className="absolute right-0 mt-2 w-48 bg-[var(--background-card)] border border-[var(--border-light)] rounded-2xl shadow-xl p-2 z-50 text-xs font-bold space-y-1 text-left"
                                 >
-                                  <MoreVertical size={18} />
-                                </button>
-                                <AnimatePresence>
-                                  {activeDropdown === request._id && (
+                                  {req.donation_status === "inprogress" && (
                                     <>
-                                      <motion.div
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        exit={{ opacity: 0 }}
-                                        className="fixed inset-0 z-10"
-                                        onClick={() => setActiveDropdown(null)}
-                                      />
-                                      <motion.div
-                                        initial={{
-                                          opacity: 0,
-                                          scale: 0.95,
-                                          y: -10,
-                                        }}
-                                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                                        exit={{
-                                          opacity: 0,
-                                          scale: 0.95,
-                                          y: -10,
-                                        }}
-                                        className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-2xl border border-gray-200 py-2 z-20"
+                                      <button
+                                        onClick={() => handleStatusUpdate(req._id, "done")}
+                                        className="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-emerald-500/10 text-emerald-600 transition-colors"
                                       >
-                                        {request.donation_status ===
-                                          "inprogress" && (
-                                          <>
-                                            <button
-                                              onClick={() =>
-                                                handleStatusUpdate(
-                                                  request._id,
-                                                  "done"
-                                                )
-                                              }
-                                              className="w-full px-4 py-2 text-left hover:bg-green-50 transition-colors flex items-center gap-2 text-green-700 font-medium"
-                                            >
-                                              <CheckCircle size={16} />
-                                              Mark as Done
-                                            </button>
-                                            <button
-                                              onClick={() =>
-                                                handleStatusUpdate(
-                                                  request._id,
-                                                  "canceled"
-                                                )
-                                              }
-                                              className="w-full px-4 py-2 text-left hover:bg-red-50 transition-colors flex items-center gap-2 text-red-700 font-medium"
-                                            >
-                                              <XCircle size={16} />
-                                              Cancel
-                                            </button>
-                                            <div className="border-t border-gray-200 my-1"></div>
-                                          </>
-                                        )}
-                                        {request.donation_status ===
-                                          "pending" && (
-                                          <>
-                                            <button
-                                              onClick={() =>
-                                                handleEdit(request._id)
-                                              }
-                                              className="w-full px-4 py-2 text-left hover:bg-orange-50 transition-colors flex items-center gap-2 text-orange-700 font-medium"
-                                            >
-                                              <Edit size={16} />
-                                              Edit
-                                            </button>
-                                            <div className="border-t border-gray-200 my-1"></div>
-                                          </>
-                                        )}
-                                        <button
-                                          onClick={() =>
-                                            handleView(request._id)
-                                          }
-                                          className="w-full px-4 py-2 text-left hover:bg-blue-50 transition-colors flex items-center gap-2 text-blue-700 font-medium"
-                                        >
-                                          <Eye size={16} />
-                                          View Details
-                                        </button>
-                                        <div className="border-t border-gray-200 my-1"></div>
-                                        <button
-                                          onClick={() =>
-                                            handleDelete(request._id)
-                                          }
-                                          className="w-full px-4 py-2 text-left hover:bg-red-50 transition-colors flex items-center gap-2 text-red-700 font-medium"
-                                        >
-                                          <Trash2 size={16} />
-                                          Delete
-                                        </button>
-                                      </motion.div>
+                                        <CheckCircle size={14} />
+                                        <span>Mark as Done</span>
+                                      </button>
+                                      <button
+                                        onClick={() => handleStatusUpdate(req._id, "canceled")}
+                                        className="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-red-500/10 text-red-600 transition-colors"
+                                      >
+                                        <XCircle size={14} />
+                                        <span>Cancel Request</span>
+                                      </button>
+                                      <div className="h-px bg-[var(--border-light)] my-1" />
                                     </>
                                   )}
-                                </AnimatePresence>
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
 
-                {/* View All Requests Button */}
-                <div className="p-6 bg-gray-50 border-t border-gray-200">
-                  <Link to="/dashboard/my-requests">
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="w-full bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-700 hover:to-blue-700 text-white font-bold py-4 rounded-xl shadow-lg flex items-center justify-center gap-2 transition-all"
-                    >
-                      View My All Requests
-                      <ArrowRight size={20} />
-                    </motion.button>
-                  </Link>
-                </div>
-              </motion.div>
-            )}
+                                  <button
+                                    onClick={() => navigate(`/donation-details/${req._id}`)}
+                                    className="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-[var(--background-main)] text-[var(--text-primary)] transition-colors"
+                                  >
+                                    <Eye size={14} />
+                                    <span>View Details</span>
+                                  </button>
 
-            {/* Empty State */}
-            {!loading && myRecentRequests.length === 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-white rounded-2xl shadow-xl border border-gray-200 p-12 text-center"
-              >
-                <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <AlertCircle className="text-gray-400" size={40} />
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                  No Donation Requests Yet
-                </h3>
-                <p className="text-gray-600 mb-6">
-                  You haven't created any donation requests. Start saving lives
-                  today!
-                </p>
-                <Link to="/dashboard/add-request">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="bg-gradient-to-r from-red-600 to-blue-600 text-white font-bold px-8 py-3 rounded-xl shadow-lg"
-                  >
-                    Create Your First Request
-                  </motion.button>
-                </Link>
-              </motion.div>
-            )}
-          </>
-        )}
-      </div>
+                                  <button
+                                    onClick={() => handleDelete(req._id)}
+                                    className="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-red-500/10 text-red-600 transition-colors"
+                                  >
+                                    <Trash2 size={14} />
+                                    <span>Delete</span>
+                                  </button>
+                                </Motion.div>
+                              </>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
